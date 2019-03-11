@@ -42,4 +42,8 @@ void Game::UpdateModel()
 
 void Game::ComposeFrame()
 {
+	gfx.DrawLine({ 10, 10 }, { 50, 50 }, Colors::White);
+	gfx.DrawLine({ 10, 10 }, { 10, 50 }, Colors::White);
+	gfx.DrawLine({ 25, 10 }, { 40, 50 }, Colors::White);
+	gfx.DrawLine({ 50, 50 }, { 25, 10 }, Colors::White);
 }

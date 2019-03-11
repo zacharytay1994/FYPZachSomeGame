@@ -24,6 +24,7 @@
 #include <wrl.h>
 #include "ChiliException.h"
 #include "Colors.h"
+#include "Vec2.h"
 
 class Graphics
 {
@@ -57,6 +58,48 @@ public:
 		PutPixel( x,y,{ unsigned char( r ),unsigned char( g ),unsigned char( b ) } );
 	}
 	void PutPixel( int x,int y,Color c );
+	void DrawLine(Vecf2 point1, Vecf2 point2, Color c) {
+		float m;
+		// Calculate gradient rise/run
+		if (point1.x != point2.x) {
+			m = (point2.y - point1.y) / (point2.x - point1.x);
+			// Calculate y-intercept c = y - mx
+			const float intercept = point1.y - m * point1.x;
+			// Check if m is too steep, if so loop with y
+			if (m > abs(1)) {
+				// Swap make sure y1 < y0 {
+				if (point1.y > point2.y) {
+					std::swap(point1, point2);
+				}
+				for (float i = point1.y; i < point2.y; i++) {
+					const float x = (i - intercept) / m;
+					PutPixel((int)x, (int)i, c);
+				}
+			}
+			else {
+				// Making sure point1.x < point2.x for loop start-end
+				if (point1.x > point2.x) {
+					std::swap(point1, point2);
+				}
+				// Draw line
+				for (float i = point1.x; i < point2.x; i++) {
+					const float y = m * i + intercept;
+					PutPixel((int)i, (int)y, c);
+				}
+			}
+		}
+		else {
+			// Swap make sure y1 < y0 {
+			if (point1.y > point2.y) {
+				std::swap(point1, point2);
+			}
+			for (int i = point1.y; i < point2.y; i++) {
+				PutPixel(point1.x, i, c);
+			}
+		}
+		
+		
+	};
 	~Graphics();
 private:
 	Microsoft::WRL::ComPtr<IDXGISwapChain>				pSwapChain;

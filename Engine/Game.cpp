@@ -20,6 +20,8 @@
  ******************************************************************************************/
 #include "MainWindow.h"
 #include "Game.h"
+#include "Mat2.h"
+#include "NDCTransformer.h"
 
 Game::Game( MainWindow& wnd )
 	:
@@ -42,8 +44,14 @@ void Game::UpdateModel()
 
 void Game::ComposeFrame()
 {
-	gfx.DrawLine({ 10, 10 }, { 50, 50 }, Colors::White);
-	gfx.DrawLine({ 10, 10 }, { 10, 50 }, Colors::White);
-	gfx.DrawLine({ 25, 10 }, { 40, 50 }, Colors::White);
-	gfx.DrawLine({ 50, 50 }, { 25, 10 }, Colors::White);
+	NDCTransformer transformer;
+	Matf2 rotMat;
+	Vecf2 vec1(0.0, 0.0);
+	Vecf2 vec2(0.7, 0.5);
+	float test = (float)cos(3.14);
+	rotMat = rotMat.Rotation(3.14f);
+	vec2 *= rotMat;
+	transformer.Transform(vec1);
+	transformer.Transform(vec2);
+	gfx.DrawLine(vec1, vec2, Colors::White);
 }

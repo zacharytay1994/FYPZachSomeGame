@@ -93,8 +93,8 @@ public:
 			if (point1.y > point2.y) {
 				std::swap(point1, point2);
 			}
-			for (int i = point1.y; i < point2.y; i++) {
-				PutPixel(point1.x, i, c);
+			for (float i = point1.y; i < point2.y; i++) {
+				PutPixel((int)point1.x, (int)i, c);
 			}
 		}
 		

@@ -20,6 +20,8 @@
 ******************************************************************************************/
 #pragma once
 
+#include "MathStuff.h"
+
 template <typename T>
 class Vec2
 {

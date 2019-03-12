@@ -21,12 +21,12 @@
 #include "MainWindow.h"
 #include "Game.h"
 #include "Mat2.h"
-#include "NDCTransformer.h"
 
 Game::Game( MainWindow& wnd )
 	:
 	wnd( wnd ),
-	gfx( wnd )
+	gfx( wnd ),
+	cube( 0.5f )
 {
 }
 
@@ -44,14 +44,19 @@ void Game::UpdateModel()
 
 void Game::ComposeFrame()
 {
-	NDCTransformer transformer;
-	Matf2 rotMat;
-	Vecf2 vec1(0.0, 0.0);
-	Vecf2 vec2(0.7, 0.5);
-	float test = (float)cos(3.14);
-	rotMat = rotMat.Rotation(3.14f);
-	vec2 *= rotMat;
-	transformer.Transform(vec1);
-	transformer.Transform(vec2);
+	// Get cube lines
+	//IndexedLineList linelist = cube.GetLines();
+	//for (Vecf3& v : linelist.vertices) {
+	//	// translate 1.0 in the +z axis
+	//	v += {0.0f, 0.0f, 1.0f};
+	//	trans.Transform(v);
+	//}
+	//for (std::_Vector_const_iterator i = linelist.indices.cbegin(), end = linelist.indices.cend(); i != end; std::advance(i, 2)) {
+	//	gfx.DrawLine(linelist.vertices[*i], linelist.vertices[*std::next(i)], Colors::White);
+	//}
+	Vecf2 vec1({ 0.0f, 0.0f });
+	Vecf2 vec2({ 0.3f, 0.5f });
+	trans.Transform(vec1);
+	trans.Transform(vec2);
 	gfx.DrawLine(vec1, vec2, Colors::White);
 }

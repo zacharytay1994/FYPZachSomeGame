@@ -23,6 +23,8 @@
 #include "Keyboard.h"
 #include "Mouse.h"
 #include "Graphics.h"
+#include "NDCTransformer.h"
+#include "Cube.h"
 
 class Game
 {
@@ -43,4 +45,6 @@ private:
 	/********************************/
 	/*  User Variables              */
 	/********************************/
+	NDCTransformer trans;
+	Cube cube;
 };

@@ -150,6 +150,7 @@
     <ClInclude Include="Keyboard.h" />
     <ClInclude Include="MainWindow.h" />
     <ClInclude Include="Mat2.h" />
+    <ClInclude Include="Mat3.h" />
     <ClInclude Include="MathStuff.h" />
     <ClInclude Include="Mouse.h" />
     <ClInclude Include="NDCTransformer.h" />

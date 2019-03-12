@@ -66,7 +66,7 @@ public:
 			// Calculate y-intercept c = y - mx
 			const float intercept = point1.y - m * point1.x;
 			// Check if m is too steep, if so loop with y
-			if (m > abs(1)) {
+			if (abs(m) > 1) {
 				// Swap make sure y1 < y0 {
 				if (point1.y > point2.y) {
 					std::swap(point1, point2);
@@ -89,7 +89,7 @@ public:
 			}
 		}
 		else {
-			// Swap make sure y1 < y0 {
+			// Swap make sure y1 < y2 {
 			if (point1.y > point2.y) {
 				std::swap(point1, point2);
 			}

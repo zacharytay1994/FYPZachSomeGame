@@ -240,6 +240,76 @@ Graphics::Graphics( HWNDKey& key )
 		_aligned_malloc( sizeof( Color ) * Graphics::ScreenWidth * Graphics::ScreenHeight,16u ) );
 }
 
+void Graphics::DrawTriangle(const Vecf3 & p1, const Vecf3 & p2, const Vecf3 & p3, Color c)
+{
+	// Don't want the values to change but we want to swap them, so pointers
+	const Vecf3* v0 = &p1;
+	const Vecf3* v1 = &p2;
+	const Vecf3* v2 = &p3;
+
+	// Ensure vertices are in order
+	if (v0->y > v1->y) {
+		std::swap(v0, v1);
+	}
+	if (v1->y > v2->y) {
+		std::swap(v1, v2);
+	}
+	if (v0->y > v1->y) {
+		std::swap(v0, v1);
+	}
+	/*if (v1->y < v0->y) std::swap(v0, v1);
+	if (v2->y < v1->y) std::swap(v1, v2);
+	if (v1->y < v0->y) std::swap(v0, v1);*/
+
+	// Check if triangle is flat top/bottom
+	if (v0->y == v1->y) {
+		// Flattop
+		// Sorting x to draw left to right
+		if (v0->x > v1->x) {
+			std::swap(v0, v1);
+			DrawFlatTopTriangle(*v0, *v1, *v2, c);
+		}
+	}
+	else if (v1->y == v2->y) {
+		// Flatbottom
+		if (v1->x > v2->x) {
+			std::swap(v1, v2);
+			DrawFlatBottomTriangle(*v0, *v1, *v2, c);
+		}
+	}
+	else {
+		// Split
+		const float alpha = (v1->y - v0->y)/(v2->y - v0->y);
+		const Vecf2 v3(v0->x + (v2->x - v0->x) * alpha, v1->y);
+
+		if (v1->x < v3.x) {
+			// Major right
+			DrawFlatBottomTriangle(*v0, *v1, v3, c);
+			DrawFlatTopTriangle(*v1, v3, *v2, c);
+		}
+		else {
+			// Major left
+			DrawFlatBottomTriangle(*v0, v3, *v1, c);
+			DrawFlatTopTriangle(v3, *v1, *v2, c);
+		}
+		const float alphaSplit =
+			(v1->y - v0->y) /
+			(v2->y - v0->y);
+		const Vecf2 vi = *v0 + (*v2 - *v0) * alphaSplit;
+
+		//if (v1->x < vi.x) // major right
+		//{
+		//	DrawFlatBottomTriangle(*v0, *v1, vi, c);
+		//	DrawFlatTopTriangle(*v1, vi, *v2, c);
+		//}
+		//else // major left
+		//{
+		//	DrawFlatBottomTriangle(*v0, vi, *v1, c);
+		//	DrawFlatTopTriangle(vi, *v1, *v2, c);
+		//}
+	}
+}
+
 Graphics::~Graphics()
 {
 	// free sysbuffer memory (aligned free)
@@ -250,6 +320,56 @@ Graphics::~Graphics()
 	}
 	// clear the state of the device context before destruction
 	if( pImmediateContext ) pImmediateContext->ClearState();
+}
+
+void Graphics::DrawFlatTopTriangle(const Vecf2 & v0, const Vecf2 & v1, const Vecf2 & v2, Color c)
+{
+	// Calculate gradients run/rise since triangles can have x-x = 0 but not y-y for slopes
+	float m0 = (v2.x - v0.x) / (v2.y - v0.y);
+	float m1 = (v2.x - v1.x) / (v2.y - v1.y);
+
+	// Calculate the start and end of scanlines, LINES not the pixels
+	const int yStart = (int)ceilf(v0.y - 0.5f);
+	const int yEnd = (int)ceilf(v2.y - 0.5f);
+
+	for (int y = yStart; y < yEnd; y++) {
+		// Calculate xStart xEnd
+		const float x0 = m0 * (float(y) + 0.5f - v0.y) + v0.x;
+		const float x1 = m1 * (float(y) + 0.5f - v1.y) + v1.x;
+
+		// calculate start and end pixels for left rast rule
+		const int xStart = (int)ceilf(x0 - 0.5f);
+		const int xEnd = (int)ceilf(x1 - 0.5f);
+
+		for (int x = xStart; x < xEnd; x++) {
+			PutPixel(x, y, c);
+		}
+	}
+}
+
+void Graphics::DrawFlatBottomTriangle(const Vecf2 & v0, const Vecf2 & v1, const Vecf2 & v2, Color c)
+{
+	// Calculate gradients run/rise since triangles can have x-x = 0 but not y-y for slopes
+	float m0 = (v1.x - v0.x) / (v1.y - v0.y);
+	float m1 = (v2.x - v0.x) / (v2.y - v0.y);
+
+	// Calculate the start and end of scanlines, LINES not the pixels
+	const int yStart = (int)ceil(v0.y - 0.5f);
+	const int yEnd = (int)ceil(v1.y - 0.5f);
+
+	for (int y = yStart; y < yEnd; y++) {
+		// Calculate xStart xEnd
+		const float x0 = m0 * (float(y) + 0.5f - v0.y) + v0.x;
+		const float x1 = m1 * (float(y) + 0.5f - v0.y) + v0.x;
+
+		// calculate start and end pixels for left rast rule
+		const int xStart = (int)ceilf(x0 - 0.5f);
+		const int xEnd = (int)ceilf(x1 - 0.5f);
+
+		for (int x = xStart; x < xEnd; x++) {
+			PutPixel(x, y, c);
+		}
+	}
 }
 
 void Graphics::EndFrame()

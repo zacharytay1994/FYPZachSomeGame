@@ -51,4 +51,5 @@ private:
 	float theta_x = 0.0f;
 	float theta_y = 0.0f;
 	float theta_z = 0.0f;
+	float zVal = 2.0f;
 };

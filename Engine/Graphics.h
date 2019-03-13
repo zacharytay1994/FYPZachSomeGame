@@ -25,6 +25,7 @@
 #include "ChiliException.h"
 #include "Colors.h"
 #include "Vec2.h"
+#include "Vec3.h"
 
 class Graphics
 {
@@ -100,7 +101,11 @@ public:
 		
 		
 	};
+	void DrawTriangle(const Vecf3& p1, const Vecf3& p2, const Vecf3& p3, Color c);
 	~Graphics();
+private:
+	void DrawFlatTopTriangle(const Vecf2& v0, const Vecf2& v1, const Vecf2& v2, Color c);
+	void DrawFlatBottomTriangle(const Vecf2& v0, const Vecf2& v1, const Vecf2& v2, Color c);
 private:
 	Microsoft::WRL::ComPtr<IDXGISwapChain>				pSwapChain;
 	Microsoft::WRL::ComPtr<ID3D11Device>				pDevice;

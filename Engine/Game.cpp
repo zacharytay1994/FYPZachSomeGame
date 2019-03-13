@@ -27,7 +27,7 @@ Game::Game( MainWindow& wnd )
 	:
 	wnd( wnd ),
 	gfx( wnd ),
-	cube( 0.5f )
+	cube( 1.0f )
 {
 }
 
@@ -66,26 +66,40 @@ void Game::UpdateModel()
 	{
 		theta_z -= dTheta * dt;
 	}
+	if (wnd.kbd.KeyIsPressed('O')) {
+		zVal += 1.0 * dt;
+	}
+	if (wnd.kbd.KeyIsPressed('P')) {
+		zVal -= 1.0 * dt;
+	}
 }
 
 void Game::ComposeFrame()
 {
+	// Array of colors
+	const Color colors[12] = {
+		Colors::White, Colors::Blue, Colors::Cyan, Colors::Gray, Colors::Green, Colors::Magenta, Colors::LightGray, 
+		Colors::Red, Colors::Yellow, Colors::White, Colors::Blue, Colors::Cyan
+	};
 	// Get cube lines
+	IndexedTriangleList trianglelist = cube.GetTriangles();
 	IndexedLineList linelist = cube.GetLines();
 	// Build rotation matrix
 	const Matf3 rot =
 		Matf3::RotationZ(theta_z) *
 		Matf3::RotationX(theta_x) *
 		Matf3::RotationY(theta_y);
-	for (Vecf3& v : linelist.vertices) {
+	for (Vecf3& v : trianglelist.vertices) {
 		// Rotate transform
 		v *= rot;
 		// Translate 1.0 in the +z axis
-		v += {0.0f, 0.0f, 1.0f};
+		v += {0.0f, 0.0f, zVal};
 		trans.Transform(v);
 	}
-	for (std::_Vector_const_iterator i = linelist.indices.cbegin(), end = linelist.indices.cend(); i != end; std::advance(i, 2)) {
-		gfx.DrawLine(linelist.vertices[*i], linelist.vertices[*std::next(i)], Colors::White);
+	for (std::_Vector_const_iterator i = trianglelist.indices.cbegin(), end = trianglelist.indices.cend(); i != end; std::advance(i, 3)) {
+		gfx.DrawTriangle(trianglelist.vertices[*i], trianglelist.vertices[*std::next(i)], trianglelist.vertices[*std::next(i, 2)], 
+			colors[std::distance(trianglelist.indices.cbegin(),i)/3]);
+		//gfx.DrawLine(linelist.vertices[*i], linelist.vertices[*std::next(i)], Colors::White);
 	}
 
 	// Draw Line

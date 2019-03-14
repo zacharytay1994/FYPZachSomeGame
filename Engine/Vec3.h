@@ -89,6 +89,13 @@ public:
 	{
 		return Vec3(*this) *= rhs;
 	}
+	float operator*(const Vec3& rhs) const {
+		float result = x * rhs.x + y * rhs.y + z * rhs.z;
+		return result;
+	}
+	Vec3 operator%(const Vec3& rhs) const {
+		return { y*rhs.z - z * rhs.y, z*rhs.x - x * rhs.z, x*rhs.y - y * rhs.x };
+	}
 	Vec3&	operator/=(const T &rhs)
 	{
 		x /= rhs;

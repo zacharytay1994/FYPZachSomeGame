@@ -89,18 +89,37 @@ void Game::ComposeFrame()
 		Matf3::RotationZ(theta_z) *
 		Matf3::RotationX(theta_x) *
 		Matf3::RotationY(theta_y);
+	// Model space to world space
 	for (Vecf3& v : trianglelist.vertices) {
 		// Rotate transform
 		v *= rot;
 		// Translate 1.0 in the +z axis
 		v += {0.0f, 0.0f, zVal};
+	}
+	// Cull triangles
+	for (size_t i = 0, end = trianglelist.indices.size() / 3; i < end; i++) {
+		const Vecf3& v0 = trianglelist.vertices[trianglelist.indices[i * 3]];
+		const Vecf3& v1 = trianglelist.vertices[trianglelist.indices[i * 3 + 1]];
+		const Vecf3& v2 = trianglelist.vertices[trianglelist.indices[i * 3 + 2]];
+		float test2 = v1 * v0;
+		float test = (v1 - v0) % (v2 - v0) * v0;
+		trianglelist.cullFlags[i] = test >= 0.0f;
+	}
+	// World space to screen space
+	for (Vecf3& v : trianglelist.vertices) {
 		trans.Transform(v);
 	}
-	for (std::_Vector_const_iterator i = trianglelist.indices.cbegin(), end = trianglelist.indices.cend(); i != end; std::advance(i, 3)) {
-		gfx.DrawTriangle(trianglelist.vertices[*i], trianglelist.vertices[*std::next(i)], trianglelist.vertices[*std::next(i, 2)], 
-			colors[std::distance(trianglelist.indices.cbegin(),i)/3]);
-		//gfx.DrawLine(linelist.vertices[*i], linelist.vertices[*std::next(i)], Colors::White);
+	for (size_t i = 0, end = trianglelist.indices.size() / 3; i < end; i++) {
+		if (!trianglelist.cullFlags[i]) {
+			gfx.DrawTriangle(trianglelist.vertices[trianglelist.indices[i * 3]], trianglelist.vertices[trianglelist.indices[i * 3 + 1]],
+				trianglelist.vertices[trianglelist.indices[i * 3 + 2]], colors[i]);
+		}
 	}
+	//for (std::_Vector_const_iterator i = trianglelist.indices.cbegin(), end = trianglelist.indices.cend(); i != end; std::advance(i, 3)) {
+	//	gfx.DrawTriangle(trianglelist.vertices[*i], trianglelist.vertices[*std::next(i)], trianglelist.vertices[*std::next(i, 2)], 
+	//		colors[std::distance(trianglelist.indices.cbegin(),i)/3]);
+	//	//gfx.DrawLine(linelist.vertices[*i], linelist.vertices[*std::next(i)], Colors::White);
+	//}
 
 	// Draw Line
 	/*Matf2 rot = Matf2::Rotation(theta_z);

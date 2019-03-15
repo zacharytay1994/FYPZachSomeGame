@@ -26,6 +26,7 @@
 #include "Colors.h"
 #include "Vec2.h"
 #include "Vec3.h"
+#include "Surface.h"
 
 class Graphics
 {
@@ -59,6 +60,7 @@ public:
 		PutPixel( x,y,{ unsigned char( r ),unsigned char( g ),unsigned char( b ) } );
 	}
 	void PutPixel( int x,int y,Color c );
+	void DrawSprite(int x, int y, Surface surf);
 	void DrawLine(Vecf2 point1, Vecf2 point2, Color c) {
 		float m;
 		// Calculate gradient rise/run

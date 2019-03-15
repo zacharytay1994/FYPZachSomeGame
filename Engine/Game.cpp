@@ -29,6 +29,11 @@ Game::Game( MainWindow& wnd )
 	gfx( wnd ),
 	cube( 1.0f )
 {
+	for (int i = 0; i < surf.GetHeight(); i++) {
+		for (int j = 0; j < surf.GetWidth(); j++) {
+			surf.PutPixel(j, i, Colors::Red);
+		}
+	}
 }
 
 void Game::Go()
@@ -115,6 +120,7 @@ void Game::ComposeFrame()
 				trianglelist.vertices[trianglelist.indices[i * 3 + 2]], colors[i]);
 		}
 	}
+	gfx.DrawSprite(100, 100, surf);
 	//for (std::_Vector_const_iterator i = trianglelist.indices.cbegin(), end = trianglelist.indices.cend(); i != end; std::advance(i, 3)) {
 	//	gfx.DrawTriangle(trianglelist.vertices[*i], trianglelist.vertices[*std::next(i)], trianglelist.vertices[*std::next(i, 2)], 
 	//		colors[std::distance(trianglelist.indices.cbegin(),i)/3]);

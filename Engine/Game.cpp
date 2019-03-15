@@ -121,6 +121,7 @@ void Game::ComposeFrame()
 		}
 	}
 	gfx.DrawSprite(100, 100, surf);
+	gfx.DrawSprite(200, 200, texSurf);
 	//for (std::_Vector_const_iterator i = trianglelist.indices.cbegin(), end = trianglelist.indices.cend(); i != end; std::advance(i, 3)) {
 	//	gfx.DrawTriangle(trianglelist.vertices[*i], trianglelist.vertices[*std::next(i)], trianglelist.vertices[*std::next(i, 2)], 
 	//		colors[std::distance(trianglelist.indices.cbegin(),i)/3]);

@@ -49,6 +49,7 @@ private:
 	NDCTransformer trans;
 	Cube cube;
 	Surface surf = Surface(300, 100);
+	Surface texSurf = Surface("test.bmp");
 	static constexpr float dTheta = PI;
 	float theta_x = 0.0f;
 	float theta_y = 0.0f;

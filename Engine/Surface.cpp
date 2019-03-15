@@ -1,5 +1,7 @@
 #include "Surface.h"
+#include "ChiliWin.h"
 #include <assert.h>
+#include <fstream>
 
 Surface::Surface(int width, int height)
 	:
@@ -7,6 +9,42 @@ Surface::Surface(int width, int height)
 	height(height),
 	nPixels(new Color[width*height])
 {
+}
+
+Surface::Surface(const std::string & filename)
+{
+	// Open file
+	std::ifstream file(filename, std::ios::binary);
+	// Bitmap file header struct
+	BITMAPFILEHEADER bitmapfileheader;
+	// Bitmap info header struct
+	BITMAPINFOHEADER bitmapinfoheader;
+
+	// Read file into bitmapfileheader
+	file.read(reinterpret_cast<char*>(&bitmapfileheader), sizeof(bitmapfileheader));
+
+	file.read(reinterpret_cast<char*>(&bitmapinfoheader), sizeof(bitmapinfoheader));
+
+	assert(bitmapinfoheader.biBitCount == 24);
+	assert(bitmapinfoheader.biCompression == BI_RGB);
+
+	width = bitmapinfoheader.biWidth;
+	height = bitmapinfoheader.biHeight;
+
+	nPixels = new Color[width*height];
+	// finding padding size
+	const int padding = (4 - ((width * 3) % 4)) % 4;
+	// seeking to start of texture
+	file.seekg(bitmapfileheader.bfOffBits);
+	// flipping the image because bitmap stores it upside down
+	for (int y = height-1; y >= 0; y--) {
+		for (int x = 0; x < width; x++) {
+			//nPixels[y*width + x] = file.get() << file.get() << file.get();
+			PutPixel(x, y, Color(file.get(), file.get(), file.get()));
+		}
+		file.seekg(padding, std::ios::cur);
+	}
+
 }
 
 Surface::Surface(const Surface & rhs)

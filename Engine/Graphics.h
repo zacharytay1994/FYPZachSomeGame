@@ -27,6 +27,7 @@
 #include "Vec2.h"
 #include "Vec3.h"
 #include "Surface.h"
+#include "TextureVertex.h"
 
 class Graphics
 {
@@ -104,10 +105,13 @@ public:
 		
 	};
 	void DrawTriangle(const Vecf3& p1, const Vecf3& p2, const Vecf3& p3, Color c);
+	void DrawTriangleTex(const TextureVertex& v0, const TextureVertex& v1, const TextureVertex& v2, Surface& tex);
 	~Graphics();
 private:
 	void DrawFlatTopTriangle(const Vecf2& v0, const Vecf2& v1, const Vecf2& v2, Color c);
 	void DrawFlatBottomTriangle(const Vecf2& v0, const Vecf2& v1, const Vecf2& v2, Color c);
+	void DrawFlatTopTriangleTex(const TextureVertex& v0, const TextureVertex& v1, const TextureVertex& v2, Surface& tex);
+	void DrawFlatBottomTriangleTex(const TextureVertex& v0, const TextureVertex& v1, const TextureVertex& v2, Surface& tex);
 private:
 	Microsoft::WRL::ComPtr<IDXGISwapChain>				pSwapChain;
 	Microsoft::WRL::ComPtr<ID3D11Device>				pDevice;

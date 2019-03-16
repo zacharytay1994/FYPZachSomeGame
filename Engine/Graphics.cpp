@@ -310,6 +310,51 @@ void Graphics::DrawTriangle(const Vecf3 & p1, const Vecf3 & p2, const Vecf3 & p3
 	}
 }
 
+void Graphics::DrawTriangleTex(const TextureVertex & v0, const TextureVertex & v1, const TextureVertex & v2, Surface & tex)
+{
+	// create pointers
+	const TextureVertex* pv0 = &v0;
+	const TextureVertex* pv1 = &v1;
+	const TextureVertex* pv2 = &v2;
+
+	// sort
+	if (pv0->pos.y > pv1->pos.y) { std::swap(pv0, pv1); }
+	if (pv1->pos.y > pv2->pos.y) { std::swap(pv1, pv2); }
+	if (pv0->pos.y > pv1->pos.y) { std::swap(pv0, pv1); }
+
+	// if flattop
+	if (pv0->pos.y == pv1->pos.y) {
+		//draw flat top
+		if (pv0->pos.x > pv1->pos.x) {
+			std::swap(pv0, pv1);
+		}
+		DrawFlatTopTriangleTex(*pv0, *pv1, *pv2, tex);
+	}
+	else if (pv1->pos.y == pv2->pos.y) { // if flat bottom
+		// draw flat bottom
+		if (pv1->pos.x > pv2->pos.x) {
+			std::swap(pv1, pv2);
+		}
+		DrawFlatBottomTriangleTex(*pv0, *pv1, *pv2, tex);
+	}
+	else {
+		// split
+		// return splitting vertex
+		const TextureVertex pv3 = pv0->InterpolateTo(*pv2, pv1->pos.y - pv0->pos.y);
+		// determine major left/right
+		if (pv1->pos.x > pv3.pos.x) {
+			// major left
+			DrawFlatTopTriangleTex(pv3, *pv1, *pv2, tex);
+			DrawFlatBottomTriangleTex(*pv0, pv3, *pv1, tex);
+		}
+		else {
+			// major right
+			DrawFlatTopTriangleTex(*pv1, pv3, *pv2, tex);
+			DrawFlatBottomTriangleTex(*pv0, *pv1, pv3, tex);
+		}
+	}
+}
+
 Graphics::~Graphics()
 {
 	// free sysbuffer memory (aligned free)
@@ -368,6 +413,148 @@ void Graphics::DrawFlatBottomTriangle(const Vecf2 & v0, const Vecf2 & v1, const 
 
 		for (int x = xStart; x < xEnd; x++) {
 			PutPixel(x, y, c);
+		}
+	}
+}
+
+void Graphics::DrawFlatTopTriangleTex(const TextureVertex & v0, const TextureVertex & v1, const TextureVertex & v2, Surface & tex)
+{
+	//// calculate change of various coords per unit y
+	//const TextureVertex unitChangeLeft = (v2 - v0) / (v2.pos.y - v0.pos.y);
+	//const TextureVertex unitChangeRight = (v2 - v1) / (v2.pos.y - v0.pos.y);
+	//// calculate xystart
+	//const int ystart = (int)ceil(v0.pos.y - 0.5);
+	//const int yend = (int)ceil(v2.pos.y - 0.5);
+
+	//// interpolant
+	//TextureVertex itEdge0 = v0;
+	//TextureVertex itEdge1 = v1;
+
+	//// interpolant prestep
+	//itEdge0 += unitChangeLeft * ((float)ystart + 0.5f - v1.pos.y);
+	//itEdge1 += unitChangeRight * ((float)ystart + 0.5f - v1.pos.y);
+
+	//// init tex width/height and clamp values
+	//const float tex_width = float(tex.GetWidth());
+	//const float tex_height = float(tex.GetHeight());
+	//const float tex_clamp_x = tex_width - 1.0f;
+	//const float tex_clamp_y = tex_height - 1.0f;
+
+	//for (int y = ystart; y < yend; y++, itEdge0+=unitChangeLeft, itEdge1+=unitChangeRight) {
+	//	const int xstart = (int)ceil(itEdge0.pos.x - 0.5f);
+	//	const int xend = (int)ceil(itEdge1.pos.x - 0.5f);
+	//	const Vecf2 unitChangeX = (itEdge1.texpos - itEdge0.texpos) / (itEdge1.pos.x - itEdge0.pos.x);
+	//	// prestep
+	//	Vecf2 TexCoord = itEdge0.texpos + (unitChangeX * (float(xstart) + 0.5f - itEdge0.pos.x));
+	//	for (int x = xstart; x < xend; x++, TexCoord += unitChangeX) {
+	//		PutPixel(x, y, tex.GetPixel(
+	//			int(std::min(TexCoord.x * tex_width, tex_clamp_x)),
+	//			int(std::min(TexCoord.y * tex_height, tex_clamp_y))));
+	//	}
+	//}
+
+	// get the rate of changes
+	const TextureVertex changeRight = (v2 - v1) / (v2.pos.y - v1.pos.y);
+	const TextureVertex changeLeft = (v2 - v0) / (v2.pos.y - v0.pos.y);
+
+	// create interpolants
+	TextureVertex changeRightInterpolant = v1;
+	TextureVertex changeLeftInterpolant = v0;
+
+	// get y start and end
+	int yStart = (int)ceil(v0.pos.y - 0.5f);
+	int yEnd = (int)ceil(v2.pos.y - 0.5f);
+
+	// get prestep
+	float prestep = ((float)yStart + 0.5f) - v0.pos.y;
+
+	// prestep interpolants
+	changeRightInterpolant += changeRight * prestep;
+	changeLeftInterpolant += changeLeft * prestep;
+
+	// get texture information
+	const float tex_width = float(tex.GetWidth());
+	const float tex_height = float(tex.GetHeight());
+	const float tex_clamp_x = tex_width - 1.0f;
+	const float tex_clamp_y = tex_height - 1.0f;
+
+	// loop for y
+	for (int y = yStart; y < yEnd; y++, changeRightInterpolant += changeRight, changeLeftInterpolant += changeLeft) {
+		// get x start and end
+		int xStart = (int)ceil(changeLeftInterpolant.pos.x - 0.5f);
+		int xEnd = (int)ceil(changeRightInterpolant.pos.x - 0.5f);
+
+		// create dxtex/dxscreen
+		const Vecf2 changeInX = (changeRightInterpolant.texpos - changeLeftInterpolant.texpos) / (changeRightInterpolant.pos.x - changeLeftInterpolant.pos.x);
+
+		// create interpolant x
+		Vecf2 interpolantX = changeLeftInterpolant.texpos;
+
+		// get prestep
+		float xPrestep = ((float)xStart + 0.5f) - changeLeftInterpolant.pos.x;
+
+		// pre step interpolant
+		interpolantX += changeInX * xPrestep;
+
+		// loop for x
+		for (int x = xStart; x < xEnd; x++, interpolantX += changeInX) {
+			PutPixel(x, y, tex.GetPixel(
+				(int)std::min(interpolantX.x * tex_width, tex_clamp_x),
+				(int)std::min(interpolantX.y * tex_height, tex_clamp_y)));
+		}
+	}
+}
+
+void Graphics::DrawFlatBottomTriangleTex(const TextureVertex & v0, const TextureVertex & v1, const TextureVertex & v2, Surface & tex)
+{
+	// get the rate of changes
+	const TextureVertex changeRight = (v2 - v0) / (v2.pos.y - v0.pos.y);
+	const TextureVertex changeLeft = (v1 - v0) / (v1.pos.y - v0.pos.y);
+
+	// create interpolants
+	TextureVertex changeRightInterpolant = v0;
+	TextureVertex changeLeftInterpolant = v0;
+
+	// get y start and end
+	int yStart = (int)ceil(v0.pos.y - 0.5f);
+	int yEnd = (int)ceil(v1.pos.y - 0.5f);
+
+	// get prestep
+	float prestep = ((float)yStart + 0.5f) - v0.pos.y;
+
+	// prestep interpolants
+	changeRightInterpolant += changeRight * prestep;
+	changeLeftInterpolant += changeLeft * prestep;
+
+	// get texture information
+	const float tex_width = float(tex.GetWidth());
+	const float tex_height = float(tex.GetHeight());
+	const float tex_clamp_x = tex_width - 1.0f;
+	const float tex_clamp_y = tex_height - 1.0f;
+
+	// loop for y
+	for (int y = yStart; y < yEnd; y++, changeRightInterpolant += changeRight, changeLeftInterpolant += changeLeft) {
+		// get x start and end
+		int xStart = (int)ceil(changeLeftInterpolant.pos.x - 0.5f);
+		int xEnd = (int)ceil(changeRightInterpolant.pos.x - 0.5f);
+
+		// create dxtex/dxscreen
+		const Vecf2 changeInX = (changeRightInterpolant.texpos - changeLeftInterpolant.texpos) / (changeRightInterpolant.pos.x - changeLeftInterpolant.pos.x);
+		
+		// create interpolant x
+		Vecf2 interpolantX = changeLeftInterpolant.texpos;
+
+		// get prestep
+		float xPrestep = ((float)xStart + 0.5f) - changeLeftInterpolant.pos.x;
+
+		// pre step interpolant
+		interpolantX += changeInX * xPrestep;
+
+		// loop for x
+		for (int x = xStart; x < xEnd; x++, interpolantX += changeInX) {
+			PutPixel(x, y, tex.GetPixel(
+				(int)std::min(interpolantX.x * tex_width, tex_clamp_x),
+				(int)std::min(interpolantX.y * tex_height, tex_clamp_y)));
 		}
 	}
 }

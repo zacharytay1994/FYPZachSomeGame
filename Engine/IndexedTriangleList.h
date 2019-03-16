@@ -2,6 +2,7 @@
 
 #include <vector>
 #include "Vec3.h"
+#include "TextureVertex.h"
 #include <assert.h>
 
 struct IndexedTriangleList {
@@ -14,7 +15,17 @@ struct IndexedTriangleList {
 		assert(indices.size() % 3 == 0);
 		cullFlags.resize(indices.size() / 3, false);
 	}
+	IndexedTriangleList(std::vector<TextureVertex> verts_in, std::vector<size_t> indices_in)
+		:
+		texVertices(std::move(verts_in)),
+		indices(std::move(indices_in))
+	{
+		//assert(verts_in.size() > 2);
+		assert(indices.size() % 3 == 0);
+		cullFlags.resize(indices.size() / 3, false);
+	}
 	std::vector<Vecf3> vertices;
+	std::vector<TextureVertex> texVertices;
 	std::vector<size_t> indices;
 	std::vector<bool> cullFlags;
 };

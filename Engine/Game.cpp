@@ -22,19 +22,24 @@
 #include "Game.h"
 #include "Mat2.h"
 #include "Mat3.h"
+#include "Pipeline.h"
 
 Game::Game( MainWindow& wnd )
 	:
 	wnd( wnd ),
 	gfx( wnd ),
 	cube( 1.0f ),
-	texCube(1.0f)
+	pipeline(gfx),
+	testList(TexCube::GetWrap<Pipeline::Vertex>())
 {
-	for (int i = 0; i < surf.GetHeight(); i++) {
+	// bind texture to pipeline
+	pipeline.BindTexture("test.bmp");
+
+	/*for (int i = 0; i < surf.GetHeight(); i++) {
 		for (int j = 0; j < surf.GetWidth(); j++) {
 			surf.PutPixel(j, i, Colors::Red);
 		}
-	}
+	}*/
 }
 
 void Game::Go()
@@ -82,47 +87,61 @@ void Game::UpdateModel()
 
 void Game::ComposeFrame()
 {
-	// Get tex cube line
-	IndexedTriangleList triangleList = texCube.getTriangleList();
+	// bind transforms
 	const Matf3 rot =
 		Matf3::RotationZ(theta_z) *
 		Matf3::RotationX(theta_x) *
 		Matf3::RotationY(theta_y);
-	// Model space to world space
-	for (TextureVertex& v : triangleList.texVertices) {
-		// Rotate transform
-		v.pos *= rot;
-		// Translate 1.0 in the +z axis
-		v.pos += Vecf3{0.0f, 0.0f, zVal};
-	}
-	// Cull triangles
-	for (size_t i = 0, end = triangleList.indices.size() / 3; i < end; i++) {
-		const Vecf3& v0 = triangleList.texVertices[triangleList.indices[i * 3]].pos;
-		const Vecf3& v1 = triangleList.texVertices[triangleList.indices[i * 3 + 1]].pos;
-		const Vecf3& v2 = triangleList.texVertices[triangleList.indices[i * 3 + 2]].pos;
-		//float test2 = v1 * v0;
-		float test = (v1 - v0) % (v2 - v0) * v0;
-		triangleList.cullFlags[i] = test >= 0.0f;
-	}
-	// World space to screen space
-	for (TextureVertex& v : triangleList.texVertices) {
-		trans.Transform(v.pos);
-	}
-	for (size_t i = 0, end = triangleList.indices.size() / 3; i < end; i++) {
-		if (!triangleList.cullFlags[i]) {
-			gfx.DrawTriangleTex(
-				triangleList.texVertices[triangleList.indices[i * 3]],
-				triangleList.texVertices[triangleList.indices[i * 3 + 1]],
-				triangleList.texVertices[triangleList.indices[i * 3 + 2]],
-				texSurf
-			);
-		}
-	}
+	pipeline.BindRotation(rot);
+	const Vecf3 translate = { 0.0f, 0.0f, zVal };
+	pipeline.BindTranslation(translate);
+
+	// draw thingsss
+	pipeline.Draw(testList);
+
+	//--------------------------------------------------------------------------------------------------
+
+	//// Get tex cube line
+	//IndexedTriangleList triangleList = texCube.getTriangleList();
+	//const Matf3 rot =
+	//	Matf3::RotationZ(theta_z) *
+	//	Matf3::RotationX(theta_x) *
+	//	Matf3::RotationY(theta_y);
+	//// Model space to world space
+	//for (TextureVertex& v : triangleList.texVertices) {
+	//	// Rotate transform
+	//	v.pos *= rot;
+	//	// Translate 1.0 in the +z axis
+	//	v.pos += Vecf3{0.0f, 0.0f, zVal};
+	//}
+	//// Cull triangles
+	//for (size_t i = 0, end = triangleList.indices.size() / 3; i < end; i++) {
+	//	const Vecf3& v0 = triangleList.texVertices[triangleList.indices[i * 3]].pos;
+	//	const Vecf3& v1 = triangleList.texVertices[triangleList.indices[i * 3 + 1]].pos;
+	//	const Vecf3& v2 = triangleList.texVertices[triangleList.indices[i * 3 + 2]].pos;
+	//	//float test2 = v1 * v0;
+	//	float test = (v1 - v0) % (v2 - v0) * v0;
+	//	triangleList.cullFlags[i] = test >= 0.0f;
+	//}
+	//// World space to screen space
+	//for (TextureVertex& v : triangleList.texVertices) {
+	//	trans.Transform(v.pos);
+	//}
+	//for (size_t i = 0, end = triangleList.indices.size() / 3; i < end; i++) {
+	//	if (!triangleList.cullFlags[i]) {
+	//		gfx.DrawTriangleTex(
+	//			triangleList.texVertices[triangleList.indices[i * 3]],
+	//			triangleList.texVertices[triangleList.indices[i * 3 + 1]],
+	//			triangleList.texVertices[triangleList.indices[i * 3 + 2]],
+	//			texSurf
+	//		);
+	//	}
+	//}
 	//--------------------------------------------------------------------------------------------------
 
 	/*gfx.DrawTriangleTex(tvec1, tvec2, tvec3, texSurf);
-	gfx.DrawTriangleTex(tvec1, tvec21, tvec31, texSurf);*/
-	//gfx.DrawSprite(300, 300, texSurf);
+	gfx.DrawTriangleTex(tvec1, tvec21, tvec31, texSurf);
+	gfx.DrawSprite(300, 300, texSurf);*/
 	
 	//--------------------------------------------------------------------------------------------------
 

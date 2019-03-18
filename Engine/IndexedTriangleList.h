@@ -2,30 +2,18 @@
 
 #include <vector>
 #include "Vec3.h"
-#include "TextureVertex.h"
 #include <assert.h>
 
+template <class T>
 struct IndexedTriangleList {
-	IndexedTriangleList(std::vector<Vecf3> verts_in, std::vector<size_t> indices_in) 
+	IndexedTriangleList(std::vector<T> verts_in, std::vector<size_t> indices_in) 
 		:
 		vertices(std::move(verts_in)),
 		indices(std::move(indices_in))
 	{
-		//assert(verts_in.size() > 2);
+		assert(vertices.size() > 2);
 		assert(indices.size() % 3 == 0);
-		cullFlags.resize(indices.size() / 3, false);
 	}
-	IndexedTriangleList(std::vector<TextureVertex> verts_in, std::vector<size_t> indices_in)
-		:
-		texVertices(std::move(verts_in)),
-		indices(std::move(indices_in))
-	{
-		//assert(verts_in.size() > 2);
-		assert(indices.size() % 3 == 0);
-		cullFlags.resize(indices.size() / 3, false);
-	}
-	std::vector<Vecf3> vertices;
-	std::vector<TextureVertex> texVertices;
+	std::vector<T> vertices;
 	std::vector<size_t> indices;
-	std::vector<bool> cullFlags;
 };

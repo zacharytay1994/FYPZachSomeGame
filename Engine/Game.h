@@ -28,6 +28,7 @@
 #include "TexCube.h"
 #include "Surface.h"
 #include "TextureVertex.h"
+#include "Pipeline.h"
 
 class Game
 {
@@ -50,14 +51,13 @@ private:
 	/********************************/
 	NDCTransformer trans;
 	Cube cube;
-	TexCube texCube;
 	Surface surf = Surface(300, 100);
 	Surface texSurf = Surface("test.bmp");
 	static constexpr float dTheta = PI;
 	float theta_x = 0.0f;
 	float theta_y = 0.0f;
 	float theta_z = 0.0f;
-	float zVal = 5.0f;
+	float zVal = 2.0f;
 	TextureVertex tvec1 = TextureVertex( { 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f });
 	TextureVertex tvec2 = TextureVertex({ 300.0f, 10.0f, 1.0f }, { 1.0f, 0.0f });
 	TextureVertex tvec3 = TextureVertex({ 10.0f, 300.0f, 1.0f }, { 0.0f, 1.0f });
@@ -67,4 +67,7 @@ private:
 	TextureVertex tvec21 = TextureVertex({ 600.0f, 150.0f, 1.0f }, { 1.0f, 0.0f });
 	TextureVertex tvec31 = TextureVertex({ 400.0f, 300.0f, 1.0f }, { 0.0f, 1.0f });
 	TextureVertex tvec41 = TextureVertex({ 600.0f, 300.0f, 1.0f }, { 1.0f, 1.0f });
+
+	Pipeline pipeline;
+	IndexedTriangleList<Pipeline::Vertex> testList;
 };

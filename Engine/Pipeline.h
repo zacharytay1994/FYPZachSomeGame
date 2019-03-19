@@ -7,6 +7,7 @@
 #include "Mat3.h"
 #include "IndexedTriangleList.h"
 #include "Triangle.h"
+#include "ZBuffer.h"
 #include "TextureEffect.h"
 #include <string>
 
@@ -18,7 +19,8 @@ public:
 public:
 	Pipeline(Graphics& gfx)
 		:
-		gfx(gfx)
+		gfx(gfx),
+		zBuffer(gfx.ScreenWidth, gfx.ScreenHeight)
 	{}
 	void Draw(IndexedTriangleList<Vertex> triangleList) { ProcessVertices(triangleList.vertices, triangleList.indices); }
 	void BindRotation(const Matf3& rotation_in) {
@@ -29,6 +31,9 @@ public:
 	}
 	void BindTexture(const std::string& filename) {
 		texture = std::make_unique<Surface>(Surface(filename));
+	}
+	void BeginFrame() {
+		zBuffer.Clear();
 	}
 private:
 	void ProcessVertices(std::vector<Vertex>& vertices, std::vector<size_t>& indices) {
@@ -172,9 +177,13 @@ private:
 
 			// loop for x
 			for (int x = xStart; x < xEnd; x++, leftToRight = leftToRight + changeX) {
-				// bring texture coordinates back to orthographic space
-				const Vertex passIn = leftToRight * 1/leftToRight.pos.z;
-				gfx.PutPixel(x, y, effect.pixelShader(passIn));
+				// get z value
+				const float zValue = 1.0f/leftToRight.pos.z;
+				if (zBuffer.TestAndSet(x, y, zValue)) {
+					// bring texture coordinates back to orthographic space
+					const Vertex passIn = leftToRight * zValue;
+					gfx.PutPixel(x, y, effect.pixelShader(passIn));
+				}
 			}
 		}
 	}
@@ -185,4 +194,5 @@ private:
 	NDCTransformer<Vertex> trans;
 	Matf3 rotation;
 	Vecf3 translation;
+	ZBuffer zBuffer;
 };

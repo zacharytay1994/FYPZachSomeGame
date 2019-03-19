@@ -99,6 +99,8 @@ void Game::UpdateModel()
 
 void Game::ComposeFrame()
 {
+	pipeline.BeginFrame();
+	cPipeline.BeginFrame();
 	// bind transforms
 	const Matf3 rot =
 		Matf3::RotationZ(theta_z) *
@@ -106,16 +108,20 @@ void Game::ComposeFrame()
 		Matf3::RotationY(theta_y);
 	pipeline.BindRotation(rot);
 	const Vecf3 translate = { 0.0f, 0.0f, zVal };
-	pipeline.BindTranslation(translate);
+	pipeline.BindTranslation(translate * 2);
 
 	cPipeline.BindRotation(rot);
-	cPipeline.BindTranslation(translate);
 
+	cPipeline.BindTranslation({ 0.5f, 0.5f, 3.0f });
+	/*cPipeline.Draw(colorList);
+
+	cPipeline.BindTranslation(translate * 2);
+	cPipeline.Draw(colorList);*/
 	// draw textured cube pipeline
 	pipeline.Draw(testList);
 
-	// draw color cube pipeline
-	//cPipeline.Draw(colorList);
+	pipeline.BindTranslation({ 0.5f, 0.5f, 3.0f });
+	pipeline.Draw(testList);
 
 	//--------------------------------------------------------------------------------------------------
 

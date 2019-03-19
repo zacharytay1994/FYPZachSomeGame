@@ -30,10 +30,10 @@ Game::Game( MainWindow& wnd )
 	gfx( wnd ),
 	cube( 1.0f ),
 	pipeline(gfx),
-	testList(TexCube::GetWrap<Pipeline::Vertex>())
+	testList(TexCube::GetWrap<Pipeline<TextureEffect>::Vertex>())
 {
 	// bind texture to pipeline
-	pipeline.BindTexture("test.bmp");
+	pipeline.effect.pixelShader.BindTexture("test.bmp");
 
 	/*for (int i = 0; i < surf.GetHeight(); i++) {
 		for (int j = 0; j < surf.GetWidth(); j++) {

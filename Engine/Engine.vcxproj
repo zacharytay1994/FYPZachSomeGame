@@ -161,6 +161,7 @@
     <ClInclude Include="SoundEffect.h" />
     <ClInclude Include="Surface.h" />
     <ClInclude Include="TexCube.h" />
+    <ClInclude Include="TextureEffect.h" />
     <ClInclude Include="TextureVertex.h" />
     <ClInclude Include="Triangle.h" />
     <ClInclude Include="Vec2.h" />

@@ -7,44 +7,14 @@
 #include "Mat3.h"
 #include "IndexedTriangleList.h"
 #include "Triangle.h"
+#include "TextureEffect.h"
 #include <string>
 
+template<class Effect> 
 class Pipeline {
 public:
-	class Vertex {
-	public:
-		Vertex() = default;
-		Vertex(const Vecf3& pos, const Vecf2& texpos)
-			:
-			pos(pos),
-			texpos(texpos)
-		{}
-		Vertex operator-(const Vertex& rhs) const {
-			return Vertex(pos - rhs.pos, texpos - rhs.texpos);
-		}
-		Vertex& operator/(float val) {
-			pos = pos / val;
-			texpos = texpos / val;
-			return *this;
-		}
-		Vertex operator+(const Vertex& rhs) const {
-			Vecf3 temppos = pos + rhs.pos;
-			Vecf2 temptexpos = texpos + rhs.texpos;
-			Vertex temp = { temppos, temptexpos };
-			return temp;
-		}
-		Vertex operator+=(const Vertex& rhs) {
-			return *this + rhs;
-		}
-		Vertex operator*(float val) const {
-			return Vertex(pos * val, texpos * val);
-		}
-	public:
-		Vecf3 pos;
-		Vecf2 texpos;
-	private:
-	};
-
+	// gets Vertex from effect class
+	typedef typename Effect::Vertex Vertex;
 public:
 	Pipeline(Graphics& gfx)
 		:
@@ -67,7 +37,7 @@ private:
 
 		// transform vertices
 		for (Vertex v : vertices) {
-			verticesOut.emplace_back(v.pos * rotation + translation, v.texpos);
+			verticesOut.emplace_back(v.pos * rotation + translation, v);
 		}
 
 		// pass it on
@@ -75,7 +45,6 @@ private:
 	}
 	void AssembleTriangles(std::vector<Vertex>& vertices, std::vector<size_t>& indices) {
 		// loops and create triangles
-		float testval = indices.size();
 		for (size_t i = 0, end = indices.size() / 3; i < end; i++) {
 			// get vertices by index
 			const Vertex& v0 = vertices[indices[i * 3]];
@@ -201,25 +170,17 @@ private:
 			float xPrestep = ((float)xStart + 0.5f) - leftInterpolant.pos.x;
 			leftToRight += changeX * xPrestep;
 
-			// get tex info and clamp
-			float texWidth = (float)texture->GetWidth();
-			float texHeight = (float)texture->GetHeight();
-			float widthClamp = texWidth - 1.0f;
-			float heightClamp = texHeight - 1.0f;
-
 			// loop for x
 			for (int x = xStart; x < xEnd; x++, leftToRight = leftToRight + changeX) {
-				gfx.PutPixel(x, y, texture->GetPixel(
-					(int)std::min(leftToRight.texpos.x * texWidth, widthClamp),
-					(int)std::min(leftToRight.texpos.y * texHeight, heightClamp)
-				));
+				gfx.PutPixel(x, y, effect.pixelShader(leftToRight));
 			}
 		}
 	}
+public:
+	Effect effect;
 private:
 	Graphics& gfx;
 	NDCTransformer trans;
 	Matf3 rotation;
 	Vecf3 translation;
-	std::unique_ptr<Surface> texture;
 };

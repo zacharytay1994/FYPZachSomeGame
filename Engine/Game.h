@@ -29,6 +29,7 @@
 #include "Surface.h"
 #include "TextureVertex.h"
 #include "Pipeline.h"
+#include "TextureEffect.h"
 
 class Game
 {
@@ -68,6 +69,6 @@ private:
 	TextureVertex tvec31 = TextureVertex({ 400.0f, 300.0f, 1.0f }, { 0.0f, 1.0f });
 	TextureVertex tvec41 = TextureVertex({ 600.0f, 300.0f, 1.0f }, { 1.0f, 1.0f });
 
-	Pipeline pipeline;
-	IndexedTriangleList<Pipeline::Vertex> testList;
+	Pipeline<TextureEffect> pipeline;
+	IndexedTriangleList<Pipeline<TextureEffect>::Vertex> testList;
 };

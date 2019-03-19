@@ -140,6 +140,7 @@
   <ItemGroup>
     <ClInclude Include="ChiliException.h" />
     <ClInclude Include="ChiliWin.h" />
+    <ClInclude Include="ColorEffect.h" />
     <ClInclude Include="Colors.h" />
     <ClInclude Include="COMInitializer.h" />
     <ClInclude Include="Cube.h" />

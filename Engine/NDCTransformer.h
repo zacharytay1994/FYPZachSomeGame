@@ -3,6 +3,7 @@
 #include "Vec3.h"
 #include "Graphics.h"
 
+template <class T>
 class NDCTransformer {
 public:
 	NDCTransformer()
@@ -10,16 +11,21 @@ public:
 		horizontalF(float(Graphics::ScreenWidth) / 2.0f),
 		verticalF(float(Graphics::ScreenHeight) / 2.0f)
 	{}
-	Vecf3& Transform(Vecf3& v) const {
+	T& Transform(T& v) const {
 		// Perspective projection
-		const float zInv = 1.0f / v.z;
+		const float zInv = 1.0f / v.pos.z;
 		// NDC to screen space
-		v.x = (v.x * zInv + 1.0f) * horizontalF;
-		v.y = (-v.y * zInv + 1.0f) * verticalF;
+		// z divide the entire vertex
+		v = v * zInv;
+		// transform x and y into screenspace
+		v.pos.x = (v.pos.x + 1.0f) * horizontalF;
+		v.pos.y = (-v.pos.y + 1.0f) * verticalF;
+		// store z inverse for calculation purposes later on
+		v.pos.z = zInv;
 		return v;
 	}
-	Vecf2& GetTransformed(const Vecf3& v) const {
-		return Transform(Vecf3(v));
+	T& GetTransformed(const T& v) const {
+		return Transform(T(v));
 	}
 private:
 	float horizontalF;

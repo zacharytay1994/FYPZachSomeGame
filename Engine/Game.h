@@ -30,6 +30,7 @@
 #include "TextureVertex.h"
 #include "Pipeline.h"
 #include "TextureEffect.h"
+#include "ColorEffect.h"
 
 class Game
 {
@@ -50,7 +51,6 @@ private:
 	/********************************/
 	/*  User Variables              */
 	/********************************/
-	NDCTransformer trans;
 	Cube cube;
 	Surface surf = Surface(300, 100);
 	Surface texSurf = Surface("test.bmp");
@@ -69,6 +69,11 @@ private:
 	TextureVertex tvec31 = TextureVertex({ 400.0f, 300.0f, 1.0f }, { 0.0f, 1.0f });
 	TextureVertex tvec41 = TextureVertex({ 600.0f, 300.0f, 1.0f }, { 1.0f, 1.0f });
 
+	// for testing texture effect
 	Pipeline<TextureEffect> pipeline;
 	IndexedTriangleList<Pipeline<TextureEffect>::Vertex> testList;
+
+	// for testing color effect
+	Pipeline<ColorEffect> cPipeline;
+	IndexedTriangleList<Pipeline<ColorEffect>::Vertex> colorList;
 };

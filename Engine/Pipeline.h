@@ -62,9 +62,9 @@ private:
 	} // makeshift geom shader
 	void PerpectiveTransform(Triangle<Vertex>& triangle) { 
 		// NDC transform
-		trans.Transform(triangle.v0.pos);
-		trans.Transform(triangle.v1.pos);
-		trans.Transform(triangle.v2.pos);
+		trans.Transform(triangle.v0);
+		trans.Transform(triangle.v1);
+		trans.Transform(triangle.v2);
 
 		DrawTriangle(triangle); 
 	}
@@ -172,7 +172,9 @@ private:
 
 			// loop for x
 			for (int x = xStart; x < xEnd; x++, leftToRight = leftToRight + changeX) {
-				gfx.PutPixel(x, y, effect.pixelShader(leftToRight));
+				// bring texture coordinates back to orthographic space
+				const Vertex passIn = leftToRight * 1/leftToRight.pos.z;
+				gfx.PutPixel(x, y, effect.pixelShader(passIn));
 			}
 		}
 	}
@@ -180,7 +182,7 @@ public:
 	Effect effect;
 private:
 	Graphics& gfx;
-	NDCTransformer trans;
+	NDCTransformer<Vertex> trans;
 	Matf3 rotation;
 	Vecf3 translation;
 };

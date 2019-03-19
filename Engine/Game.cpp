@@ -30,10 +30,22 @@ Game::Game( MainWindow& wnd )
 	gfx( wnd ),
 	cube( 1.0f ),
 	pipeline(gfx),
-	testList(TexCube::GetWrap<Pipeline<TextureEffect>::Vertex>())
+	cPipeline(gfx),
+	testList(TexCube::GetWrap<Pipeline<TextureEffect>::Vertex>()),
+	colorList(TexCube::GetPlain<Pipeline<ColorEffect>::Vertex>())
 {
 	// bind texture to pipeline
 	pipeline.effect.pixelShader.BindTexture("test.bmp");
+
+	// set colors to vertices in colorList
+	colorList.vertices[0].color = (Vecf3)Colors::Red;
+	colorList.vertices[1].color = (Vecf3)Colors::Blue;
+	colorList.vertices[2].color = (Vecf3)Colors::Cyan;
+	colorList.vertices[3].color = (Vecf3)Colors::Gray;
+	colorList.vertices[4].color = (Vecf3)Colors::Green;
+	colorList.vertices[5].color = (Vecf3)Colors::Magenta;
+	colorList.vertices[6].color = (Vecf3)Colors::Black;
+	colorList.vertices[7].color = (Vecf3)Colors::White;
 
 	/*for (int i = 0; i < surf.GetHeight(); i++) {
 		for (int j = 0; j < surf.GetWidth(); j++) {
@@ -96,8 +108,14 @@ void Game::ComposeFrame()
 	const Vecf3 translate = { 0.0f, 0.0f, zVal };
 	pipeline.BindTranslation(translate);
 
-	// draw thingsss
+	cPipeline.BindRotation(rot);
+	cPipeline.BindTranslation(translate);
+
+	// draw textured cube pipeline
 	pipeline.Draw(testList);
+
+	// draw color cube pipeline
+	//cPipeline.Draw(colorList);
 
 	//--------------------------------------------------------------------------------------------------
 

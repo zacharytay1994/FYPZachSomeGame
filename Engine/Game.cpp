@@ -97,6 +97,7 @@ void Game::UpdateModel()
 	if (wnd.kbd.KeyIsPressed('P')) {
 		zVal -= 1.0 * dt;
 	}
+	time += dt;
 }
 
 void Game::ComposeFrame()
@@ -111,6 +112,7 @@ void Game::ComposeFrame()
 	pipeline.effect.vertexShader.BindRotation(rot);
 	const Vecf3 translate = { 0.0f, 0.0f, zVal };
 	pipeline.effect.vertexShader.BindTranslation(translate);
+	pipeline.effect.vertexShader.SetTime(time);
 
 	//cPipeline.BindRotation(rot);
 

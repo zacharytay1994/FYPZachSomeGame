@@ -48,7 +48,33 @@ public:
 	private:
 	};
 	
-	typedef DefaultVertexShader<Vertex> VertexShader;
+	//typedef DefaultVertexShader<Vertex> VertexShader;
+	class VertexShader {
+	public:
+		typedef Vertex Output;
+	public:
+		void BindRotation(const Matf3& rotation_in) {
+			rotation = rotation_in;
+		}
+		void BindTranslation(const Vecf3& translation_in) {
+			translation = translation_in;
+		}
+		void SetTime(float t) {
+			time = t;
+		}
+		Output operator()(const Vertex& vertex_in) const {
+			Vecf3 tempPos = vertex_in.pos * rotation + translation;
+			tempPos.y = tempPos.y + (amplitude * std::sin(time * freqScroll + tempPos.x * frequency));
+			return { tempPos, vertex_in };
+		}
+	private:
+		Matf3 rotation;
+		Vecf3 translation;
+		float time;
+		float frequency = 10.0f;
+		float amplitude = 0.05f;
+		float freqScroll = 5.0f;
+	};
 
 	class PixelShader {
 	public:

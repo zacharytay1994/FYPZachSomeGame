@@ -72,8 +72,9 @@ private:
 	// for testing texture effect
 	Pipeline<TextureEffect> pipeline;
 	IndexedTriangleList<Pipeline<TextureEffect>::Vertex> testList;
+	IndexedTriangleList<Pipeline<TextureEffect>::Vertex> tessellateList;
 
 	// for testing color effect
-	Pipeline<ColorEffect> cPipeline;
-	IndexedTriangleList<Pipeline<ColorEffect>::Vertex> colorList;
+	//Pipeline<ColorEffect> cPipeline;
+	//IndexedTriangleList<Pipeline<ColorEffect>::Vertex> colorList;
 };

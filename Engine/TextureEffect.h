@@ -1,6 +1,7 @@
 #pragma once
 #include "Vec3.h"
 #include "Surface.h"
+#include "DefaultVertexShader.h"
 #include <string>
 
 class TextureEffect {
@@ -47,6 +48,8 @@ public:
 	private:
 	};
 	
+	typedef DefaultVertexShader<Vertex> VertexShader;
+
 	class PixelShader {
 	public:
 		template<class Input>
@@ -75,4 +78,5 @@ public:
 // member variables of TextureEffect
 public:
 	PixelShader pixelShader;
+	VertexShader vertexShader;
 };

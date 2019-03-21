@@ -144,6 +144,7 @@
     <ClInclude Include="Colors.h" />
     <ClInclude Include="COMInitializer.h" />
     <ClInclude Include="Cube.h" />
+    <ClInclude Include="DefaultVertexShader.h" />
     <ClInclude Include="DXErr.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Graphics.h" />
@@ -161,6 +162,7 @@
     <ClInclude Include="Sound.h" />
     <ClInclude Include="SoundEffect.h" />
     <ClInclude Include="Surface.h" />
+    <ClInclude Include="Tessellate.h" />
     <ClInclude Include="TexCube.h" />
     <ClInclude Include="TextureEffect.h" />
     <ClInclude Include="TextureVertex.h" />

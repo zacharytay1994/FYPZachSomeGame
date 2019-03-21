@@ -23,6 +23,7 @@
 #include "Mat2.h"
 #include "Mat3.h"
 #include "Pipeline.h"
+#include "Tessellate.h"
 
 Game::Game( MainWindow& wnd )
 	:
@@ -30,22 +31,23 @@ Game::Game( MainWindow& wnd )
 	gfx( wnd ),
 	cube( 1.0f ),
 	pipeline(gfx),
-	cPipeline(gfx),
 	testList(TexCube::GetWrap<Pipeline<TextureEffect>::Vertex>()),
-	colorList(TexCube::GetPlain<Pipeline<ColorEffect>::Vertex>())
+	tessellateList(Tessallate::GetTessellate<Pipeline<TextureEffect>::Vertex>(testList))
 {
 	// bind texture to pipeline
 	pipeline.effect.pixelShader.BindTexture("test.bmp");
-
+	for (int i = 0; i < 5; i++) {
+		tessellateList = Tessallate::GetTessellate<Pipeline<TextureEffect>::Vertex>(tessellateList);
+	}
 	// set colors to vertices in colorList
-	colorList.vertices[0].color = (Vecf3)Colors::Red;
+	/*colorList.vertices[0].color = (Vecf3)Colors::Red;
 	colorList.vertices[1].color = (Vecf3)Colors::Blue;
 	colorList.vertices[2].color = (Vecf3)Colors::Cyan;
 	colorList.vertices[3].color = (Vecf3)Colors::Gray;
 	colorList.vertices[4].color = (Vecf3)Colors::Green;
 	colorList.vertices[5].color = (Vecf3)Colors::Magenta;
 	colorList.vertices[6].color = (Vecf3)Colors::Black;
-	colorList.vertices[7].color = (Vecf3)Colors::White;
+	colorList.vertices[7].color = (Vecf3)Colors::White;*/
 
 	/*for (int i = 0; i < surf.GetHeight(); i++) {
 		for (int j = 0; j < surf.GetWidth(); j++) {
@@ -100,28 +102,28 @@ void Game::UpdateModel()
 void Game::ComposeFrame()
 {
 	pipeline.BeginFrame();
-	cPipeline.BeginFrame();
+	//cPipeline.BeginFrame();
 	// bind transforms
 	const Matf3 rot =
 		Matf3::RotationZ(theta_z) *
 		Matf3::RotationX(theta_x) *
 		Matf3::RotationY(theta_y);
-	pipeline.BindRotation(rot);
+	pipeline.effect.vertexShader.BindRotation(rot);
 	const Vecf3 translate = { 0.0f, 0.0f, zVal };
-	pipeline.BindTranslation(translate * 2);
+	pipeline.effect.vertexShader.BindTranslation(translate);
 
-	cPipeline.BindRotation(rot);
+	//cPipeline.BindRotation(rot);
 
-	cPipeline.BindTranslation({ 0.5f, 0.5f, 3.0f });
+	//cPipeline.BindTranslation({ 0.5f, 0.5f, 3.0f });
 	/*cPipeline.Draw(colorList);
 
 	cPipeline.BindTranslation(translate * 2);
 	cPipeline.Draw(colorList);*/
 	// draw textured cube pipeline
-	pipeline.Draw(testList);
+	pipeline.Draw(tessellateList);
 
-	pipeline.BindTranslation({ 0.5f, 0.5f, 3.0f });
-	pipeline.Draw(testList);
+	/*pipeline.effect.vertexShader.BindTranslation({ 0.5f, 0.5f, 3.0f });
+	pipeline.Draw(testList);*/
 
 	//--------------------------------------------------------------------------------------------------
 

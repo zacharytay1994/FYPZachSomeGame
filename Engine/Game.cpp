@@ -35,8 +35,8 @@ Game::Game( MainWindow& wnd )
 	tessellateList(Tessallate::GetTessellate<Pipeline<TextureEffect>::Vertex>(testList))
 {
 	// bind texture to pipeline
-	pipeline.effect.pixelShader.BindTexture("pikachumeme.bmp");
-	for (int i = 0; i < 1; i++) {
+	pipeline.effect.pixelShader.BindTexture("waterimage.bmp");
+	for (int i = 0; i < 2; i++) {
 		tessellateList = Tessallate::GetTessellate<Pipeline<TextureEffect>::Vertex>(tessellateList);
 	}
 	// set colors to vertices in colorList

@@ -64,16 +64,18 @@ public:
 		}
 		Output operator()(const Vertex& vertex_in) const {
 			Vecf3 tempPos = vertex_in.pos * rotation + translation;
-			tempPos.y = tempPos.y + (amplitude * std::sin(time * freqScroll + tempPos.x * frequency));
+			tempPos.y = tempPos.y + (amplitude * std::sin(time * freqScroll + tempPos.x * frequency) * std::sin(time * freqScroll + tempPos.z * frequency));// *std::sin(time * freqScroll + tempPos.y * frequency) * std::sin(time * freqScroll + tempPos.z * frequency));
+			tempPos.x = tempPos.x + (amplitude * std::sin(time * freqScroll + tempPos.y * frequency) * std::sin(time * freqScroll + tempPos.z * frequency));// *std::sin(time * freqScroll + tempPos.y * frequency) * std::sin(time * freqScroll + tempPos.z * frequency));
+			tempPos.z = tempPos.z + (amplitude * std::sin(time * freqScroll + tempPos.x * frequency) * std::sin(time * freqScroll + tempPos.y * frequency) * std::sin(time * freqScroll + tempPos.z * frequency));
 			return { tempPos, vertex_in };
 		}
 	private:
 		Matf3 rotation;
 		Vecf3 translation;
 		float time;
-		float frequency = 10.0f;
-		float amplitude = 0.15f;
-		float freqScroll = 5.0f;
+		float frequency = 8.0f;
+		float amplitude = 0.10f;
+		float freqScroll = 2.0f;
 	};
 
 	class GeomShader {

@@ -54,7 +54,7 @@ private:
 	Cube cube;
 	Surface surf = Surface(300, 100);
 	Surface texSurf = Surface("pikachumeme.bmp");
-	static constexpr float dTheta = PI/2;
+	static constexpr float dTheta = PI/4;
 	float theta_x = 0.0f;
 	float theta_y = 0.0f;
 	float theta_z = 0.0f;

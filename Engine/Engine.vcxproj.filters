@@ -170,5 +170,8 @@
     <Image Include="..\..\..\Memes\pikachumeme.bmp">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="..\..\..\Memes\waterimage.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

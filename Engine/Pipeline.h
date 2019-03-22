@@ -188,6 +188,6 @@ public:
 	Effect effect;
 private:
 	Graphics& gfx;
-	NDCTransformer<Vertex> trans;
+	NDCTransformer<outputGeom> trans;
 	ZBuffer zBuffer;
 };

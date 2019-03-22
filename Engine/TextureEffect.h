@@ -101,8 +101,20 @@ public:
 		float width_clamp;
 		float height_clamp;
 	};
+
+	class GeomShader {
+	public:
+		typedef VertexShader::Output Output;
+	public:
+		Triangle<Output> operator()(const VertexShader::Output& v0, const VertexShader::Output& v1, const VertexShader::Output& v2, unsigned int triangleIndex) const {
+			return { v0, v1, v2 };
+		}
+	private:
+		Vecf3 surfaceNormal;
+	};
 // member variables of TextureEffect
 public:
 	PixelShader pixelShader;
 	VertexShader vertexShader;
+	GeomShader geomShader;
 };

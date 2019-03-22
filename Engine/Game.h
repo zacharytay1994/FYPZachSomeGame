@@ -53,12 +53,12 @@ private:
 	/********************************/
 	Cube cube;
 	Surface surf = Surface(300, 100);
-	Surface texSurf = Surface("test.bmp");
+	Surface texSurf = Surface("pikachumeme.bmp");
 	static constexpr float dTheta = PI/2;
 	float theta_x = 0.0f;
 	float theta_y = 0.0f;
 	float theta_z = 0.0f;
-	float zVal = 2.0f;
+	float zVal = 2.5f;
 	float time = 0.0f;
 	TextureVertex tvec1 = TextureVertex( { 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f });
 	TextureVertex tvec2 = TextureVertex({ 300.0f, 10.0f, 1.0f }, { 1.0f, 0.0f });

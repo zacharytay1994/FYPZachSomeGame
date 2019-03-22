@@ -72,7 +72,7 @@ public:
 		Vecf3 translation;
 		float time;
 		float frequency = 10.0f;
-		float amplitude = 0.05f;
+		float amplitude = 0.15f;
 		float freqScroll = 5.0f;
 	};
 
@@ -107,10 +107,17 @@ public:
 		typedef VertexShader::Output Output;
 	public:
 		Triangle<Output> operator()(const VertexShader::Output& v0, const VertexShader::Output& v1, const VertexShader::Output& v2, unsigned int triangleIndex) const {
-			return { v0, v1, v2 };
+			Vecf3 surfaceNormal = (v1.pos - v0.pos) % (v2.pos - v0.pos);
+			Vecf3 v0out = v0.pos + surfaceNormal * 7 * abs(sin(time));
+			Vecf3 v1out = v1.pos + surfaceNormal * 7 * abs(sin(time));
+			Vecf3 v2out = v2.pos + surfaceNormal * 7 * abs(sin(time));
+			return { {v0out, v0.texpos}, {v1out, v1.texpos}, {v2out, v2.texpos} };
+		}
+		void BindTime(float t) {
+			time = t;
 		}
 	private:
-		Vecf3 surfaceNormal;
+		float time;
 	};
 // member variables of TextureEffect
 public:

@@ -68,7 +68,10 @@ private:
 		DrawTriangle(triangle);
 		/*gfx.DrawLine(triangle.v0.pos, triangle.v1.pos, Colors::White);
 		gfx.DrawLine(triangle.v0.pos, triangle.v2.pos, Colors::White);
-		gfx.DrawLine(triangle.v1.pos, triangle.v2.pos, Colors::White);*/
+		gfx.DrawLine(triangle.v1.pos, triangle.v2.pos, Colors::White);
+		gfx.DrawLine(triangle.v0.pos, triangle.v0.normal, Colors::Red);
+		gfx.DrawLine(triangle.v1.pos, triangle.v1.normal, Colors::Red);
+		gfx.DrawLine(triangle.v2.pos, triangle.v2.normal, Colors::Red);*/
 	}
 	void DrawTriangle(Triangle<outputGeom>& triangle) {
 		// get pointers to vertices

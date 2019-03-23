@@ -51,7 +51,48 @@ public:
 	//typedef DefaultVertexShader<Vertex> VertexShader;
 	class VertexShader {
 	public:
-		typedef Vertex Output;
+		class Output {
+		public:
+			Output() = default;
+			Output(const Vecf3& pos, const Vecf2& texpos, const Vecf3& normal)
+				:
+				pos(pos),
+				texpos(texpos),
+				normal(normal)
+			{}
+			// new copy constructor to copy all but pos
+			Output(const Vecf3 pos_in, const Vertex& vert_in, Vecf3 normal)
+				:
+				pos(pos_in),
+				texpos(vert_in.texpos),
+				normal(normal)
+			{
+			}
+			Output operator-(const Output& rhs) const {
+				return Output(pos - rhs.pos, texpos - rhs.texpos, normal - rhs.normal);
+			}
+			Output& operator/(float val) {
+				pos = pos / val;
+				texpos = texpos / val;
+				return *this;
+			}
+			Output operator+(const Output& rhs) const {
+				Vecf3 temppos = pos + rhs.pos;
+				Vecf2 temptexpos = texpos + rhs.texpos;
+				Output temp = { temppos, temptexpos, normal + rhs.normal };
+				return temp;
+			}
+			Output operator+=(const Output& rhs) {
+				return *this + rhs;
+			}
+			Output operator*(float val) const {
+				return Output(pos * val, texpos * val, normal);
+			}
+		public:
+			Vecf3 pos;
+			Vecf2 texpos;
+			Vecf3 normal;
+		};
 	public:
 		void BindRotation(const Matf3& rotation_in) {
 			rotation = rotation_in;
@@ -64,10 +105,24 @@ public:
 		}
 		Output operator()(const Vertex& vertex_in) const {
 			Vecf3 tempPos = vertex_in.pos * rotation + translation;
-			tempPos.y = tempPos.y + (amplitude * std::sin(time * freqScroll + tempPos.x * frequency) * std::sin(time * freqScroll + tempPos.z * frequency));// *std::sin(time * freqScroll + tempPos.y * frequency) * std::sin(time * freqScroll + tempPos.z * frequency));
-			tempPos.x = tempPos.x + (amplitude * std::sin(time * freqScroll + tempPos.y * frequency) * std::sin(time * freqScroll + tempPos.z * frequency));// *std::sin(time * freqScroll + tempPos.y * frequency) * std::sin(time * freqScroll + tempPos.z * frequency));
-			tempPos.z = tempPos.z + (amplitude * std::sin(time * freqScroll + tempPos.x * frequency) * std::sin(time * freqScroll + tempPos.y * frequency) * std::sin(time * freqScroll + tempPos.z * frequency));
-			return { tempPos, vertex_in };
+			tempPos.y = tempPos.y + (amplitude * std::sin(time * freqScroll + tempPos.x * frequency));
+			Vecf3 tangenty1 = { tempPos.x, tempPos.y, amplitude * -abs(std::cos(time * freqScroll + tempPos.x * frequency)) };
+			tempPos.y = tempPos.y + (amplitude * std::sin(time * freqScroll + tempPos.z * frequency));
+			Vecf3 tangenty2 = { tempPos.x, tempPos.y, amplitude * -abs(std::cos(time * freqScroll + tempPos.z * frequency)) };
+			Vecf3 normal = tangenty1 % tangenty2;
+			tempPos.x = tempPos.x + (amplitude * std::sin(time * freqScroll + tempPos.y * frequency));
+			Vecf3 tangentx1 = { tempPos.x, tempPos.y, amplitude * -abs(std::cos(time * freqScroll + tempPos.y * frequency)) };
+			tempPos.x = tempPos.x + (amplitude * std::sin(time * freqScroll + tempPos.z * frequency));
+			Vecf3 tangentx2 = { tempPos.x, tempPos.y, amplitude * -abs(std::cos(time * freqScroll + tempPos.z * frequency)) };
+			Vecf3 normal2 = tangentx1 % tangentx2;
+			tempPos.z = tempPos.z + (amplitude * std::sin(time * freqScroll + tempPos.x * frequency));
+			Vecf3 tangentz1 = { tempPos.x, tempPos.y, amplitude * -abs(std::cos(time * freqScroll + tempPos.x * frequency)) };
+			tempPos.z = tempPos.z + (amplitude * std::sin(time * freqScroll + tempPos.y * frequency));
+			Vecf3 tangentz2 = { tempPos.x, tempPos.y, amplitude * -abs(std::sin(time * freqScroll + tempPos.y * frequency)) };
+			Vecf3 normal3 = tangentz1 % tangentz2;
+
+			Vecf3 resultantNormal = normal + normal2 + normal3;
+			return { tempPos, vertex_in, resultantNormal.GetNormalized() };
 		}
 	private:
 		Matf3 rotation;
@@ -83,42 +138,48 @@ public:
 		class Output {
 		public:
 			Output() = default;
-			Output(const Vecf3& pos, const Vecf2& texpos, const float& intensity)
+			Output(const Vecf3& pos, const Vecf2& texpos, const float& intensity, const Vecf3& normal)
 				:
 				pos(pos),
 				texpos(texpos),
-				intensity(intensity)
+				intensity(intensity),
+				normal(normal)
 			{}
 			// new copy constructor to copy all but pos
-			Output(const Vecf3 pos_in, const Vertex& vert_in)
+			Output(const Vecf3 pos_in, const Output& vert_in)
 				:
 				pos(pos_in),
-				texpos(vert_in.texpos)
+				texpos(vert_in.texpos),
+				intensity(vert_in.intensity),
+				normal(vert_in.normal)
 			{
 			}
 			Output operator-(const Output& rhs) const {
-				return Output(pos - rhs.pos, texpos - rhs.texpos, rhs.intensity);
+				return Output(pos - rhs.pos, texpos - rhs.texpos, intensity - rhs.intensity, normal);
 			}
 			Output& operator/(float val) {
 				pos = pos / val;
 				texpos = texpos / val;
+				intensity = intensity / val;
 				return *this;
 			}
 			Output operator+(const Output& rhs) const {
 				Vecf3 temppos = pos + rhs.pos;
 				Vecf2 temptexpos = texpos + rhs.texpos;
-				Output temp = { temppos, temptexpos, intensity };
+				float tempintensity = intensity + rhs.intensity;
+				Output temp = { temppos, temptexpos, tempintensity, normal };
 				return temp;
 			}
 			Output operator+=(const Output& rhs) {
 				return *this + rhs;
 			}
 			Output operator*(float val) const {
-				return Output(pos * val, texpos * val, intensity);
+				return Output(pos * val, texpos * val, intensity * val, normal);
 			}
 		public:
 			Vecf3 pos;
 			Vecf2 texpos;
+			Vecf3 normal;
 			float intensity;
 		};
 	public:
@@ -133,8 +194,13 @@ public:
 			Vecf3 v1out = v1.pos;
 			Vecf3 v2out = v2.pos;
 			// calculating intensity based on angle
-			float intensityIn = std::min(1.0f, std::max(0.0f, (-directionLight * surfaceNormal)) * diffuseLight + ambientLight);
-			return { {v0out, v0.texpos, intensityIn}, {v1out, v1.texpos, intensityIn}, {v2out, v2.texpos, intensityIn} };
+			// vertex normal gouraud shading
+			float v0intensityIn = std::min(1.0f, std::max(0.0f, (-directionLight * v0.normal)) * diffuseLight + ambientLight);
+			float v1intensityIn = std::min(1.0f, std::max(0.0f, (-directionLight * v1.normal)) * diffuseLight + ambientLight);
+			float v2intensityIn = std::min(1.0f, std::max(0.0f, (-directionLight * v2.normal)) * diffuseLight + ambientLight);
+			// face normal flat shading
+			//float intensityIn = std::min(1.0f, std::max(0.0f, (-directionLight * surfaceNormal)) * diffuseLight + ambientLight);
+			return { {v0out, v0.texpos, v0intensityIn, v0.normal}, {v1out, v1.texpos, v1intensityIn, v1.normal}, {v2out, v2.texpos, v2intensityIn, v2.normal} };
 		}
 		void BindTime(float t) {
 			time = t;

@@ -250,6 +250,8 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\..\..\Downloads\test.bmp" />
+    <Image Include="..\..\..\Memes\blackimage.bmp" />
+    <Image Include="..\..\..\Memes\greenimage.bmp" />
     <Image Include="..\..\..\Memes\pikachumeme.bmp" />
     <Image Include="..\..\..\Memes\waterimage.bmp" />
     <Image Include="Chili.ico" />

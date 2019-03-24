@@ -253,7 +253,9 @@
     <Image Include="..\..\..\Memes\blackimage.bmp" />
     <Image Include="..\..\..\Memes\greenimage.bmp" />
     <Image Include="..\..\..\Memes\pikachumeme.bmp" />
+    <Image Include="..\..\..\Memes\sandimage.bmp" />
     <Image Include="..\..\..\Memes\waterimage.bmp" />
+    <Image Include="..\..\..\Memes\whiteimage.bmp" />
     <Image Include="Chili.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

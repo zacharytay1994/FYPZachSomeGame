@@ -30,15 +30,22 @@ Game::Game( MainWindow& wnd )
 	wnd( wnd ),
 	gfx( wnd ),
 	cube( 1.0f ),
-	pipeline(gfx),
-	testList(TexCube::GetWrap<Pipeline<TextureEffect>::Vertex>()),
+	zBuffer(std::make_shared<ZBuffer>(gfx.ScreenWidth, gfx.ScreenHeight)),
+	pipeline(gfx, zBuffer),
+	pipelineLight(gfx, zBuffer),
+	testList(TexCube::GetWrap<Pipeline<TextureEffect>::Vertex>(1.0f)),
+	lightList(TexCube::GetWrap<Pipeline<TextureEffect>::Vertex>(0.1f)),
 	tessellateList(Tessallate::GetTessellate<Pipeline<TextureEffect>::Vertex>(testList))
 {
 	// bind texture to pipeline
-	pipeline.effect.pixelShader.BindTexture("waterimage.bmp");
-	for (int i = 0; i < 2; i++) {
+	pipeline.effect.pixelShader.BindTexture("sandimage.bmp");
+	for (int i = 0; i < 4; i++) {
 		tessellateList = Tessallate::GetTessellate<Pipeline<TextureEffect>::Vertex>(tessellateList);
 	}
+	pipelineLight.effect.pixelShader.BindTexture("whiteimage.bmp");
+	pipelineLight.effect.vertexShader.SetTransValues(0.0f, 0.0f, 0.0f);
+
+	pipelineLight.effect.geomShader.SetIsLight(true);
 	// set colors to vertices in colorList
 	/*colorList.vertices[0].color = (Vecf3)Colors::Red;
 	colorList.vertices[1].color = (Vecf3)Colors::Blue;
@@ -97,6 +104,24 @@ void Game::UpdateModel()
 	if (wnd.kbd.KeyIsPressed('P')) {
 		zVal -= 1.0 * dt;
 	}
+	if (wnd.kbd.KeyIsPressed('H')) {
+		lightPosX -= 0.5f * dt;
+	}
+	if (wnd.kbd.KeyIsPressed('K')) {
+		lightPosX += 0.5f * dt;
+	}
+	if (wnd.kbd.KeyIsPressed('U')) {
+		lightPosY += 0.5f * dt;
+	}
+	if (wnd.kbd.KeyIsPressed('J')) {
+		lightPosY -= 0.5f * dt;
+	}
+	if (wnd.kbd.KeyIsPressed('Y')) {
+		lightPosZ += 0.5f * dt;
+	}
+	if (wnd.kbd.KeyIsPressed('I')) {
+		lightPosZ -= 0.5f * dt;
+	}
 	time += dt;
 }
 
@@ -114,7 +139,12 @@ void Game::ComposeFrame()
 	pipeline.effect.vertexShader.BindTranslation(translate);
 	pipeline.effect.vertexShader.SetTime(time);
 	pipeline.effect.geomShader.BindTime(time);
+	pipeline.effect.geomShader.SetLightPosition({ lightPosX, lightPosY, lightPosZ });
 
+	// draw light source
+	pipelineLight.effect.vertexShader.BindRotation(rot);
+	pipelineLight.effect.vertexShader.BindTranslation({ lightPosX, lightPosY, lightPosZ });
+	
 	//cPipeline.BindRotation(rot);
 
 	//cPipeline.BindTranslation({ 0.5f, 0.5f, 3.0f });
@@ -124,6 +154,7 @@ void Game::ComposeFrame()
 	cPipeline.Draw(colorList);*/
 	// draw textured cube pipeline
 	pipeline.Draw(tessellateList);
+	pipelineLight.Draw(lightList);
 
 	/*pipeline.effect.vertexShader.BindTranslation({ 0.5f, 0.5f, 3.0f });
 	pipeline.Draw(testList);*/

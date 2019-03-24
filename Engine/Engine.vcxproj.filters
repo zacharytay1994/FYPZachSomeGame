@@ -179,5 +179,11 @@
     <Image Include="..\..\..\Memes\greenimage.bmp">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="..\..\..\Memes\whiteimage.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\..\Memes\sandimage.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

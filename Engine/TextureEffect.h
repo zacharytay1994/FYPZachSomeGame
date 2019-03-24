@@ -103,6 +103,11 @@ public:
 		void SetTime(float t) {
 			time = t;
 		}
+		void SetTransValues(float frequencyIn, float amplitudeIn, float scrollIn) {
+			frequency = frequencyIn;
+			amplitude = amplitudeIn;
+			freqScroll = scrollIn;
+		}
 		Output operator()(const Vertex& vertex_in) const {
 			Vecf3 tempPos = vertex_in.pos * rotation + translation;
 			tempPos.y = tempPos.y + (amplitude * std::sin(time * freqScroll + tempPos.x * frequency));
@@ -185,7 +190,7 @@ public:
 	public:
 		Triangle<Output> operator()(const VertexShader::Output& v0, const VertexShader::Output& v1, const VertexShader::Output& v2, unsigned int triangleIndex) const {
 			// calculate surface normal
-			Vecf3 surfaceNormal = ((v1.pos - v0.pos) % (v2.pos - v0.pos)).GetNormalized();
+			//Vecf3 surfaceNormal = ((v1.pos - v0.pos) % (v2.pos - v0.pos)).GetNormalized();
 			// exploding stuff
 			/*Vecf3 v0out = v0.pos + surfaceNormal * 0.2 * abs(sin(time / 2));
 			Vecf3 v1out = v1.pos + surfaceNormal * 0.2 * abs(sin(time / 2));
@@ -193,17 +198,38 @@ public:
 			Vecf3 v0out = v0.pos;
 			Vecf3 v1out = v1.pos;
 			Vecf3 v2out = v2.pos;
+
+			// calculating point light direction
+			const Vecf3 lightToVertexVector = pointLightPosition - v0.pos;
+			// calculating light distance
+			const float lightDistance = lightToVertexVector.Len();
+			// calculate normalized direction of light
+			const Vecf3 lightDirection = lightToVertexVector / lightDistance;
+			// calculate attenuation 
+			const float attenuation = 1.0f / (constant_attenuation + quadratic_attenuation * sq(lightDistance));
+
 			// calculating intensity based on angle
 			// vertex normal gouraud shading
-			float v0intensityIn = std::min(1.0f, std::max(0.0f, (-directionLight * v0.normal)) * diffuseLight + ambientLight);
-			float v1intensityIn = std::min(1.0f, std::max(0.0f, (-directionLight * v1.normal)) * diffuseLight + ambientLight);
-			float v2intensityIn = std::min(1.0f, std::max(0.0f, (-directionLight * v2.normal)) * diffuseLight + ambientLight);
+			float v0intensityIn = 1.0f;
+			float v1intensityIn = 1.0f;
+			float v2intensityIn = 1.0f;
+			if (!isLight) {
+				v0intensityIn = std::min(1.0f, std::max(0.0f, (-lightDirection * v0.normal)) * diffuseLight * attenuation + ambientLight);
+				v1intensityIn = std::min(1.0f, std::max(0.0f, (-lightDirection * v1.normal)) * diffuseLight * attenuation + ambientLight);
+				v2intensityIn = std::min(1.0f, std::max(0.0f, (-lightDirection * v2.normal)) * diffuseLight * attenuation + ambientLight);
+			}
 			// face normal flat shading
 			//float intensityIn = std::min(1.0f, std::max(0.0f, (-directionLight * surfaceNormal)) * diffuseLight + ambientLight);
 			return { {v0out, v0.texpos, v0intensityIn, v0.normal}, {v1out, v1.texpos, v1intensityIn, v1.normal}, {v2out, v2.texpos, v2intensityIn, v2.normal} };
 		}
 		void BindTime(float t) {
 			time = t;
+		}
+		void SetLightPosition(const Vecf3& position) {
+			pointLightPosition = position;
+		}
+		void SetIsLight(bool isLightIn) {
+			isLight = isLightIn;
 		}
 	private:
 		float time;
@@ -213,6 +239,15 @@ public:
 		float diffuseLight = 1.0f;
 		// ambient light around assumed
 		float ambientLight = 0.2f;
+
+		// point light attributes
+		Vecf3 pointLightPosition = { 0.0f, 0.0f, 2.5f };
+		float quadratic_attenuation = 2.619f;
+		//float linear_attenuation = 1.0f;
+		float constant_attenuation = 1.0f;
+
+		// temp boolean for test
+		bool isLight = false;
 	};
 
 	class PixelShader {

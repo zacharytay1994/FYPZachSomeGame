@@ -23,12 +23,18 @@ public:
 public:
 	Pipeline(Graphics& gfx)
 		:
-		gfx(gfx),
-		zBuffer(gfx.ScreenWidth, gfx.ScreenHeight)
+		Pipeline(gfx, std::make_shared<ZBuffer>(gfx.ScreenWidth, gfx.ScreenHeight))
 	{}
+	Pipeline(Graphics& gfx, std::shared_ptr<ZBuffer> zBuffer)
+		:
+		gfx(gfx),
+		zBuffer(std::move(zBuffer))
+	{
+		assert(zBuffer->height == gfx.ScreenHeight && zBuffer->width == gfx.ScreenWidth);
+	}
 	void Draw(IndexedTriangleList<Vertex> triangleList) { ProcessVertices(triangleList.vertices, triangleList.indices); }
 	void BeginFrame() {
-		zBuffer.Clear();
+		zBuffer->Clear();
 	}
 private:
 	void ProcessVertices(std::vector<Vertex>& vertices, std::vector<size_t>& indices) {
@@ -179,7 +185,7 @@ private:
 			for (int x = xStart; x < xEnd; x++, leftToRight = leftToRight + changeX) {
 				// get z value
 				const float zValue = 1.0f/leftToRight.pos.z;
-				if (zBuffer.TestAndSet(x, y, zValue)) {
+				if (zBuffer->TestAndSet(x, y, zValue)) {
 					// bring texture coordinates back to orthographic space
 					const outputGeom passIn = leftToRight * zValue;
 					gfx.PutPixel(x, y, effect.pixelShader(passIn));
@@ -192,5 +198,5 @@ public:
 private:
 	Graphics& gfx;
 	NDCTransformer<outputGeom> trans;
-	ZBuffer zBuffer;
+	std::shared_ptr<ZBuffer> zBuffer;
 };

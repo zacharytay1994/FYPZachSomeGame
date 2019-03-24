@@ -60,6 +60,11 @@ private:
 	float theta_z = 0.0f;
 	float zVal = 2.5f;
 	float time = 0.0f;
+
+	// light pos values
+	float lightPosX = 0.0f;
+	float lightPosY = 0.0f;
+	float lightPosZ = 1.0f;
 	TextureVertex tvec1 = TextureVertex( { 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f });
 	TextureVertex tvec2 = TextureVertex({ 300.0f, 10.0f, 1.0f }, { 1.0f, 0.0f });
 	TextureVertex tvec3 = TextureVertex({ 10.0f, 300.0f, 1.0f }, { 0.0f, 1.0f });
@@ -70,11 +75,16 @@ private:
 	TextureVertex tvec31 = TextureVertex({ 400.0f, 300.0f, 1.0f }, { 0.0f, 1.0f });
 	TextureVertex tvec41 = TextureVertex({ 600.0f, 300.0f, 1.0f }, { 1.0f, 1.0f });
 
+	// shared zBuffer
+	std::shared_ptr<ZBuffer> zBuffer;
 	// for testing texture effect
 	Pipeline<TextureEffect> pipeline;
 	IndexedTriangleList<Pipeline<TextureEffect>::Vertex> testList;
 	IndexedTriangleList<Pipeline<TextureEffect>::Vertex> tessellateList;
 
+	// pipeline for point light
+	Pipeline<TextureEffect> pipelineLight; 
+	IndexedTriangleList<Pipeline<TextureEffect>::Vertex> lightList;
 	// for testing color effect
 	//Pipeline<ColorEffect> cPipeline;
 	//IndexedTriangleList<Pipeline<ColorEffect>::Vertex> colorList;

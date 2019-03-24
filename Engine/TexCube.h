@@ -7,7 +7,7 @@
 class TexCube {
 public:
 	template<class T>
-	static IndexedTriangleList<T> GetWrap(float size = 1.0f) {
+	static IndexedTriangleList<T> GetWrap(float size) {
 		const float side = size / 2.0f;
 
 		std::vector<Vecf3> vertices;

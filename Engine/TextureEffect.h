@@ -121,12 +121,12 @@ public:
 			tempPos.z = tempPos.z + (amplitude * std::sin(time * freqScroll + tempPos.x * frequency));
 			tempPos.z = tempPos.z + (amplitude * std::sin(time * freqScroll + tempPos.y * frequency));
 			Vecf3 tangenty1 = { tempPos.x, tempPos.y, amplitude * std::cos(time * freqScroll + tempPos.x * frequency) };
-			Vecf3 tangenty2 = { tempPos.z, tempPos.y, amplitude * std::cos(time * freqScroll + tempPos.z * frequency) };
+			Vecf3 tangenty2 = { tempPos.y, tempPos.z, amplitude * std::cos(time * freqScroll + tempPos.z * frequency) };
 			Vecf3 normal = tangenty2 % tangenty1;
-			Vecf3 tangentx1 = { tempPos.y, tempPos.x, amplitude * std::cos(time * freqScroll + tempPos.y * frequency) };
+			Vecf3 tangentx1 = { tempPos.x, tempPos.y, amplitude * std::cos(time * freqScroll + tempPos.y * frequency) };
 			Vecf3 tangentx2 = { tempPos.z, tempPos.x, amplitude * std::cos(time * freqScroll + tempPos.z * frequency) };
 			Vecf3 normal2 = tangentx1 % tangentx2;
-			Vecf3 tangentz1 = { tempPos.x, tempPos.z, amplitude * std::cos(time * freqScroll + tempPos.x * frequency) };
+			Vecf3 tangentz1 = { tempPos.z, tempPos.x, amplitude * std::cos(time * freqScroll + tempPos.x * frequency) };
 			Vecf3 tangentz2 = { tempPos.y, tempPos.z, amplitude * std::cos(time * freqScroll + tempPos.y * frequency) };
 			Vecf3 normal3 = tangentz1 % tangentz2;
 
@@ -250,7 +250,7 @@ public:
 		// intensity of light, full stream white 100%
 		float diffuseLight = 1.0f;
 		// ambient light around assumed
-		float ambientLight = 0.2f;
+		float ambientLight = 0.1f;
 
 		// point light attributes
 		Vecf3 pointLightPosition = { 0.0f, 0.0f, 2.5f };

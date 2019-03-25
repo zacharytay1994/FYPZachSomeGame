@@ -39,7 +39,7 @@ Game::Game( MainWindow& wnd )
 {
 	// bind texture to pipeline
 	pipeline.effect.pixelShader.BindTexture("sandimage.bmp");
-	for (int i = 0; i < 4; i++) {
+	for (int i = 0; i < 3; i++) {
 		tessellateList = Tessallate::GetTessellate<Pipeline<TextureEffect>::Vertex>(tessellateList);
 	}
 	pipelineLight.effect.pixelShader.BindTexture("whiteimage.bmp");

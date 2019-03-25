@@ -59,12 +59,14 @@ public:
 				pos(pos),
 				texpos(texpos),
 				normal(normal)
+				//worldPos(worldPos)
 			{}
 			// new copy constructor to copy all but pos
 			Output(const Vecf3 pos_in, const Vertex& vert_in, Vecf3 normal)
 				:
 				pos(pos_in),
 				texpos(vert_in.texpos),
+				//worldPos(worldPos),
 				normal(normal)
 			{
 			}
@@ -74,12 +76,13 @@ public:
 			Output& operator/(float val) {
 				pos = pos / val;
 				texpos = texpos / val;
+				//worldPos = worldPos / val;
 				return *this;
 			}
 			Output operator+(const Output& rhs) const {
 				Vecf3 temppos = pos + rhs.pos;
 				Vecf2 temptexpos = texpos + rhs.texpos;
-				Output temp = { temppos, temptexpos, normal + rhs.normal };
+				Output temp = { temppos, temptexpos, normal + rhs.normal};
 				return temp;
 			}
 			Output operator+=(const Output& rhs) {
@@ -92,6 +95,7 @@ public:
 			Vecf3 pos;
 			Vecf2 texpos;
 			Vecf3 normal;
+			//Vecf3 worldPos;
 		};
 	public:
 		void BindRotation(const Matf3& rotation_in) {
@@ -111,19 +115,19 @@ public:
 		Output operator()(const Vertex& vertex_in) const {
 			Vecf3 tempPos = vertex_in.pos * rotation + translation;
 			tempPos.y = tempPos.y + (amplitude * std::sin(time * freqScroll + tempPos.x * frequency));
-			Vecf3 tangenty1 = { tempPos.x, tempPos.y, amplitude * -abs(std::cos(time * freqScroll + tempPos.x * frequency)) };
 			tempPos.y = tempPos.y + (amplitude * std::sin(time * freqScroll + tempPos.z * frequency));
-			Vecf3 tangenty2 = { tempPos.x, tempPos.y, amplitude * -abs(std::cos(time * freqScroll + tempPos.z * frequency)) };
-			Vecf3 normal = tangenty1 % tangenty2;
 			tempPos.x = tempPos.x + (amplitude * std::sin(time * freqScroll + tempPos.y * frequency));
-			Vecf3 tangentx1 = { tempPos.x, tempPos.y, amplitude * -abs(std::cos(time * freqScroll + tempPos.y * frequency)) };
 			tempPos.x = tempPos.x + (amplitude * std::sin(time * freqScroll + tempPos.z * frequency));
-			Vecf3 tangentx2 = { tempPos.x, tempPos.y, amplitude * -abs(std::cos(time * freqScroll + tempPos.z * frequency)) };
-			Vecf3 normal2 = tangentx1 % tangentx2;
 			tempPos.z = tempPos.z + (amplitude * std::sin(time * freqScroll + tempPos.x * frequency));
-			Vecf3 tangentz1 = { tempPos.x, tempPos.y, amplitude * -abs(std::cos(time * freqScroll + tempPos.x * frequency)) };
 			tempPos.z = tempPos.z + (amplitude * std::sin(time * freqScroll + tempPos.y * frequency));
-			Vecf3 tangentz2 = { tempPos.x, tempPos.y, amplitude * -abs(std::sin(time * freqScroll + tempPos.y * frequency)) };
+			Vecf3 tangenty1 = { tempPos.x, tempPos.y, amplitude * std::cos(time * freqScroll + tempPos.x * frequency) };
+			Vecf3 tangenty2 = { tempPos.z, tempPos.y, amplitude * std::cos(time * freqScroll + tempPos.z * frequency) };
+			Vecf3 normal = tangenty2 % tangenty1;
+			Vecf3 tangentx1 = { tempPos.y, tempPos.x, amplitude * std::cos(time * freqScroll + tempPos.y * frequency) };
+			Vecf3 tangentx2 = { tempPos.z, tempPos.x, amplitude * std::cos(time * freqScroll + tempPos.z * frequency) };
+			Vecf3 normal2 = tangentx1 % tangentx2;
+			Vecf3 tangentz1 = { tempPos.x, tempPos.z, amplitude * std::cos(time * freqScroll + tempPos.x * frequency) };
+			Vecf3 tangentz2 = { tempPos.y, tempPos.z, amplitude * std::cos(time * freqScroll + tempPos.y * frequency) };
 			Vecf3 normal3 = tangentz1 % tangentz2;
 
 			Vecf3 resultantNormal = normal + normal2 + normal3;
@@ -149,6 +153,7 @@ public:
 				texpos(texpos),
 				intensity(intensity),
 				normal(normal)
+				//worldPos(worldPos)
 			{}
 			// new copy constructor to copy all but pos
 			Output(const Vecf3 pos_in, const Output& vert_in)
@@ -157,6 +162,7 @@ public:
 				texpos(vert_in.texpos),
 				intensity(vert_in.intensity),
 				normal(vert_in.normal)
+				//worldPos(vert_in.worldPos)
 			{
 			}
 			Output operator-(const Output& rhs) const {
@@ -166,13 +172,15 @@ public:
 				pos = pos / val;
 				texpos = texpos / val;
 				intensity = intensity / val;
+				//worldPos = worldPos / val;
 				return *this;
 			}
 			Output operator+(const Output& rhs) const {
 				Vecf3 temppos = pos + rhs.pos;
 				Vecf2 temptexpos = texpos + rhs.texpos;
 				float tempintensity = intensity + rhs.intensity;
-				Output temp = { temppos, temptexpos, tempintensity, normal };
+				//Vecf3 tempWorldPos = worldPos + rhs.worldPos;
+				Output temp = { temppos, temptexpos, tempintensity, normal};
 				return temp;
 			}
 			Output operator+=(const Output& rhs) {
@@ -186,12 +194,13 @@ public:
 			Vecf2 texpos;
 			Vecf3 normal;
 			float intensity;
+			//Vecf3 worldPos;
 		};
 	public:
 		Triangle<Output> operator()(const VertexShader::Output& v0, const VertexShader::Output& v1, const VertexShader::Output& v2, unsigned int triangleIndex) const {
-			// calculate surface normal
-			//Vecf3 surfaceNormal = ((v1.pos - v0.pos) % (v2.pos - v0.pos)).GetNormalized();
-			// exploding stuff
+			/* calculate surface normal
+			Vecf3 surfaceNormal = ((v1.pos - v0.pos) % (v2.pos - v0.pos)).GetNormalized();
+			 exploding stuff*/
 			/*Vecf3 v0out = v0.pos + surfaceNormal * 0.2 * abs(sin(time / 2));
 			Vecf3 v1out = v1.pos + surfaceNormal * 0.2 * abs(sin(time / 2));
 			Vecf3 v2out = v2.pos + surfaceNormal * 0.2 * abs(sin(time / 2));*/
@@ -221,6 +230,9 @@ public:
 			// face normal flat shading
 			//float intensityIn = std::min(1.0f, std::max(0.0f, (-directionLight * surfaceNormal)) * diffuseLight + ambientLight);
 			return { {v0out, v0.texpos, v0intensityIn, v0.normal}, {v1out, v1.texpos, v1intensityIn, v1.normal}, {v2out, v2.texpos, v2intensityIn, v2.normal} };
+			/*return { {v0.pos, v0.texpos, 1.0f, v0.normal, v0.worldPos},
+			{v1.pos, v1.texpos, 1.0f, v1.normal, v1.worldPos},
+			{v2.pos, v2.texpos, 1.0f, v2.normal, v2.worldPos} };*/
 		}
 		void BindTime(float t) {
 			time = t;
@@ -255,6 +267,17 @@ public:
 		template<class Input>
 		// overload () operator to return a color from input, same as previously in pipeline
 		Color operator()(const Input& input) const {
+
+			//// calculate light intensity per pixel lighting
+			//const Vecf3 lightToVertex = pointLightPosition - input.worldPos;
+			//// calcculate distance to light
+			//const float dist = lightToVertex.Len();
+			//// calculate direction normalize
+			//const Vecf3 pointLightDir = lightToVertex / dist;
+			//// calculate attenuation
+			//const float attenuation = 1.0f / (constant_attenuation + quadratic_attenuation * sq(dist));
+			//// calculate intensity
+			//const float intens = std::min(1.0f, diffuseLight * attenuation *std::max(0.0f, input.normal * pointLightDir) + ambientLight);
 			Vecf3 colorReturn = (Vecf3)texture->GetPixel(
 				(int)std::min(input.texpos.x * tex_width, width_clamp),
 				(int)std::min(input.texpos.y * tex_height, height_clamp));
@@ -268,6 +291,9 @@ public:
 			width_clamp = tex_width - 1.0f;
 			height_clamp = tex_height - 1.0f;
 		}
+		void SetLightPosition(const Vecf3& position) {
+			pointLightPosition = position;
+		}
 		// member variables of pixelshader
 	private:
 		std::unique_ptr<Surface> texture;
@@ -275,6 +301,17 @@ public:
 		float tex_height;
 		float width_clamp;
 		float height_clamp;
+
+		// calculating per pixel attributes
+		float diffuseLight = 1.0f;
+		// ambient light around assumed
+		float ambientLight = 0.2f;
+
+		// point light attributes
+		Vecf3 pointLightPosition = { 0.0f, 0.0f, 2.5f };
+		float quadratic_attenuation = 2.619f;
+		//float linear_attenuation = 1.0f;
+		float constant_attenuation = 1.0f;
 	};
 
 // member variables of TextureEffect

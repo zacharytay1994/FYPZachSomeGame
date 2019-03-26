@@ -114,6 +114,9 @@
     <ClInclude Include="Tessellate.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="TextureEffectPerPixel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DXErr.cpp">
@@ -183,6 +186,9 @@
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="..\..\..\Memes\sandimage.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\..\Memes\checkered.bmp">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

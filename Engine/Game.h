@@ -31,6 +31,7 @@
 #include "Pipeline.h"
 #include "TextureEffect.h"
 #include "ColorEffect.h"
+#include "TextureEffectPerPixel.h"
 
 class Game
 {
@@ -83,8 +84,13 @@ private:
 	IndexedTriangleList<Pipeline<TextureEffect>::Vertex> tessellateList;
 
 	// pipeline for point light
-	Pipeline<TextureEffect> pipelineLight; 
+	Pipeline<TextureEffect> pipelineLight;
 	IndexedTriangleList<Pipeline<TextureEffect>::Vertex> lightList;
+
+	// pipeline for per pixel light
+	Pipeline<TextureEffectPerPixel> pipelinePerPixel;
+	IndexedTriangleList<Pipeline<TextureEffectPerPixel>::Vertex> ppStartList;
+	IndexedTriangleList<Pipeline<TextureEffectPerPixel>::Vertex> ppTesList;
 	// for testing color effect
 	//Pipeline<ColorEffect> cPipeline;
 	//IndexedTriangleList<Pipeline<ColorEffect>::Vertex> colorList;

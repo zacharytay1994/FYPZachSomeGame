@@ -165,6 +165,7 @@
     <ClInclude Include="Tessellate.h" />
     <ClInclude Include="TexCube.h" />
     <ClInclude Include="TextureEffect.h" />
+    <ClInclude Include="TextureEffectPerPixel.h" />
     <ClInclude Include="TextureVertex.h" />
     <ClInclude Include="Triangle.h" />
     <ClInclude Include="Vec2.h" />
@@ -251,6 +252,7 @@
   <ItemGroup>
     <Image Include="..\..\..\..\Downloads\test.bmp" />
     <Image Include="..\..\..\Memes\blackimage.bmp" />
+    <Image Include="..\..\..\Memes\checkered.bmp" />
     <Image Include="..\..\..\Memes\greenimage.bmp" />
     <Image Include="..\..\..\Memes\pikachumeme.bmp" />
     <Image Include="..\..\..\Memes\sandimage.bmp" />

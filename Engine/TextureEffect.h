@@ -130,7 +130,7 @@ public:
 			Vecf3 tangentz2 = { tempPos.y, tempPos.z, amplitude * std::cos(time * freqScroll + tempPos.y * frequency) };
 			Vecf3 normal3 = tangentz1 % tangentz2;
 
-			Vecf3 resultantNormal = normal + normal2 + normal3;
+			Vecf3 resultantNormal = (normal + normal2 + normal3);
 			return { tempPos, vertex_in, resultantNormal.GetNormalized() };
 		}
 	private:
@@ -172,6 +172,7 @@ public:
 				pos = pos / val;
 				texpos = texpos / val;
 				intensity = intensity / val;
+				
 				//worldPos = worldPos / val;
 				return *this;
 			}
@@ -197,7 +198,7 @@ public:
 			//Vecf3 worldPos;
 		};
 	public:
-		Triangle<Output> operator()(const VertexShader::Output& v0, const VertexShader::Output& v1, const VertexShader::Output& v2, unsigned int triangleIndex) const {
+		Triangle<Output> operator()(const VertexShader::Output& v0, const VertexShader::Output& v1, const VertexShader::Output& v2) const {
 			/* calculate surface normal
 			Vecf3 surfaceNormal = ((v1.pos - v0.pos) % (v2.pos - v0.pos)).GetNormalized();
 			 exploding stuff*/
@@ -209,13 +210,21 @@ public:
 			Vecf3 v2out = v2.pos;
 
 			// calculating point light direction
-			const Vecf3 lightToVertexVector = pointLightPosition - v0.pos;
+			const Vecf3 lightToVertexVector0 = pointLightPosition - v0.pos;
+			const Vecf3 lightToVertexVector1 = pointLightPosition - v1.pos;
+			const Vecf3 lightToVertexVector2 = pointLightPosition - v2.pos;
 			// calculating light distance
-			const float lightDistance = lightToVertexVector.Len();
+			const float lightDistance0 = lightToVertexVector0.Len();
+			const float lightDistance1 = lightToVertexVector1.Len();
+			const float lightDistance2 = lightToVertexVector2.Len();
 			// calculate normalized direction of light
-			const Vecf3 lightDirection = lightToVertexVector / lightDistance;
+			const Vecf3 lightDirection0 = lightToVertexVector0 / lightDistance0;
+			const Vecf3 lightDirection1 = lightToVertexVector1 / lightDistance1;
+			const Vecf3 lightDirection2 = lightToVertexVector2 / lightDistance2;
 			// calculate attenuation 
-			const float attenuation = 1.0f / (constant_attenuation + quadratic_attenuation * sq(lightDistance));
+			const float attenuation0 = 1.0f / (constant_attenuation + linear_attenuation * lightDistance0 + quadratic_attenuation * sq(lightDistance0));
+			const float attenuation1 = 1.0f / (constant_attenuation + linear_attenuation * lightDistance1 + quadratic_attenuation * sq(lightDistance1));
+			const float attenuation2 = 1.0f / (constant_attenuation + linear_attenuation * lightDistance2 + quadratic_attenuation * sq(lightDistance2));
 
 			// calculating intensity based on angle
 			// vertex normal gouraud shading
@@ -223,9 +232,9 @@ public:
 			float v1intensityIn = 1.0f;
 			float v2intensityIn = 1.0f;
 			if (!isLight) {
-				v0intensityIn = std::min(1.0f, std::max(0.0f, (-lightDirection * v0.normal)) * diffuseLight * attenuation + ambientLight);
-				v1intensityIn = std::min(1.0f, std::max(0.0f, (-lightDirection * v1.normal)) * diffuseLight * attenuation + ambientLight);
-				v2intensityIn = std::min(1.0f, std::max(0.0f, (-lightDirection * v2.normal)) * diffuseLight * attenuation + ambientLight);
+				v0intensityIn = std::min(1.0f, std::max(0.0f, (-lightDirection0 * v0.normal)) * diffuseLight * attenuation0 + ambientLight);
+				v1intensityIn = std::min(1.0f, std::max(0.0f, (-lightDirection1 * v1.normal)) * diffuseLight * attenuation1 + ambientLight);
+				v2intensityIn = std::min(1.0f, std::max(0.0f, (-lightDirection2 * v2.normal)) * diffuseLight * attenuation2 + ambientLight);
 			}
 			// face normal flat shading
 			//float intensityIn = std::min(1.0f, std::max(0.0f, (-directionLight * surfaceNormal)) * diffuseLight + ambientLight);
@@ -255,8 +264,8 @@ public:
 		// point light attributes
 		Vecf3 pointLightPosition = { 0.0f, 0.0f, 2.5f };
 		float quadratic_attenuation = 2.619f;
-		//float linear_attenuation = 1.0f;
-		float constant_attenuation = 1.0f;
+		float linear_attenuation = 1.0f;
+		float constant_attenuation = 0.382f;
 
 		// temp boolean for test
 		bool isLight = false;

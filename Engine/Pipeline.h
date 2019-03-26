@@ -30,7 +30,7 @@ public:
 		gfx(gfx),
 		zBuffer(std::move(zBuffer))
 	{
-		assert(zBuffer->height == gfx.ScreenHeight && zBuffer->width == gfx.ScreenWidth);
+		//assert(zBuffer->height == gfx.ScreenHeight && zBuffer->width == gfx.ScreenWidth);
 	}
 	void Draw(IndexedTriangleList<Vertex> triangleList) { ProcessVertices(triangleList.vertices, triangleList.indices); }
 	void BeginFrame() {
@@ -63,7 +63,7 @@ private:
 		}
 	}
 	void ProcessTriangle(const outputVertex& v0, const outputVertex& v1, const outputVertex& v2) {
-		PerpectiveTransform(effect.geomShader(v0, v1, v2, 1));
+		PerpectiveTransform(effect.geomShader(v0, v1, v2));
 	} // makeshift geom shader
 	void PerpectiveTransform(Triangle<outputGeom>& triangle) {
 		// NDC transform
@@ -74,8 +74,8 @@ private:
 		DrawTriangle(triangle);
 		/*gfx.DrawLine(triangle.v0.pos, triangle.v1.pos, Colors::White);
 		gfx.DrawLine(triangle.v0.pos, triangle.v2.pos, Colors::White);
-		gfx.DrawLine(triangle.v1.pos, triangle.v2.pos, Colors::White);
-		gfx.DrawLine(triangle.v0.pos, triangle.v0.normal, Colors::Red);
+		gfx.DrawLine(triangle.v1.pos, triangle.v2.pos, Colors::White);*/
+		/*gfx.DrawLine(triangle.v0.pos, triangle.v0.normal, Colors::Red);
 		gfx.DrawLine(triangle.v1.pos, triangle.v1.normal, Colors::Red);
 		gfx.DrawLine(triangle.v2.pos, triangle.v2.normal, Colors::Red);*/
 	}

@@ -51,7 +51,7 @@ Game::Game( MainWindow& wnd )
 
 	pipelineLight.effect.geomShader.SetIsLight(true);
 
-	pipelinePerPixel.effect.pixelShader.BindTexture("checkered.bmp");
+	pipelinePerPixel.effect.pixelShader.BindTexture("whiteimage.bmp");
 	// set colors to vertices in colorList
 	/*colorList.vertices[0].color = (Vecf3)Colors::Red;
 	colorList.vertices[1].color = (Vecf3)Colors::Blue;

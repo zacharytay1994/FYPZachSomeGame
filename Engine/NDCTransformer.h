@@ -21,8 +21,8 @@ public:
 		v.pos.x = (v.pos.x + 1.0f) * horizontalF;
 		v.pos.y = (-v.pos.y + 1.0f) * verticalF;
 
-		//v.normal.x = (v.normal.x + 1.0f) * horizontalF;
-		//v.normal.y = (-v.normal.y + 1.0f) * verticalF;
+		/*v.normal.x = (v.normal.x + 1.0f) * horizontalF;
+		v.normal.y = (-v.normal.y + 1.0f) * verticalF;*/
 		// store z inverse for calculation purposes later on
 		v.pos.z = zInv;
 		return v;

@@ -157,7 +157,7 @@ public:
 		float time;
 		float frequency = 8.0f;
 		float amplitude = 0.10f;
-		float freqScroll = 0.0f;
+		float freqScroll = 1.0f;
 	};
 
 	class GeomShader {
@@ -230,6 +230,8 @@ public:
 	public:
 		template<class Input>
 		Color operator()(const Input& input) const {
+			// calculate normal
+			const Vecf3 normalizedNormal = input.normal.GetNormalized();
 			// calculate light intensity per pixel lighting
 			const Vecf3 lightToVertex = pointLightPosition - input.worldPos;
 			// calcculate distance to light
@@ -238,8 +240,20 @@ public:
 			const Vecf3 pointLightDir = lightToVertex / dist;
 			// calculate attenuation
 			const float attenuation = 1.0f / (constant_attenuation + linear_attenuation * dist + quadratic_attenuation * sq(dist));
+
+			// calculate specular highlight
+			// projection of light dir vector on n hat
+			const float lProjection = lightToVertex * normalizedNormal;
+			// normal * scalar
+			const Vecf3 normalScaled = normalizedNormal * lProjection;
+			// calculate reflection vector
+			const Vecf3 reflectionVector = (normalScaled * 2.0f) - lightToVertex;
+			// calculate specular intensity
+			const float s = std::pow(std::max(0.0f, reflectionVector.GetNormalized() * -input.worldPos.GetNormalized()), specularPower);
+			const float specularIntensity = diffuseLight * specularScalar * s;
+
 			// calculate intensity
-			const float intensity = std::min(1.0f, std::max(0.0f, (-pointLightDir * input.normal)) * diffuseLight * attenuation + ambientLight);
+			const float intensity = std::min(1.0f, std::max(0.0f, (-pointLightDir * normalizedNormal)) * diffuseLight * attenuation + ambientLight + specularIntensity);
 
 			Vecf3 colorReturn = (Vecf3)texture->GetPixel(
 				(int)std::min(input.texpos.x * tex_width, width_clamp),
@@ -267,13 +281,18 @@ public:
 		// diffuse light intensity
 		float diffuseLight = 1.0f;
 		// ambient light around assumed
-		float ambientLight = 0.1f;
+		float ambientLight = 0.2f;
 
 		// point light attributes
 		Vecf3 pointLightPosition = { 0.0f, 0.0f, 2.5f };
-		float quadratic_attenuation = 2.619f;
-		float linear_attenuation = 1.0f;
-		float constant_attenuation = 0.382f;
+		float quadratic_attenuation = 4.619f;
+		float linear_attenuation = 0.2f;
+		float constant_attenuation = 0.2f;
+
+		// specular highlight attributes
+		float specularScalar = 0.8f;
+		// to alter fall off with angle
+		float specularPower = 60.0f;
 	};
 public:
 	PixelShader pixelShader;

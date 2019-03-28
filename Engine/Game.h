@@ -65,7 +65,7 @@ private:
 	// light pos values
 	float lightPosX = 0.0f;
 	float lightPosY = 0.0f;
-	float lightPosZ = 1.0f;
+	float lightPosZ = 2.5f;
 	TextureVertex tvec1 = TextureVertex( { 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f });
 	TextureVertex tvec2 = TextureVertex({ 300.0f, 10.0f, 1.0f }, { 1.0f, 0.0f });
 	TextureVertex tvec3 = TextureVertex({ 10.0f, 300.0f, 1.0f }, { 0.0f, 1.0f });

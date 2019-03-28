@@ -133,9 +133,9 @@ public:
 			Vecf3 tangentz2 = { tempPos.y, tempPos.z, amplitude * std::cos(time * freqScroll + tempPos.y * frequency) };
 			Vecf3 normal3 = tangentz1 % tangentz2;
 
-			Vecf3 resultantNormal = (normal + normal2 + normal3);
+			Vecf3 resultantNormal = (normal + normal2 + normal3) / 3;
 			// return vertex shader output
-			return { tempPos, vertex_in, resultantNormal.GetNormalized() };
+			return { tempPos, vertex_in, resultantNormal };
 		}
 		void BindRotation(const Matf3& rotation_in) {
 			rotation = rotation_in;
@@ -156,8 +156,8 @@ public:
 		Vecf3 translation;
 		float time;
 		float frequency = 8.0f;
-		float amplitude = 0.10f;
-		float freqScroll = 1.0f;
+		float amplitude = 0.1f;
+		float freqScroll = 2.0f;
 	};
 
 	class GeomShader {
@@ -281,7 +281,7 @@ public:
 		// diffuse light intensity
 		float diffuseLight = 1.0f;
 		// ambient light around assumed
-		float ambientLight = 0.2f;
+		float ambientLight = 0.1f;
 
 		// point light attributes
 		Vecf3 pointLightPosition = { 0.0f, 0.0f, 2.5f };

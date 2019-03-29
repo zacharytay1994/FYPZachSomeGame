@@ -155,6 +155,7 @@
     <ClInclude Include="Mat2.h" />
     <ClInclude Include="Mat3.h" />
     <ClInclude Include="MathStuff.h" />
+    <ClInclude Include="MatTemplate.h" />
     <ClInclude Include="Mouse.h" />
     <ClInclude Include="NDCTransformer.h" />
     <ClInclude Include="Pipeline.h" />
@@ -170,6 +171,7 @@
     <ClInclude Include="Triangle.h" />
     <ClInclude Include="Vec2.h" />
     <ClInclude Include="Vec3.h" />
+    <ClInclude Include="Vec4.h" />
     <ClInclude Include="ZBuffer.h" />
   </ItemGroup>
   <ItemGroup>

@@ -21,7 +21,7 @@
 #include "MainWindow.h"
 #include "Game.h"
 #include "Mat2.h"
-#include "Mat3.h"
+#include "MatTemplate.h"
 #include "Pipeline.h"
 #include "Tessellate.h"
 
@@ -136,24 +136,27 @@ void Game::ComposeFrame()
 	pipeline.BeginFrame();
 	//cPipeline.BeginFrame();
 	// bind transforms
-	const Matf3 rot =
+	/*const Matf3 rot =
 		Matf3::RotationZ(theta_z) *
 		Matf3::RotationX(theta_x) *
-		Matf3::RotationY(theta_y);
-	pipeline.effect.vertexShader.BindRotation(rot);
+		Matf3::RotationY(theta_y);*/
+	//pipeline.effect.vertexShader.BindRotation(rot);
 	const Vecf3 translate = { 0.0f, 0.0f, zVal };
-	pipeline.effect.vertexShader.BindTranslation(translate);
+	//pipeline.effect.vertexShader.BindTranslation(translate);
+	pipeline.effect.vertexShader.BindTransformation(Matf4::RotationZ(theta_z) * Matf4::RotationX(theta_x) * Matf4::RotationY(theta_y) * Matf4::Translation(translate));
 	pipeline.effect.vertexShader.SetTime(time);
 	//pipeline.effect.geomShader.BindTime(time);
 	pipeline.effect.geomShader.SetLightPosition({ lightPosX, lightPosY, lightPosZ });
 
 	// draw light source
-	pipelineLight.effect.vertexShader.BindRotation(rot);
-	pipelineLight.effect.vertexShader.BindTranslation({ lightPosX, lightPosY, lightPosZ });
+	/*pipelineLight.effect.vertexShader.BindRotation(rot);
+	pipelineLight.effect.vertexShader.BindTranslation({ lightPosX, lightPosY, lightPosZ });*/
+	pipelineLight.effect.vertexShader.BindTransformation(Matf4::RotationZ(theta_z) * Matf4::RotationX(theta_x) * Matf4::RotationY(theta_y) * Matf4::Translation(lightPosX, lightPosY, lightPosZ));
 
 	// per pixel pipeline
-	pipelinePerPixel.effect.vertexShader.BindRotation(rot);
-	pipelinePerPixel.effect.vertexShader.BindTranslation(translate);
+	/*pipelinePerPixel.effect.vertexShader.BindRotation(rot);
+	pipelinePerPixel.effect.vertexShader.BindTranslation(translate);*/
+	pipelinePerPixel.effect.vertexShader.BindTransformation(Matf4::RotationZ(theta_z) * Matf4::RotationX(theta_x) * Matf4::RotationY(theta_y) * Matf4::Translation(translate));
 	pipelinePerPixel.effect.vertexShader.SetTime(time);
 	pipelinePerPixel.effect.pixelShader.SetLightPosition({ lightPosX, lightPosY, lightPosZ });
 	

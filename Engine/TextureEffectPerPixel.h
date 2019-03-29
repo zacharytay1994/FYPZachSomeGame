@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Vec3.h"
-#include "Mat3.h"
+#include "MatTemplate.h"
 #include "Triangle.h"
 #include "Surface.h"
 
@@ -106,10 +106,10 @@ public:
 				return *this;
 			}
 		public:
-			Vecf3 pos;
+			Vecf4 pos;
 			Vecf2 texpos;
 			Vecf3 worldPos;
-			Vecf3 normal;
+			Vecf4 normal;
 		};
 	public:
 		Output operator()(const Vertex& vertex_in) {
@@ -134,18 +134,20 @@ public:
 			Vecf3 normal3 = tangentz1 % tangentz2;
 			Vecf3 resultantNormal = (normal + normal2 + normal3) / 3;
 			// transform from model space to world space
-			Vecf3 postTransNormal = resultantNormal * rotation;
-			Vecf3 tempPos = preTransPos * rotation + translation;
+			// converting normal from vec3 to vec4 with w as 0 to negate translation
+			Vecf4 postTransNormal = Vecf4(resultantNormal, 0.0f) * transformation;
+			// transforming position
+			Vecf4 tempPos = Vecf4(preTransPos) * transformation;
 			
 			// return vertex shader output
 			return { tempPos, vertex_in, postTransNormal };
 		}
-		void BindRotation(const Matf3& rotation_in) {
+		/*void BindRotation(const Matf3& rotation_in) {
 			rotation = rotation_in;
 		}
 		void BindTranslation(const Vecf3& translation_in) {
 			translation = translation_in;
-		}
+		}*/
 		void SetTime(float t) {
 			time = t;
 		}
@@ -154,9 +156,13 @@ public:
 			amplitude = amplitudeIn;
 			freqScroll = scrollIn;
 		}
+		void BindTransformation(const Matf4& transformation_in) {
+			transformation = transformation_in;
+		}
 	private: // vertex shader attributes
-		Matf3 rotation;
-		Vecf3 translation;
+		Matf4 transformation;
+		/*Matf3 rotation;
+		Vecf3 translation;*/
 		float time;
 		float frequency = 0.0f;
 		float amplitude = 0.0f;
@@ -169,14 +175,14 @@ public:
 		public:
 			// constructors
 			Output() = default;
-			Output(const Vecf3& pos, const Vecf2& texpos, const Vecf3& worldPos, const Vecf3& normal)
+			Output(const Vecf4 pos, const Vecf2& texpos, const Vecf3& worldPos, const Vecf4& normal)
 				:
 				pos(pos),
 				texpos(texpos),
 				worldPos(worldPos),
 				normal(normal)
 			{}
-			Output(const Vecf3& pos, const VertexShader::Output& vertex_in)
+			Output(const Vecf4& pos, const VertexShader::Output& vertex_in)
 				:
 				pos(pos),
 				texpos(vertex_in.texpos),
@@ -215,10 +221,10 @@ public:
 				return *this;
 			}
 		public:
-			Vecf3 pos;
+			Vecf4 pos;
 			Vecf2 texpos;
 			Vecf3 worldPos;
-			Vecf3 normal;
+			Vecf4 normal;
 		};
 	public:
 		Triangle<Output> operator()(const VertexShader::Output& v0, const VertexShader::Output& v1, const VertexShader::Output& v2) {
@@ -288,8 +294,10 @@ public:
 
 		// point light attributes
 		Vecf3 pointLightPosition = { 0.0f, 0.0f, 2.5f };
+		// linear and quadratic dont affect much
 		float quadratic_attenuation = 2.619f;
 		float linear_attenuation = 2.0f;
+		// higher constant attenuation means less attenuation
 		float constant_attenuation = 0.2f;
 
 		// specular highlight attributes

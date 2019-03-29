@@ -7,8 +7,7 @@
 template <typename T>
 class Vec3 : public Vec2<T> {
 public:
-	Vec3()
-	{}
+	Vec3() = default;
 	Vec3(T x, T y, T z)
 		:
 		Vec2(x, y),

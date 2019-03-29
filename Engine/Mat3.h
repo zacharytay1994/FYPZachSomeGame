@@ -103,6 +103,6 @@ Vec3<T> operator*=(Vec3<T>& lhs, const Mat3<T>& rhs) {
 	return lhs = lhs * rhs;
 }
 
-typedef Mat3<float> Matf3;
-typedef Mat3<double> Matd3;
+typedef Mat3<float> Matf3old;
+typedef Mat3<double> Matd3old;
 typedef Mat3<int> Mati3;

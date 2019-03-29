@@ -62,7 +62,7 @@ public:
 				//worldPos(worldPos)
 			{}
 			// new copy constructor to copy all but pos
-			Output(const Vecf3 pos_in, const Vertex& vert_in, Vecf3 normal)
+			Output(const Vecf4 pos_in, const Vertex& vert_in, Vecf4 normal)
 				:
 				pos(pos_in),
 				texpos(vert_in.texpos),
@@ -92,17 +92,20 @@ public:
 				return Output(pos * val, texpos * val, normal);
 			}
 		public:
-			Vecf3 pos;
+			Vecf4 pos;
 			Vecf2 texpos;
 			Vecf3 normal;
 			//Vecf3 worldPos;
 		};
 	public:
-		void BindRotation(const Matf3& rotation_in) {
+		/*void BindRotation(const Matf3& rotation_in) {
 			rotation = rotation_in;
 		}
 		void BindTranslation(const Vecf3& translation_in) {
 			translation = translation_in;
+		}*/
+		void BindTransformation(const Matf4& transformation_in) {
+			transformation = transformation_in;
 		}
 		void SetTime(float t) {
 			time = t;
@@ -113,7 +116,7 @@ public:
 			freqScroll = scrollIn;
 		}
 		Output operator()(const Vertex& vertex_in) const {
-			Vecf3 tempPos = vertex_in.pos * rotation + translation;
+			Vecf4 tempPos = Vecf4(vertex_in.pos) * transformation;
 			tempPos.y = tempPos.y + (amplitude * std::sin(time * freqScroll + tempPos.x * frequency));
 			tempPos.y = tempPos.y + (amplitude * std::sin(time * freqScroll + tempPos.z * frequency));
 			tempPos.x = tempPos.x + (amplitude * std::sin(time * freqScroll + tempPos.y * frequency));
@@ -134,8 +137,9 @@ public:
 			return { tempPos, vertex_in, resultantNormal.GetNormalized() };
 		}
 	private:
-		Matf3 rotation;
-		Vecf3 translation;
+		Matf4 transformation;
+		/*Matf3 rotation;
+		Vecf3 translation;*/
 		float time;
 		float frequency = 8.0f;
 		float amplitude = 0.10f;

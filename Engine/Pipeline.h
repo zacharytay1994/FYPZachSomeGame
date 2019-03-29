@@ -4,7 +4,7 @@
 #include "Graphics.h"
 #include "NDCTransformer.h"
 #include "Surface.h"
-#include "Mat3.h"
+#include "MatTemplate.h"
 #include "IndexedTriangleList.h"
 #include "Triangle.h"
 #include "ZBuffer.h"

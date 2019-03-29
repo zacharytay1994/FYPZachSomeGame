@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Mat3.h"
+#include "MatTemplate.h"
 #include "Vec3.h"
 
 template<class T>

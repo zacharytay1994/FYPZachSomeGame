@@ -42,7 +42,7 @@ Game::Game( MainWindow& wnd )
 {
 	// bind texture to pipeline
 	pipeline.effect.pixelShader.BindTexture("sandimage.bmp");
-	for (int i = 0; i < 2; i++) {
+	for (int i = 0; i < 0; i++) {
 		tessellateList = Tessallate::GetTessellate<Pipeline<TextureEffect>::Vertex>(tessellateList);
 		ppTesList = Tessallate::GetTessellate<Pipeline<TextureEffectPerPixel>::Vertex>(ppTesList);
 	}
@@ -51,7 +51,7 @@ Game::Game( MainWindow& wnd )
 
 	pipelineLight.effect.geomShader.SetIsLight(true);
 
-	pipelinePerPixel.effect.pixelShader.BindTexture("waterimage.bmp");
+	pipelinePerPixel.effect.pixelShader.BindTexture("whiteimage.bmp");
 	// set colors to vertices in colorList
 	/*colorList.vertices[0].color = (Vecf3)Colors::Red;
 	colorList.vertices[1].color = (Vecf3)Colors::Blue;
@@ -102,7 +102,7 @@ void Game::UpdateModel()
 	}
 	if (wnd.kbd.KeyIsPressed('D'))
 	{
-		theta_z -= dTheta * dt;
+		theta_x += dTheta * dt;
 	}
 	if (wnd.kbd.KeyIsPressed('O')) {
 		zVal += 1.0 * dt;

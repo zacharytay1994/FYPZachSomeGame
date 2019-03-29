@@ -113,29 +113,32 @@ public:
 		};
 	public:
 		Output operator()(const Vertex& vertex_in) {
-			// transform from model space to world space
-			Vecf3 tempPos = vertex_in.pos * rotation + translation;
+			// Vecf3 temp
+			Vecf3 preTransPos = vertex_in.pos;
 			// transform vertices
-			tempPos.y = tempPos.y + (amplitude * std::sin(time * freqScroll + tempPos.x * frequency));
-			tempPos.y = tempPos.y + (amplitude * std::sin(time * freqScroll + tempPos.z * frequency));
-			tempPos.x = tempPos.x + (amplitude * std::sin(time * freqScroll + tempPos.y * frequency));
-			tempPos.x = tempPos.x + (amplitude * std::sin(time * freqScroll + tempPos.z * frequency));
-			tempPos.z = tempPos.z + (amplitude * std::sin(time * freqScroll + tempPos.x * frequency));
-			tempPos.z = tempPos.z + (amplitude * std::sin(time * freqScroll + tempPos.y * frequency));
+			preTransPos.y = preTransPos.y + (amplitude * std::sin(time * freqScroll + preTransPos.x * frequency));
+			preTransPos.y = preTransPos.y + (amplitude * std::sin(time * freqScroll + preTransPos.z * frequency));
+			preTransPos.x = preTransPos.x + (amplitude * std::sin(time * freqScroll + preTransPos.y * frequency));
+			preTransPos.x = preTransPos.x + (amplitude * std::sin(time * freqScroll + preTransPos.z * frequency));
+			preTransPos.z = preTransPos.z + (amplitude * std::sin(time * freqScroll + preTransPos.x * frequency));
+			preTransPos.z = preTransPos.z + (amplitude * std::sin(time * freqScroll + preTransPos.y * frequency));
 			// calculate normals of vertices
-			Vecf3 tangenty1 = { tempPos.x, tempPos.y, amplitude * std::cos(time * freqScroll + tempPos.x * frequency) };
-			Vecf3 tangenty2 = { tempPos.y, tempPos.z, amplitude * std::cos(time * freqScroll + tempPos.z * frequency) };
+			Vecf3 tangenty1 = { preTransPos.x, preTransPos.y, amplitude * std::cos(time * freqScroll + preTransPos.x * frequency) };
+			Vecf3 tangenty2 = { preTransPos.y, preTransPos.z, amplitude * std::cos(time * freqScroll + preTransPos.z * frequency) };
 			Vecf3 normal = tangenty2 % tangenty1;
-			Vecf3 tangentx1 = { tempPos.x, tempPos.y, amplitude * std::cos(time * freqScroll + tempPos.y * frequency) };
-			Vecf3 tangentx2 = { tempPos.z, tempPos.x, amplitude * std::cos(time * freqScroll + tempPos.z * frequency) };
+			Vecf3 tangentx1 = { preTransPos.x, preTransPos.y, amplitude * std::cos(time * freqScroll + preTransPos.y * frequency) };
+			Vecf3 tangentx2 = { preTransPos.z, preTransPos.x, amplitude * std::cos(time * freqScroll + preTransPos.z * frequency) };
 			Vecf3 normal2 = tangentx1 % tangentx2;
-			Vecf3 tangentz1 = { tempPos.z, tempPos.x, amplitude * std::cos(time * freqScroll + tempPos.x * frequency) };
-			Vecf3 tangentz2 = { tempPos.y, tempPos.z, amplitude * std::cos(time * freqScroll + tempPos.y * frequency) };
+			Vecf3 tangentz1 = { preTransPos.z, preTransPos.x, amplitude * std::cos(time * freqScroll + preTransPos.x * frequency) };
+			Vecf3 tangentz2 = { preTransPos.y, preTransPos.z, amplitude * std::cos(time * freqScroll + preTransPos.y * frequency) };
 			Vecf3 normal3 = tangentz1 % tangentz2;
-
 			Vecf3 resultantNormal = (normal + normal2 + normal3) / 3;
+			// transform from model space to world space
+			Vecf3 postTransNormal = resultantNormal * rotation;
+			Vecf3 tempPos = preTransPos * rotation + translation;
+			
 			// return vertex shader output
-			return { tempPos, vertex_in, resultantNormal };
+			return { tempPos, vertex_in, postTransNormal };
 		}
 		void BindRotation(const Matf3& rotation_in) {
 			rotation = rotation_in;
@@ -155,9 +158,9 @@ public:
 		Matf3 rotation;
 		Vecf3 translation;
 		float time;
-		float frequency = 8.0f;
-		float amplitude = 0.1f;
-		float freqScroll = 2.0f;
+		float frequency = 0.0f;
+		float amplitude = 0.0f;
+		float freqScroll = 0.0f;
 	};
 
 	class GeomShader {
@@ -285,14 +288,14 @@ public:
 
 		// point light attributes
 		Vecf3 pointLightPosition = { 0.0f, 0.0f, 2.5f };
-		float quadratic_attenuation = 4.619f;
-		float linear_attenuation = 0.2f;
+		float quadratic_attenuation = 2.619f;
+		float linear_attenuation = 2.0f;
 		float constant_attenuation = 0.2f;
 
 		// specular highlight attributes
 		float specularScalar = 0.8f;
 		// to alter fall off with angle
-		float specularPower = 60.0f;
+		float specularPower = 100.0f;
 	};
 public:
 	PixelShader pixelShader;

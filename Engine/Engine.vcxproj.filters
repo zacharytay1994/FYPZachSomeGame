@@ -191,5 +191,8 @@
     <Image Include="..\..\..\Memes\checkered.bmp">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="..\..\..\Memes\silverimage.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

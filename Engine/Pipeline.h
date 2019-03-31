@@ -48,6 +48,8 @@ private:
 		AssembleTriangles(verticesOut, indices);
 	}
 	void AssembleTriangles(const std::vector<outputVertex>& vertices, const std::vector<size_t>& indices) {
+		// calculate origin with perspective projection matrix
+		const Vecf4 eyepos = Vecf4{ 0.0f, 0.0f, 0.0f, 1.0f } * effect.vertexShader.GetProj();
 		// loops and create triangles
 		for (size_t i = 0, end = indices.size() / 3; i < end; i++) {
 			// get vertices by index
@@ -56,8 +58,8 @@ private:
 			const outputVertex& v2 = vertices[indices[i * 3 + 2]];
 
 			// backface cull
-			float testVal = ((v1.pos - v0.pos) % (v2.pos - v0.pos)) * v0.pos;
-			if ((v1.pos - v0.pos) % (v2.pos - v0.pos) * v0.pos <= 0.0f) {
+			float testVal = ((v1.pos - v0.pos) % (v2.pos - v0.pos)) * Vecf3(v0.pos - eyepos);
+			if ((v1.pos - v0.pos) % (v2.pos - v0.pos) * Vecf3(v0.pos - eyepos) <= 0.0f) {
 				ProcessTriangle( v0, v1, v2 );
 			}
 		}
@@ -184,10 +186,12 @@ private:
 			// loop for x
 			for (int x = xStart; x < xEnd; x++, leftToRight = leftToRight + changeX) {
 				// get z value
-				const float zValue = 1.0f/leftToRight.pos.z;
+				const float zValue = leftToRight.pos.z;
 				if (zBuffer->TestAndSet(x, y, zValue)) {
+					// get w back from winv
+					const float w = 1.0f/leftToRight.pos.w;
 					// bring texture coordinates back to orthographic space
-					const outputGeom passIn = leftToRight * zValue;
+					const outputGeom passIn = leftToRight * w;
 					gfx.PutPixel(x, y, effect.pixelShader(passIn));
 				}
 			}

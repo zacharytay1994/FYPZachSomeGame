@@ -141,9 +141,11 @@ void Game::ComposeFrame()
 		Matf3::RotationX(theta_x) *
 		Matf3::RotationY(theta_y);*/
 	//pipeline.effect.vertexShader.BindRotation(rot);
+	const Matf4 proj = Matf4::Projection(4.0f, 2.0f, 1.0f, 10.0f);
 	const Vecf3 translate = { 0.0f, 0.0f, zVal };
 	//pipeline.effect.vertexShader.BindTranslation(translate);
-	pipeline.effect.vertexShader.BindTransformation(Matf4::RotationZ(theta_z) * Matf4::RotationX(theta_x) * Matf4::RotationY(theta_y) * Matf4::Translation(translate));
+	pipeline.effect.vertexShader.BindWorld(Matf4::RotationZ(theta_z) * Matf4::RotationX(theta_x) * Matf4::RotationY(theta_y) * Matf4::Translation(translate));
+	pipeline.effect.vertexShader.BindProjection(proj);
 	pipeline.effect.vertexShader.SetTime(time);
 	//pipeline.effect.geomShader.BindTime(time);
 	pipeline.effect.geomShader.SetLightPosition({ lightPosX, lightPosY, lightPosZ });
@@ -151,12 +153,15 @@ void Game::ComposeFrame()
 	// draw light source
 	/*pipelineLight.effect.vertexShader.BindRotation(rot);
 	pipelineLight.effect.vertexShader.BindTranslation({ lightPosX, lightPosY, lightPosZ });*/
-	pipelineLight.effect.vertexShader.BindTransformation(Matf4::RotationZ(theta_z) * Matf4::RotationX(theta_x) * Matf4::RotationY(theta_y) * Matf4::Translation(lightPosX, lightPosY, lightPosZ));
-
+	pipelineLight.effect.vertexShader.BindWorld(Matf4::RotationZ(theta_z) * Matf4::RotationX(theta_x) * Matf4::RotationY(theta_y) * Matf4::Translation(lightPosX, lightPosY, lightPosZ));
+	pipelineLight.effect.vertexShader.BindProjection(proj);
 	// per pixel pipeline
 	/*pipelinePerPixel.effect.vertexShader.BindRotation(rot);
 	pipelinePerPixel.effect.vertexShader.BindTranslation(translate);*/
-	pipelinePerPixel.effect.vertexShader.BindTransformation(Matf4::RotationZ(theta_z) * Matf4::RotationX(theta_x) * Matf4::RotationY(theta_y) * Matf4::Translation(translate));
+	// defaut projection matrix
+	
+	pipelinePerPixel.effect.vertexShader.BindWorld(Matf4::RotationZ(theta_z) * Matf4::RotationX(theta_x) * Matf4::RotationY(theta_y) * Matf4::Translation(translate));
+	pipelinePerPixel.effect.vertexShader.BindProjection(proj);
 	pipelinePerPixel.effect.vertexShader.SetTime(time);
 	pipelinePerPixel.effect.pixelShader.SetLightPosition({ lightPosX, lightPosY, lightPosZ });
 	

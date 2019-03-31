@@ -54,7 +54,7 @@ public:
 		class Output {
 		public:
 			Output() = default;
-			Output(const Vecf3& pos, const Vecf2& texpos, const Vecf3& normal)
+			Output(const Vecf4& pos, const Vecf2& texpos, const Vecf3& normal)
 				:
 				pos(pos),
 				texpos(texpos),
@@ -104,8 +104,19 @@ public:
 		void BindTranslation(const Vecf3& translation_in) {
 			translation = translation_in;
 		}*/
-		void BindTransformation(const Matf4& transformation_in) {
+		/*void BindTransformation(const Matf4& transformation_in) {
 			transformation = transformation_in;
+		}*/
+		void BindWorld(const Matf4& transformation_in) {
+			world = transformation_in;
+			worldProj = world * proj;
+		}
+		void BindProjection(const Matf4& transformation_in) {
+			proj = transformation_in;
+			worldProj = world * proj;
+		}
+		const Matf4& GetProj() const {
+			return proj;
 		}
 		void SetTime(float t) {
 			time = t;
@@ -116,7 +127,7 @@ public:
 			freqScroll = scrollIn;
 		}
 		Output operator()(const Vertex& vertex_in) const {
-			Vecf4 tempPos = Vecf4(vertex_in.pos) * transformation;
+			Vecf4 tempPos = Vecf4(vertex_in.pos) * worldProj;
 			tempPos.y = tempPos.y + (amplitude * std::sin(time * freqScroll + tempPos.x * frequency));
 			tempPos.y = tempPos.y + (amplitude * std::sin(time * freqScroll + tempPos.z * frequency));
 			tempPos.x = tempPos.x + (amplitude * std::sin(time * freqScroll + tempPos.y * frequency));
@@ -137,13 +148,20 @@ public:
 			return { tempPos, vertex_in, resultantNormal.GetNormalized() };
 		}
 	private:
-		Matf4 transformation;
+		//Matf4 transformation;
 		/*Matf3 rotation;
 		Vecf3 translation;*/
 		float time;
 		float frequency = 8.0f;
 		float amplitude = 0.10f;
 		float freqScroll = 2.0f;
+
+		// world transform with no persp proj
+		Matf4 world = Matf4::Identity();
+		// persp proj transform
+		Matf4 proj = Matf4::Identity();
+		// both together
+		Matf4 worldProj = Matf4::Identity();
 	};
 
 	class GeomShader {
@@ -151,7 +169,7 @@ public:
 		class Output {
 		public:
 			Output() = default;
-			Output(const Vecf3& pos, const Vecf2& texpos, const float& intensity, const Vecf3& normal)
+			Output(const Vecf4& pos, const Vecf2& texpos, const float& intensity, const Vecf3& normal)
 				:
 				pos(pos),
 				texpos(texpos),
@@ -160,7 +178,7 @@ public:
 				//worldPos(worldPos)
 			{}
 			// new copy constructor to copy all but pos
-			Output(const Vecf3 pos_in, const Output& vert_in)
+			Output(const Vecf4 pos_in, const Output& vert_in)
 				:
 				pos(pos_in),
 				texpos(vert_in.texpos),
@@ -195,7 +213,7 @@ public:
 				return Output(pos * val, texpos * val, intensity * val, normal);
 			}
 		public:
-			Vecf3 pos;
+			Vecf4 pos;
 			Vecf2 texpos;
 			Vecf3 normal;
 			float intensity;
@@ -209,9 +227,9 @@ public:
 			/*Vecf3 v0out = v0.pos + surfaceNormal * 0.2 * abs(sin(time / 2));
 			Vecf3 v1out = v1.pos + surfaceNormal * 0.2 * abs(sin(time / 2));
 			Vecf3 v2out = v2.pos + surfaceNormal * 0.2 * abs(sin(time / 2));*/
-			Vecf3 v0out = v0.pos;
-			Vecf3 v1out = v1.pos;
-			Vecf3 v2out = v2.pos;
+			Vecf4 v0out = v0.pos;
+			Vecf4 v1out = v1.pos;
+			Vecf4 v2out = v2.pos;
 
 			// calculating point light direction
 			const Vecf3 lightToVertexVector0 = pointLightPosition - v0.pos;

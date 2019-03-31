@@ -60,36 +60,36 @@ public:
 		public:
 			// constructors
 			Output() = default;
-			Output(const Vecf3& pos, const Vecf2& texpos, const Vecf3& worldPos, const Vecf3& normal)
+			Output(const Vecf4& pos, const Vecf2& texpos, const Vecf3& worldPos, const Vecf4& normal) // i dont really use this constructor
 				:
 				pos(pos),
 				texpos(texpos),
 				worldPos(worldPos),
 				normal(normal)
 			{}
-			Output(const Vecf3& pos, const Vertex& vertex_in, const Vecf3& normal) 
+			Output(const Vecf4& pos, const Vertex& vertex_in, const Vecf3 worldPos, const Vecf4& normal) 
 				:
 				pos(pos),
 				texpos(vertex_in.texpos),
-				worldPos(pos),
+				worldPos(worldPos),
 				normal(normal)
 			{}
 			// operators
 			Output operator+(const Output& rhs) const {
-				Vecf3 temppos = pos + rhs.pos;
+				Vecf4 temppos = pos + rhs.pos;
 				Vecf2 temptexpos = texpos + rhs.texpos;
 				Vecf3 tempworldPos = worldPos + rhs.worldPos;
-				Vecf3 tempnormal = normal + rhs.normal;
+				Vecf4 tempnormal = normal + rhs.normal;
 				return { temppos, temptexpos, tempworldPos, tempnormal };
 			}
 			Output operator+=(const Output& rhs) {
 				return *this + rhs;
 			}
 			Output operator-(const Output& rhs) const {
-				Vecf3 temppos = pos - rhs.pos;
+				Vecf4 temppos = pos - rhs.pos;
 				Vecf2 temptexpos = texpos - rhs.texpos;
 				Vecf3 tempworldPos = worldPos - rhs.worldPos;
-				Vecf3 tempnormal = normal - rhs.normal;
+				Vecf4 tempnormal = normal - rhs.normal;
 				return { temppos, temptexpos, tempworldPos, tempnormal };
 			}
 			Output operator-=(const Output& rhs) {
@@ -135,12 +135,13 @@ public:
 			Vecf3 resultantNormal = (normal + normal2 + normal3) / 3;
 			// transform from model space to world space
 			// converting normal from vec3 to vec4 with w as 0 to negate translation
-			Vecf4 postTransNormal = Vecf4(resultantNormal, 0.0f) * transformation;
+			Vecf4 postTransNormal = Vecf4(resultantNormal, 0.0f) * world;
 			// transforming position
-			Vecf4 tempPos = Vecf4(preTransPos) * transformation;
+			Vecf4 tempPos = Vecf4(preTransPos) * worldProj;
+			Vecf4 tempPosWorld = Vecf4(preTransPos) * world;
 			
 			// return vertex shader output
-			return { tempPos, vertex_in, postTransNormal };
+			return { tempPos, vertex_in, tempPosWorld, postTransNormal };
 		}
 		/*void BindRotation(const Matf3& rotation_in) {
 			rotation = rotation_in;
@@ -156,17 +157,36 @@ public:
 			amplitude = amplitudeIn;
 			freqScroll = scrollIn;
 		}
-		void BindTransformation(const Matf4& transformation_in) {
+		/*void BindTransformation(const Matf4& transformation_in) {
 			transformation = transformation_in;
+		}*/
+		void BindWorld(const Matf4& transformation_in) {
+			world = transformation_in;
+			worldProj = world * proj;
+		}
+		void BindProjection(const Matf4& transformation_in) {
+			proj = transformation_in;
+			worldProj = world * proj;
+		}
+		const Matf4& GetProj() const {
+			return proj;
 		}
 	private: // vertex shader attributes
-		Matf4 transformation;
+		//Matf4 transformation;
 		/*Matf3 rotation;
 		Vecf3 translation;*/
 		float time;
 		float frequency = 0.0f;
 		float amplitude = 0.0f;
 		float freqScroll = 0.0f;
+
+		// perspective projection transformations
+		// world transform with no persp proj
+		Matf4 world = Matf4::Identity();
+		// persp proj transform
+		Matf4 proj = Matf4::Identity();
+		// both together
+		Matf4 worldProj = Matf4::Identity();
 	};
 
 	class GeomShader {

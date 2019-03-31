@@ -182,6 +182,19 @@ public:
 			static_assert(false, "Wrong matrix dimensions");
 		}
 	}
+	static Mat Projection(T w, T h, T n, T f) {
+		if constexpr (S == 4) {
+			return {
+				(T)2.0 * n / w, (T)0.0, (T)0.0, (T)0.0,
+				(T)0.0, (T)2.0 * n / h, (T)0.0, (T)0.0,
+				(T)0.0, (T)0.0, f / (f - n), (T)1.0,
+				(T)0.0, (T)0.0, (-n * f) / (f - n), (T)0.0
+			};
+		}
+		else {
+			static_assert(false, "Wrong matrix dimensions");
+		}
+	}
 public:
 	// [row][column]
 	T elements[S][S];

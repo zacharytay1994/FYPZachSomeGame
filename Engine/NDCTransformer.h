@@ -13,10 +13,10 @@ public:
 	{}
 	T& Transform(T& v) const {
 		// Perspective projection
-		const float zInv = 1.0f / v.pos.z;
+		const float wInv = 1.0f / v.pos.w;
 		// NDC to screen space
 		// z divide the entire vertex
-		v = v * zInv;
+		v = v * wInv;
 		// transform x and y into screenspace
 		v.pos.x = (v.pos.x + 1.0f) * horizontalF;
 		v.pos.y = (-v.pos.y + 1.0f) * verticalF;
@@ -24,7 +24,7 @@ public:
 		/*v.normal.x = (v.normal.x + 1.0f) * horizontalF;
 		v.normal.y = (-v.normal.y + 1.0f) * verticalF;*/
 		// store z inverse for calculation purposes later on
-		v.pos.z = zInv;
+		v.pos.w = wInv;
 		return v;
 	}
 	T& GetTransformed(const T& v) const {

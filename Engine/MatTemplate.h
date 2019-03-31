@@ -41,6 +41,16 @@ public:
 		}
 		return result;
 	}
+	// inverse orthographic matrix for rotation matrix
+	Mat operator!() const {
+		Mat xp;
+		for (size_t i = 0; i < S; i++) {
+			for (size_t j = 0; j < S; j++) {
+				xp.elements[i][j] = elements[j][i];
+			}
+		}
+		return xp;
+	}
 	// matrix identities
 	static Mat Identity() {
 		// if 3 by 3, compile time check constexpr

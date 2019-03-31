@@ -94,4 +94,11 @@ private:
 	// for testing color effect
 	//Pipeline<ColorEffect> cPipeline;
 	//IndexedTriangleList<Pipeline<ColorEffect>::Vertex> colorList;
+
+	// camera view attributes
+	Vecf3 camPosition = { 0.0f, 0.0f, 0.0f };
+	Vecf3 modelPosition = { 0.0f, 0.0f, 2.5f };
+	Vecf3 lightPositon = { 0.0f, 0.0f, 0.6f };
+	const float camSpeed = 1.0f;
+	Matf4 camRot = Matf4::Identity();
 };

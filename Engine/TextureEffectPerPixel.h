@@ -135,10 +135,10 @@ public:
 			Vecf3 resultantNormal = (normal + normal2 + normal3) / 3;
 			// transform from model space to world space
 			// converting normal from vec3 to vec4 with w as 0 to negate translation
-			Vecf4 postTransNormal = Vecf4(resultantNormal, 0.0f) * world;
+			Vecf4 postTransNormal = Vecf4(resultantNormal, 0.0f) * worldView;
 			// transforming position
-			Vecf4 tempPos = Vecf4(preTransPos) * worldProj;
-			Vecf4 tempPosWorld = Vecf4(preTransPos) * world;
+			Vecf4 tempPos = Vecf4(preTransPos) * worldViewProj;
+			Vecf4 tempPosWorld = Vecf4(preTransPos) * worldView;
 			
 			// return vertex shader output
 			return { tempPos, vertex_in, tempPosWorld, postTransNormal };
@@ -162,11 +162,17 @@ public:
 		}*/
 		void BindWorld(const Matf4& transformation_in) {
 			world = transformation_in;
-			worldProj = world * proj;
+			worldView = world * view;
+			worldViewProj = worldView * proj;
+		}
+		void BindView(const Matf4& transformation_in) {
+			view = transformation_in;
+			worldView = world * view;
+			worldViewProj = worldView * proj;
 		}
 		void BindProjection(const Matf4& transformation_in) {
 			proj = transformation_in;
-			worldProj = world * proj;
+			worldViewProj = worldView * proj;
 		}
 		const Matf4& GetProj() const {
 			return proj;
@@ -183,10 +189,14 @@ public:
 		// perspective projection transformations
 		// world transform with no persp proj
 		Matf4 world = Matf4::Identity();
+		// view transform
+		Matf4 view = Matf4::Identity();
+		// world view transform
+		Matf4 worldView = Matf4::Identity();
 		// persp proj transform
 		Matf4 proj = Matf4::Identity();
 		// both together
-		Matf4 worldProj = Matf4::Identity();
+		Matf4 worldViewProj = Matf4::Identity();
 	};
 
 	class GeomShader {

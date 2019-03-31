@@ -34,7 +34,7 @@ Game::Game( MainWindow& wnd )
 	pipeline(gfx, zBuffer),
 	pipelineLight(gfx, zBuffer),
 	testList(TexCube::GetWrap<Pipeline<TextureEffect>::Vertex>(1.0f)),
-	lightList(TexCube::GetWrap<Pipeline<TextureEffect>::Vertex>(0.5f)),
+	lightList(TexCube::GetWrap<Pipeline<TextureEffect>::Vertex>(0.1f)),
 	tessellateList(Tessallate::GetTessellate<Pipeline<TextureEffect>::Vertex>(testList)),
 	pipelinePerPixel(gfx, zBuffer),
 	ppStartList(TexCube::GetWrap<Pipeline<TextureEffectPerPixel>::Vertex>(1.0f)),
@@ -128,6 +128,32 @@ void Game::UpdateModel()
 	if (wnd.kbd.KeyIsPressed('I')) {
 		lightPosZ -= 0.5f * dt;
 	}
+	// translate camera
+	if (wnd.kbd.KeyIsPressed('G')) {
+		camPosition += Vecf4(0.0f, 0.0f, 1.0f, 0.0f) * !camRot * camSpeed * dt;
+	}
+	if (wnd.kbd.KeyIsPressed('B')) {
+		camPosition += Vecf4(0.0f, 0.0f, -1.0f, 0.0f) * !camRot * camSpeed * dt;
+	}
+	if (wnd.kbd.KeyIsPressed('V')) {
+		camPosition += Vecf4(-1.0f, 0.0f, 0.0f, 0.0f) * !camRot * camSpeed * dt;
+	}
+	if (wnd.kbd.KeyIsPressed('N')) {
+		camPosition += Vecf4(1.0f, 0.0f, 0.0f, 0.0f) * !camRot * camSpeed * dt;
+	}
+	// rotate camera
+	if (wnd.kbd.KeyIsPressed('Z')) {
+		camRot = camRot * Matf4::RotationX(dTheta * dt);
+	}
+	if (wnd.kbd.KeyIsPressed('X')) {
+		camRot = camRot * Matf4::RotationX(-dTheta * dt);
+	}
+	if (wnd.kbd.KeyIsPressed('R')) {
+		camRot = camRot * Matf4::RotationY(dTheta * dt);
+	}
+	if (wnd.kbd.KeyIsPressed('T')) {
+		camRot = camRot * Matf4::RotationY(-dTheta * dt);
+	}
 	time += dt;
 }
 
@@ -142,6 +168,8 @@ void Game::ComposeFrame()
 		Matf3::RotationY(theta_y);*/
 	//pipeline.effect.vertexShader.BindRotation(rot);
 	const Matf4 proj = Matf4::Projection(2.0f, 2.0f, 1.0f, 10.0f);
+	// view transform
+	const Matf4 view = Matf4::Translation(-camPosition) * camRot;
 	const Vecf3 translate = { 0.0f, 0.0f, zVal };
 	//pipeline.effect.vertexShader.BindTranslation(translate);
 	pipeline.effect.vertexShader.BindWorld(Matf4::RotationZ(theta_z) * Matf4::RotationX(theta_x) * Matf4::RotationY(theta_y) * Matf4::Translation(translate));
@@ -160,7 +188,8 @@ void Game::ComposeFrame()
 	pipelinePerPixel.effect.vertexShader.BindTranslation(translate);*/
 	// defaut projection matrix
 	
-	pipelinePerPixel.effect.vertexShader.BindWorld(Matf4::RotationZ(theta_z) * Matf4::RotationX(theta_x) * Matf4::RotationY(theta_y) * Matf4::Translation(translate));
+	pipelinePerPixel.effect.vertexShader.BindWorld(Matf4::RotationZ(theta_z) * Matf4::RotationX(theta_x) * Matf4::RotationY(theta_y) * Matf4::Translation(modelPosition));
+	pipelinePerPixel.effect.vertexShader.BindView(view);
 	pipelinePerPixel.effect.vertexShader.BindProjection(proj);
 	pipelinePerPixel.effect.vertexShader.SetTime(time);
 	pipelinePerPixel.effect.pixelShader.SetLightPosition({ lightPosX, lightPosY, lightPosZ });
@@ -174,7 +203,7 @@ void Game::ComposeFrame()
 	cPipeline.Draw(colorList);*/
 	// draw textured cube pipeline
 	//pipeline.Draw(tessellateList);
-	pipelineLight.Draw(tessellateList);
+	pipelineLight.Draw(lightList);
 	pipelinePerPixel.Draw(ppStartList);
 
 	/*pipeline.effect.vertexShader.BindTranslation({ 0.5f, 0.5f, 3.0f });

@@ -59,6 +59,7 @@ public:
 		x *= rhs;
 		y *= rhs;
 		z *= rhs;
+		w *= rhs;
 		return *this;
 	}
 	Vec4 operator*(const T& rhs) const {

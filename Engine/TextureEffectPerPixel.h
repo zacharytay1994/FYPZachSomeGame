@@ -60,14 +60,14 @@ public:
 		public:
 			// constructors
 			Output() = default;
-			Output(const Vecf4& pos, const Vecf2& texpos, const Vecf3& worldPos, const Vecf4& normal) // i dont really use this constructor
+			Output(const Vecf4& pos, const Vecf2& texpos, const Vecf4& worldPos, const Vecf4& normal) // i dont really use this constructor
 				:
 				pos(pos),
 				texpos(texpos),
 				worldPos(worldPos),
 				normal(normal)
 			{}
-			Output(const Vecf4& pos, const Vertex& vertex_in, const Vecf3 worldPos, const Vecf4& normal) 
+			Output(const Vecf4& pos, const Vertex& vertex_in, const Vecf4 worldPos, const Vecf4& normal) 
 				:
 				pos(pos),
 				texpos(vertex_in.texpos),
@@ -78,7 +78,7 @@ public:
 			Output operator+(const Output& rhs) const {
 				Vecf4 temppos = pos + rhs.pos;
 				Vecf2 temptexpos = texpos + rhs.texpos;
-				Vecf3 tempworldPos = worldPos + rhs.worldPos;
+				Vecf4 tempworldPos = worldPos + rhs.worldPos;
 				Vecf4 tempnormal = normal + rhs.normal;
 				return { temppos, temptexpos, tempworldPos, tempnormal };
 			}
@@ -88,7 +88,7 @@ public:
 			Output operator-(const Output& rhs) const {
 				Vecf4 temppos = pos - rhs.pos;
 				Vecf2 temptexpos = texpos - rhs.texpos;
-				Vecf3 tempworldPos = worldPos - rhs.worldPos;
+				Vecf4 tempworldPos = worldPos - rhs.worldPos;
 				Vecf4 tempnormal = normal - rhs.normal;
 				return { temppos, temptexpos, tempworldPos, tempnormal };
 			}
@@ -108,7 +108,7 @@ public:
 		public:
 			Vecf4 pos;
 			Vecf2 texpos;
-			Vecf3 worldPos;
+			Vecf4 worldPos;
 			Vecf4 normal;
 		};
 	public:
@@ -195,7 +195,7 @@ public:
 		public:
 			// constructors
 			Output() = default;
-			Output(const Vecf4 pos, const Vecf2& texpos, const Vecf3& worldPos, const Vecf4& normal)
+			Output(const Vecf4 pos, const Vecf2& texpos, const Vecf4& worldPos, const Vecf4& normal)
 				:
 				pos(pos),
 				texpos(texpos),
@@ -211,9 +211,9 @@ public:
 			{}
 			// operators
 			Output operator+(const Output& rhs) const {
-				Vecf3 temppos = pos + rhs.pos;
+				Vecf4 temppos = pos + rhs.pos;
 				Vecf2 temptexpos = texpos + rhs.texpos;
-				Vecf3 tempworldPos = worldPos + rhs.worldPos;
+				Vecf4 tempworldPos = worldPos + rhs.worldPos;
 				Vecf3 tempnormal = normal + rhs.normal;
 				return { temppos, temptexpos, tempworldPos, tempnormal };
 			}
@@ -221,9 +221,9 @@ public:
 				return *this + rhs;
 			}
 			Output operator-(const Output& rhs) const {
-				Vecf3 temppos = pos - rhs.pos;
+				Vecf4 temppos = pos - rhs.pos;
 				Vecf2 temptexpos = texpos - rhs.texpos;
-				Vecf3 tempworldPos = worldPos - rhs.worldPos;
+				Vecf4 tempworldPos = worldPos - rhs.worldPos;
 				Vecf3 tempnormal = normal - rhs.normal;
 				return { temppos, temptexpos, tempworldPos, tempnormal };
 			}
@@ -243,7 +243,7 @@ public:
 		public:
 			Vecf4 pos;
 			Vecf2 texpos;
-			Vecf3 worldPos;
+			Vecf4 worldPos;
 			Vecf4 normal;
 		};
 	public:
@@ -310,7 +310,7 @@ public:
 		// diffuse light intensity
 		float diffuseLight = 1.0f;
 		// ambient light around assumed
-		float ambientLight = 0.1f;
+		float ambientLight = 0.8f;
 
 		// point light attributes
 		Vecf3 pointLightPosition = { 0.0f, 0.0f, 2.5f };

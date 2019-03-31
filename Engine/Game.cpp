@@ -34,7 +34,7 @@ Game::Game( MainWindow& wnd )
 	pipeline(gfx, zBuffer),
 	pipelineLight(gfx, zBuffer),
 	testList(TexCube::GetWrap<Pipeline<TextureEffect>::Vertex>(1.0f)),
-	lightList(TexCube::GetWrap<Pipeline<TextureEffect>::Vertex>(0.1f)),
+	lightList(TexCube::GetWrap<Pipeline<TextureEffect>::Vertex>(0.5f)),
 	tessellateList(Tessallate::GetTessellate<Pipeline<TextureEffect>::Vertex>(testList)),
 	pipelinePerPixel(gfx, zBuffer),
 	ppStartList(TexCube::GetWrap<Pipeline<TextureEffectPerPixel>::Vertex>(1.0f)),
@@ -42,16 +42,16 @@ Game::Game( MainWindow& wnd )
 {
 	// bind texture to pipeline
 	pipeline.effect.pixelShader.BindTexture("sandimage.bmp");
-	for (int i = 0; i < 0; i++) {
+	for (int i = 0; i < 3; i++) {
 		tessellateList = Tessallate::GetTessellate<Pipeline<TextureEffect>::Vertex>(tessellateList);
 		ppTesList = Tessallate::GetTessellate<Pipeline<TextureEffectPerPixel>::Vertex>(ppTesList);
 	}
-	pipelineLight.effect.pixelShader.BindTexture("whiteimage.bmp");
+	pipelineLight.effect.pixelShader.BindTexture("test.bmp");
 	pipelineLight.effect.vertexShader.SetTransValues(0.0f, 0.0f, 0.0f);
 
 	pipelineLight.effect.geomShader.SetIsLight(true);
 
-	pipelinePerPixel.effect.pixelShader.BindTexture("whiteimage.bmp");
+	pipelinePerPixel.effect.pixelShader.BindTexture("test.bmp");
 	// set colors to vertices in colorList
 	/*colorList.vertices[0].color = (Vecf3)Colors::Red;
 	colorList.vertices[1].color = (Vecf3)Colors::Blue;
@@ -141,7 +141,7 @@ void Game::ComposeFrame()
 		Matf3::RotationX(theta_x) *
 		Matf3::RotationY(theta_y);*/
 	//pipeline.effect.vertexShader.BindRotation(rot);
-	const Matf4 proj = Matf4::Projection(4.0f, 2.0f, 1.0f, 10.0f);
+	const Matf4 proj = Matf4::Projection(2.0f, 2.0f, 1.0f, 10.0f);
 	const Vecf3 translate = { 0.0f, 0.0f, zVal };
 	//pipeline.effect.vertexShader.BindTranslation(translate);
 	pipeline.effect.vertexShader.BindWorld(Matf4::RotationZ(theta_z) * Matf4::RotationX(theta_x) * Matf4::RotationY(theta_y) * Matf4::Translation(translate));
@@ -153,7 +153,7 @@ void Game::ComposeFrame()
 	// draw light source
 	/*pipelineLight.effect.vertexShader.BindRotation(rot);
 	pipelineLight.effect.vertexShader.BindTranslation({ lightPosX, lightPosY, lightPosZ });*/
-	pipelineLight.effect.vertexShader.BindWorld(Matf4::RotationZ(theta_z) * Matf4::RotationX(theta_x) * Matf4::RotationY(theta_y) * Matf4::Translation(lightPosX, lightPosY, lightPosZ));
+	pipelineLight.effect.vertexShader.BindWorld(Matf4::RotationZ(theta_z) * Matf4::RotationX(theta_x) * Matf4::RotationY(theta_y) * Matf4::Translation(lightPosX * 3, lightPosY * 3, lightPosZ));
 	pipelineLight.effect.vertexShader.BindProjection(proj);
 	// per pixel pipeline
 	/*pipelinePerPixel.effect.vertexShader.BindRotation(rot);
@@ -174,8 +174,8 @@ void Game::ComposeFrame()
 	cPipeline.Draw(colorList);*/
 	// draw textured cube pipeline
 	//pipeline.Draw(tessellateList);
-	pipelineLight.Draw(lightList);
-	pipelinePerPixel.Draw(ppTesList);
+	pipelineLight.Draw(tessellateList);
+	pipelinePerPixel.Draw(ppStartList);
 
 	/*pipeline.effect.vertexShader.BindTranslation({ 0.5f, 0.5f, 3.0f });
 	pipeline.Draw(testList);*/

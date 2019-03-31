@@ -21,7 +21,7 @@ T wrap_angle(T theta)
 }
 
 template<typename T>
-inline T interpolate(const T& src, const T& dst, float alpha)
+constexpr T interpolate(const T& src, const T& dst, float alpha)
 {
 	return src + (dst - src) * alpha;
 }

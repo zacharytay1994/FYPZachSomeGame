@@ -199,7 +199,7 @@ public:
 				return *this;
 			}
 			Output operator+(const Output& rhs) const {
-				Vecf3 temppos = pos + rhs.pos;
+				Vecf4 temppos = pos + rhs.pos;
 				Vecf2 temptexpos = texpos + rhs.texpos;
 				float tempintensity = intensity + rhs.intensity;
 				//Vecf3 tempWorldPos = worldPos + rhs.worldPos;

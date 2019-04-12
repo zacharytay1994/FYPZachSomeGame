@@ -164,6 +164,7 @@
     <ClInclude Include="Sound.h" />
     <ClInclude Include="SoundEffect.h" />
     <ClInclude Include="Surface.h" />
+    <ClInclude Include="SurfaceDirectionalLighting.h" />
     <ClInclude Include="Tessellate.h" />
     <ClInclude Include="TestScene.h" />
     <ClInclude Include="TexCube.h" />

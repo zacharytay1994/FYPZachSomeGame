@@ -4,6 +4,7 @@
 #include "TexCube.h"
 #include "MatTemplate.h"
 #include "TextureEffectPerPixel.h"
+#include "SurfaceDirectionalLighting.h"
 #include "Pipeline.h"
 #include "ZBuffer.h"
 
@@ -14,24 +15,26 @@ public:
 		Scene("Test Scene"),
 		zBuffer(std::make_shared<ZBuffer>(gfx.ScreenWidth, gfx.ScreenHeight)),
 		pipelinePerPixel(gfx, zBuffer),
-		testList(TexCube::GetWrap<Pipeline<TextureEffectPerPixel>::Vertex>(1.0f))
+		testList(TexCube::GetWrap<Pipeline<SurfaceDirectionalLighting>::Vertex>(1.0f))
 	{
 		pipelinePerPixel.effect.pixelShader.BindTexture("whiteimage.bmp");
 	}
 	virtual void Update(Keyboard&kbd, Mouse& mouse, float dt) override {
 		// camera movement
 		if (kbd.KeyIsPressed('W')) {
-			cameraPosition += Vecf4{ 0.0f, 0.0f, 1.0f, 0.0f } *cameraSpeed * dt;
+			cameraPosition += Vecf4{ 0.0f, 0.0f, 1.0f, 0.0f } * !camRotInverse * cameraSpeed * dt;
 		}
 		if (kbd.KeyIsPressed('A')) {
-			cameraPosition += Vecf4{ -1.0f, 0.0f, 0.0f, 0.0f } *cameraSpeed * dt;
+			cameraPosition += Vecf4{ -1.0f, 0.0f, 0.0f, 0.0f } * !camRotInverse * cameraSpeed * dt;
 		}
 		if (kbd.KeyIsPressed('S')) {
-			cameraPosition += Vecf4{ 1.0f, 0.0f, -1.0f, 0.0f } *cameraSpeed * dt;
+			cameraPosition += Vecf4{ 1.0f, 0.0f, -1.0f, 0.0f } * !camRotInverse * cameraSpeed * dt;
 		}
 		if (kbd.KeyIsPressed('D')) {
-			cameraPosition += Vecf4{ 1.0f, 0.0f, 0.0f, 0.0f } *cameraSpeed * dt;
+			cameraPosition += Vecf4{ 1.0f, 0.0f, 0.0f, 0.0f } * !camRotInverse * cameraSpeed * dt;
 		}
+		theta_x += 2.0f * dt;
+		theta_y += 1.0f * dt;
 	}
 	virtual void Draw() override {
 		pipelinePerPixel.BeginFrame();
@@ -45,7 +48,7 @@ public:
 		pipelinePerPixel.effect.vertexShader.BindView(viewMatrix);
 		pipelinePerPixel.effect.vertexShader.BindProjection(projectionMatrix);
 		// setting other pipeline values
-		pipelinePerPixel.effect.vertexShader.SetTime(time);
+
 		// draw pipeline
 		pipelinePerPixel.Draw(testList);
 	}
@@ -53,17 +56,17 @@ public:
 private:
 	// pipeline stuff
 	std::shared_ptr<ZBuffer> zBuffer;
-	Pipeline<TextureEffectPerPixel> pipelinePerPixel;
+	Pipeline<SurfaceDirectionalLighting> pipelinePerPixel;
 	float time = 0.0f;
 	// indexed triangle list
-	IndexedTriangleList<Pipeline<TextureEffectPerPixel>::Vertex> testList;
+	IndexedTriangleList<Pipeline<SurfaceDirectionalLighting>::Vertex> testList;
 	// orientation euler angles
 	float theta_x = 0.0f;
 	float theta_y = 0.0f;
 	float theta_z = 0.0f;
 	// projection inverse matrices and camera stuff
-	Matf4 camRotInverse = Matf4::Identity();
-	Vecf3 cameraPosition = { 0.0f, 0.0f, 0.0f };
+	Matf4 camRotInverse = Matf4::Identity() * Matf4::RotationX(-0.5f);
+	Vecf3 cameraPosition = { 0.0f, 1.0f, 0.0f };
 	Vecf3 modelPosition = { 0.0f, 0.0f, 2.5f };
 	Vecf3 lightPosition = { 0.0f, 0.0f, 0.6f };
 	const float cameraSpeed = 1.0f;

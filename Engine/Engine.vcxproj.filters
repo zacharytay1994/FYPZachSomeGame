@@ -19,6 +19,9 @@
     <Filter Include="Header Files\Scenes">
       <UniqueIdentifier>{95652c71-8069-4c65-a410-cdf2a28f51ad}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Effects">
+      <UniqueIdentifier>{3f6d6801-0401-44e1-b69e-3041867b4dfc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ChiliWin.h">
@@ -131,6 +134,9 @@
     </ClInclude>
     <ClInclude Include="TestScene.h">
       <Filter>Header Files\Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="SurfaceDirectionalLighting.h">
+      <Filter>Header Files\Effects</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

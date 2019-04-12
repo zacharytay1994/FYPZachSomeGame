@@ -160,6 +160,7 @@
     <ClInclude Include="NDCTransformer.h" />
     <ClInclude Include="Pipeline.h" />
     <ClInclude Include="Resource.h" />
+    <ClInclude Include="Scene.h" />
     <ClInclude Include="Sound.h" />
     <ClInclude Include="SoundEffect.h" />
     <ClInclude Include="Surface.h" />

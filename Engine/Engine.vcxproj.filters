@@ -138,6 +138,9 @@
     <ClInclude Include="SurfaceDirectionalLighting.h">
       <Filter>Header Files\Effects</Filter>
     </ClInclude>
+    <ClInclude Include="Board.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DXErr.cpp">
@@ -213,6 +216,12 @@
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="..\..\..\Memes\silverimage.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\..\Memes\postgrassblock.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\..\Memes\makeshiftboardtile.bmp">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

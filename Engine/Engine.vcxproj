@@ -138,6 +138,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Board.h" />
     <ClInclude Include="ChiliException.h" />
     <ClInclude Include="ChiliWin.h" />
     <ClInclude Include="ColorEffect.h" />
@@ -259,7 +260,9 @@
     <Image Include="..\..\..\Memes\blackimage.bmp" />
     <Image Include="..\..\..\Memes\checkered.bmp" />
     <Image Include="..\..\..\Memes\greenimage.bmp" />
+    <Image Include="..\..\..\Memes\makeshiftboardtile.bmp" />
     <Image Include="..\..\..\Memes\pikachumeme.bmp" />
+    <Image Include="..\..\..\Memes\postgrassblock.bmp" />
     <Image Include="..\..\..\Memes\sandimage.bmp" />
     <Image Include="..\..\..\Memes\silverimage.bmp" />
     <Image Include="..\..\..\Memes\waterimage.bmp" />

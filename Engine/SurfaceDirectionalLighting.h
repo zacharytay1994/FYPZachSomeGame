@@ -192,7 +192,7 @@ public:
 			{v2.pos, v2, intensity} };
 		}
 	private:
-		Vecf3 directionalLight = { 0.5f, 0.5f, -0.6f };
+		Vecf3 directionalLight = { -0.5f, 0.5f, -0.5f };
 		float diffuseLight = 1.0f;
 		float ambientLight = 0.2f;
 	};

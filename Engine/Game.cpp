@@ -20,16 +20,15 @@
  ******************************************************************************************/
 #include "MainWindow.h"
 #include "Game.h"
-#include "Mat2.h"
-#include "MatTemplate.h"
-#include "Pipeline.h"
-#include "Tessellate.h"
+#include "TestScene.h"
 
 Game::Game( MainWindow& wnd )
 	:
 	wnd( wnd ),
 	gfx( wnd )
 {
+	scenes.push_back(std::make_unique<TestScene>(gfx));
+	curScene = scenes.begin();
 }
 
 void Game::Go()
@@ -43,8 +42,10 @@ void Game::Go()
 void Game::UpdateModel()
 {
 	const float dt = 1.0f / 60.0f;
+	(*curScene)->Update(wnd.kbd, wnd.mouse, dt);
 }
 
 void Game::ComposeFrame()
 {
+	(*curScene)->Draw();
 }

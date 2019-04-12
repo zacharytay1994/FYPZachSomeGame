@@ -23,15 +23,9 @@
 #include "Keyboard.h"
 #include "Mouse.h"
 #include "Graphics.h"
-#include "NDCTransformer.h"
-#include "Cube.h"
-#include "TexCube.h"
-#include "Surface.h"
-#include "TextureVertex.h"
-#include "Pipeline.h"
-#include "TextureEffect.h"
-#include "ColorEffect.h"
-#include "TextureEffectPerPixel.h"
+#include "Scene.h"
+#include <vector>
+#include <memory>
 
 class Game
 {
@@ -52,4 +46,6 @@ private:
 	/********************************/
 	/*  User Variables              */
 	/********************************/
+	std::vector<std::unique_ptr<Scene>> scenes;
+	std::vector<std::unique_ptr<Scene>>::iterator curScene;
 };

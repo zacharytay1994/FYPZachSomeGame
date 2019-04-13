@@ -22,6 +22,12 @@
     <Filter Include="Header Files\Effects">
       <UniqueIdentifier>{3f6d6801-0401-44e1-b69e-3041867b4dfc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\MenuImages">
+      <UniqueIdentifier>{8b089b08-6f47-4bfd-9dda-cd9d8ec470c7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\MenuImages\StartMenu">
+      <UniqueIdentifier>{3a0c08fc-ef2c-433e-8d6b-3404abd5c1d7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ChiliWin.h">
@@ -232,6 +238,27 @@
     </Image>
     <Image Include="..\..\..\Memes\makeshiftboardtile.bmp">
       <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\..\Memes\startmenutest5.bmp">
+      <Filter>Resource Files\MenuImages\StartMenu</Filter>
+    </Image>
+    <Image Include="..\..\..\Memes\startmenutest6.bmp">
+      <Filter>Resource Files\MenuImages\StartMenu</Filter>
+    </Image>
+    <Image Include="..\..\..\Memes\startmenutest7.bmp">
+      <Filter>Resource Files\MenuImages\StartMenu</Filter>
+    </Image>
+    <Image Include="..\..\..\Memes\startmenutest4.bmp">
+      <Filter>Resource Files\MenuImages\StartMenu</Filter>
+    </Image>
+    <Image Include="..\..\..\Memes\startmenutest3.bmp">
+      <Filter>Resource Files\MenuImages\StartMenu</Filter>
+    </Image>
+    <Image Include="..\..\..\Memes\startmenutest1.bmp">
+      <Filter>Resource Files\MenuImages\StartMenu</Filter>
+    </Image>
+    <Image Include="..\..\..\Memes\startmenutest2.bmp">
+      <Filter>Resource Files\MenuImages\StartMenu</Filter>
     </Image>
   </ItemGroup>
 </Project>

@@ -44,6 +44,7 @@ void Game::UpdateModel()
 {
 	const float dt = 1.0f / 60.0f;
 	(*curScene)->Update(wnd.kbd, wnd.mouse, dt);
+	sms.Update(wnd.kbd, wnd.mouse, dt);
 }
 
 void Game::ComposeFrame()

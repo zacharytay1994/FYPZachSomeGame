@@ -157,13 +157,16 @@
     <ClInclude Include="Mat3.h" />
     <ClInclude Include="MathStuff.h" />
     <ClInclude Include="MatTemplate.h" />
+    <ClInclude Include="MenuSceneParent.h" />
     <ClInclude Include="Mouse.h" />
     <ClInclude Include="NDCTransformer.h" />
     <ClInclude Include="Pipeline.h" />
+    <ClInclude Include="Rect.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="Sound.h" />
     <ClInclude Include="SoundEffect.h" />
+    <ClInclude Include="StartMenuScene.h" />
     <ClInclude Include="Surface.h" />
     <ClInclude Include="SurfaceDirectionalLighting.h" />
     <ClInclude Include="Tessellate.h" />

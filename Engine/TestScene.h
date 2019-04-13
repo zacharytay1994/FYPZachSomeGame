@@ -11,7 +11,7 @@
 
 class TestScene : public Scene {
 public:
-	TestScene( Graphics& gfx) 
+	TestScene(Graphics& gfx) 
 		:
 		Scene("Test Scene"),
 		zBuffer(std::make_shared<ZBuffer>(gfx.ScreenWidth, gfx.ScreenHeight)),
@@ -40,7 +40,7 @@ public:
 	virtual void Draw() override {
 		pipelinePerPixel->BeginFrame();
 		// transformation matrices
-		const Matf4 projectionMatrix = Matf4::Projection(2.0f, 2.0f, 1.0f, 50.0f);
+		const Matf4 projectionMatrix = Matf4::Projection(4.0f, 3.0f, 1.0f, 50.0f);
 		const Matf4 viewMatrix = Matf4::Translation(-cameraPosition) * camRotInverse;
 		const Vecf3 translate = {0.0f, 0.0f, 2.5f};
 		const Matf4 worldTransform = Matf4::RotationZ(theta_z) * Matf4::RotationX(theta_x) * Matf4::RotationY(theta_y) * Matf4::Translation(translate);
@@ -73,6 +73,6 @@ private:
 	const float cameraSpeed = 4.0f;
 
 	// board variables
-	Board<SurfaceDirectionalLighting> board = {30};
+	Board<SurfaceDirectionalLighting> board = {5};
 	Vecf3 boardOrigin = { 0.0f, 0.0f, 2.5f };
 };

@@ -25,7 +25,8 @@
 Game::Game( MainWindow& wnd )
 	:
 	wnd( wnd ),
-	gfx( wnd )
+	gfx( wnd ),
+	sms(gfx)
 {
 	scenes.push_back(std::make_unique<TestScene>(gfx));
 	curScene = scenes.begin();
@@ -48,4 +49,5 @@ void Game::UpdateModel()
 void Game::ComposeFrame()
 {
 	(*curScene)->Draw();
+	sms.Draw();
 }

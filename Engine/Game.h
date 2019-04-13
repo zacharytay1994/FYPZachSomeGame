@@ -24,6 +24,7 @@
 #include "Mouse.h"
 #include "Graphics.h"
 #include "Scene.h"
+#include "StartMenuScene.h"
 #include <vector>
 #include <memory>
 
@@ -48,4 +49,6 @@ private:
 	/********************************/
 	std::vector<std::unique_ptr<Scene>> scenes;
 	std::vector<std::unique_ptr<Scene>>::iterator curScene;
+
+	StartMenuScene sms;
 };

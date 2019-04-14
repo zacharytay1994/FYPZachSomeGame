@@ -25,7 +25,9 @@
 #include "Graphics.h"
 #include "Scene.h"
 #include "StartMenuScene.h"
+
 #include <vector>
+#include <stack>
 #include <memory>
 
 class Game
@@ -49,6 +51,6 @@ private:
 	/********************************/
 	std::vector<std::unique_ptr<Scene>> scenes;
 	std::vector<std::unique_ptr<Scene>>::iterator curScene;
-
-	StartMenuScene sms;
+	// menu scenes stack
+	std::stack<std::unique_ptr<MenuSceneParent>> menuScenes;
 };

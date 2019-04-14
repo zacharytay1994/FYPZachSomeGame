@@ -157,6 +157,7 @@
     <ClInclude Include="Mat3.h" />
     <ClInclude Include="MathStuff.h" />
     <ClInclude Include="MatTemplate.h" />
+    <ClInclude Include="MenuNaviTestScene.h" />
     <ClInclude Include="MenuSceneParent.h" />
     <ClInclude Include="Mouse.h" />
     <ClInclude Include="NDCTransformer.h" />
@@ -264,6 +265,8 @@
     <Image Include="..\..\..\Memes\checkered.bmp" />
     <Image Include="..\..\..\Memes\greenimage.bmp" />
     <Image Include="..\..\..\Memes\makeshiftboardtile.bmp" />
+    <Image Include="..\..\..\Memes\menunavi1.bmp" />
+    <Image Include="..\..\..\Memes\menunavi2.bmp" />
     <Image Include="..\..\..\Memes\pikachumeme.bmp" />
     <Image Include="..\..\..\Memes\postgrassblock.bmp" />
     <Image Include="..\..\..\Memes\sandimage.bmp" />

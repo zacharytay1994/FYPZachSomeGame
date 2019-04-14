@@ -25,11 +25,13 @@
 Game::Game( MainWindow& wnd )
 	:
 	wnd( wnd ),
-	gfx( wnd ),
-	sms(gfx)
+	gfx( wnd )
 {
 	scenes.push_back(std::make_unique<TestScene>(gfx));
 	curScene = scenes.begin();
+
+	// push in start menu
+	menuScenes.push(std::make_unique<StartMenuScene>(gfx, menuScenes));
 }
 
 void Game::Go()
@@ -44,11 +46,19 @@ void Game::UpdateModel()
 {
 	const float dt = 1.0f / 60.0f;
 	(*curScene)->Update(wnd.kbd, wnd.mouse, dt);
-	sms.Update(wnd.kbd, wnd.mouse, dt);
+
+	// update top menu scene
+	if (!menuScenes.empty()) {
+		menuScenes.top()->Update(wnd.kbd, wnd.mouse, dt);
+	}
 }
 
 void Game::ComposeFrame()
 {
 	(*curScene)->Draw();
-	sms.Draw();
+
+	// draw top menu scene
+	if (!menuScenes.empty()) {
+		menuScenes.top()->Draw();
+	}
 }

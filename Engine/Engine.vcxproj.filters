@@ -28,6 +28,12 @@
     <Filter Include="Resource Files\MenuImages\StartMenu">
       <UniqueIdentifier>{3a0c08fc-ef2c-433e-8d6b-3404abd5c1d7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Scenes\MenuScenes">
+      <UniqueIdentifier>{7a4a7378-ab70-4ca3-b223-954b9b5d9985}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\MenuImages\NaviTestMenu">
+      <UniqueIdentifier>{a27d64f7-c557-4df6-a300-4f396cb17b8f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ChiliWin.h">
@@ -147,14 +153,17 @@
     <ClInclude Include="Scene.h">
       <Filter>Header Files\Scenes</Filter>
     </ClInclude>
-    <ClInclude Include="MenuSceneParent.h">
-      <Filter>Header Files\Scenes</Filter>
-    </ClInclude>
     <ClInclude Include="Rect.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="MenuSceneParent.h">
+      <Filter>Header Files\Scenes\MenuScenes</Filter>
+    </ClInclude>
     <ClInclude Include="StartMenuScene.h">
-      <Filter>Header Files\Scenes</Filter>
+      <Filter>Header Files\Scenes\MenuScenes</Filter>
+    </ClInclude>
+    <ClInclude Include="MenuNaviTestScene.h">
+      <Filter>Header Files\Scenes\MenuScenes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -259,6 +268,12 @@
     </Image>
     <Image Include="..\..\..\Memes\startmenutest2.bmp">
       <Filter>Resource Files\MenuImages\StartMenu</Filter>
+    </Image>
+    <Image Include="..\..\..\Memes\menunavi1.bmp">
+      <Filter>Resource Files\MenuImages\NaviTestMenu</Filter>
+    </Image>
+    <Image Include="..\..\..\Memes\menunavi2.bmp">
+      <Filter>Resource Files\MenuImages\NaviTestMenu</Filter>
     </Image>
   </ItemGroup>
 </Project>

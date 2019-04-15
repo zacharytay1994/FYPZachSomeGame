@@ -6,7 +6,7 @@ class MenuNaviTestScene : public MenuSceneParent {
 public:
 	MenuNaviTestScene(Graphics& gfx, std::stack<std::unique_ptr<MenuSceneParent>>& stackIn)
 		:
-		MenuSceneParent("Navi Test", "menunavi1.bmp", gfx, stackIn)
+		MenuSceneParent("Navi Test", "menunavi1.bmp", gfx, stackIn, Vecf3(255.0f, 255.0f, 255.0f))
 	{
 		clickableRects.emplace_back(Rect(Vecf2(50.0f * perX, 50.0f * perY), 30.0f * perX, 20.0f * perY));
 	}

@@ -34,6 +34,12 @@
     <Filter Include="Resource Files\MenuImages\NaviTestMenu">
       <UniqueIdentifier>{a27d64f7-c557-4df6-a300-4f396cb17b8f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\MenuImages\DebuggingMenu">
+      <UniqueIdentifier>{152ec9f8-a85e-46c6-98db-b2235b574c27}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\VertexOutputers">
+      <UniqueIdentifier>{55f782eb-55bb-4fe7-8db9-66ddd5b70a28}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ChiliWin.h">
@@ -108,9 +114,6 @@
     <ClInclude Include="TextureVertex.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="TexCube.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Pipeline.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -164,6 +167,18 @@
     </ClInclude>
     <ClInclude Include="MenuNaviTestScene.h">
       <Filter>Header Files\Scenes\MenuScenes</Filter>
+    </ClInclude>
+    <ClInclude Include="DebuggingMenu.h">
+      <Filter>Header Files\Scenes\MenuScenes</Filter>
+    </ClInclude>
+    <ClInclude Include="ConsoleScene.h">
+      <Filter>Header Files\Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="TexCube.h">
+      <Filter>Header Files\VertexOutputers</Filter>
+    </ClInclude>
+    <ClInclude Include="PlaneVertex.h">
+      <Filter>Header Files\VertexOutputers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -274,6 +289,15 @@
     </Image>
     <Image Include="..\..\..\Memes\menunavi2.bmp">
       <Filter>Resource Files\MenuImages\NaviTestMenu</Filter>
+    </Image>
+    <Image Include="..\..\..\Memes\debuggingMenu2.bmp">
+      <Filter>Resource Files\MenuImages\DebuggingMenu</Filter>
+    </Image>
+    <Image Include="..\..\..\Memes\debuggingMenu1.bmp">
+      <Filter>Resource Files\MenuImages\DebuggingMenu</Filter>
+    </Image>
+    <Image Include="..\..\..\Memes\fonttest.bmp">
+      <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>
 </Project>

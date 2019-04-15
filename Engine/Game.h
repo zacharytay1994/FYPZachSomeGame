@@ -25,6 +25,7 @@
 #include "Graphics.h"
 #include "Scene.h"
 #include "StartMenuScene.h"
+#include "DebuggingMenu.h"
 
 #include <vector>
 #include <stack>

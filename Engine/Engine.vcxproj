@@ -144,7 +144,9 @@
     <ClInclude Include="ColorEffect.h" />
     <ClInclude Include="Colors.h" />
     <ClInclude Include="COMInitializer.h" />
+    <ClInclude Include="ConsoleScene.h" />
     <ClInclude Include="Cube.h" />
+    <ClInclude Include="DebuggingMenu.h" />
     <ClInclude Include="DefaultVertexShader.h" />
     <ClInclude Include="DXErr.h" />
     <ClInclude Include="Game.h" />
@@ -162,6 +164,7 @@
     <ClInclude Include="Mouse.h" />
     <ClInclude Include="NDCTransformer.h" />
     <ClInclude Include="Pipeline.h" />
+    <ClInclude Include="PlaneVertex.h" />
     <ClInclude Include="Rect.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="Scene.h" />
@@ -263,6 +266,9 @@
     <Image Include="..\..\..\..\Downloads\test.bmp" />
     <Image Include="..\..\..\Memes\blackimage.bmp" />
     <Image Include="..\..\..\Memes\checkered.bmp" />
+    <Image Include="..\..\..\Memes\debuggingMenu1.bmp" />
+    <Image Include="..\..\..\Memes\debuggingMenu2.bmp" />
+    <Image Include="..\..\..\Memes\fonttest.bmp" />
     <Image Include="..\..\..\Memes\greenimage.bmp" />
     <Image Include="..\..\..\Memes\makeshiftboardtile.bmp" />
     <Image Include="..\..\..\Memes\menunavi1.bmp" />

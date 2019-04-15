@@ -12,7 +12,7 @@
 
 class MenuSceneParent {
 public:
-	MenuSceneParent(const std::string& name, const std::string& filename, Graphics& gfx, std::stack<std::unique_ptr<MenuSceneParent>>& menuScenes)
+	MenuSceneParent(const std::string& name, const std::string& filename, Graphics& gfx, std::stack<std::unique_ptr<MenuSceneParent>>& menuScenes, const Vecf3& chroma)
 		:
 		name(name),
 		surface(Surface(filename)),
@@ -23,14 +23,17 @@ public:
 		surfaceHeight(surface.GetHeight()),
 		screenAlphaW(float(surfaceWidth) / float(screenWidth)),
 		screenAlphaH(float(surfaceHeight) / float(screenHeight)),
-		menuScenes(menuScenes)
+		menuScenes(menuScenes),
+		chroma(chroma)
 	{}
 	virtual void Update(Keyboard& kbd, Mouse& mouse, float dt) = 0;
 	virtual void AddDraw() = 0;
 	virtual void Draw() {
 		for (int x = 0; x < screenWidth; x++) {
 			for (int y = 0; y < screenHeight; y++) {
-				gfx.PutPixel(x, y, (Color)(surface.GetPixel(int(x * screenAlphaW), int(y * screenAlphaH))));
+				if ((Vecf3)(surface.GetPixel(int(x * screenAlphaW), int(y * screenAlphaH))) != chroma) {
+					gfx.PutPixel(x, y, (Color)(surface.GetPixel(int(x * screenAlphaW), int(y * screenAlphaH))));
+				}
 			}
 		}
 		AddDraw();
@@ -66,4 +69,5 @@ protected:
 	int eventID = 0;
 private:
 	const std::string name;
+	const Vecf3 chroma;
 };

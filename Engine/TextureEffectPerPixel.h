@@ -182,9 +182,9 @@ public:
 		/*Matf3 rotation;
 		Vecf3 translation;*/
 		float time;
-		float frequency = 0.0f;
-		float amplitude = 0.0f;
-		float freqScroll = 0.0f;
+		float frequency = 10.0f;
+		float amplitude = 0.5f;
+		float freqScroll = 0.2f;
 
 		// perspective projection transformations
 		// world transform with no persp proj
@@ -301,6 +301,13 @@ public:
 		}
 		void BindTexture(const std::string& filename) {
 			texture = std::make_unique<Surface>(Surface(filename));
+			tex_width = (float)texture->GetWidth();
+			tex_height = (float)texture->GetHeight();
+			width_clamp = tex_width - 1.0f;
+			height_clamp = tex_height - 1.0f;
+		}
+		void BindSurface(Surface& surface) {
+			texture = std::make_unique<Surface>(surface);
 			tex_width = (float)texture->GetWidth();
 			tex_height = (float)texture->GetHeight();
 			width_clamp = tex_width - 1.0f;

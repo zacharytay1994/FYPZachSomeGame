@@ -180,6 +180,9 @@
     <ClInclude Include="PlaneVertex.h">
       <Filter>Header Files\VertexOutputers</Filter>
     </ClInclude>
+    <ClInclude Include="Font.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DXErr.cpp">
@@ -296,7 +299,13 @@
     <Image Include="..\..\..\Memes\debuggingMenu1.bmp">
       <Filter>Resource Files\MenuImages\DebuggingMenu</Filter>
     </Image>
-    <Image Include="..\..\..\Memes\fonttest.bmp">
+    <Image Include="..\..\..\Memes\parchmentpaper.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\..\Memes\fontsheet3.bmp">
+      <Filter>Resource Files\MenuImages</Filter>
+    </Image>
+    <Image Include="..\..\..\Memes\fontsheet4.bmp">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

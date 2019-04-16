@@ -38,6 +38,7 @@ public:
 				}
 			}
 		}
+		consoleScene.Update(kbd, mouse, dt);
 	}
 	virtual void AddDraw() override {
 		if (consoleOut) {

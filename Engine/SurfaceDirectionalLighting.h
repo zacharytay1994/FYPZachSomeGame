@@ -213,6 +213,13 @@ public:
 			width_clamp = tex_width - 1.0f;
 			height_clamp = tex_height - 1.0f;
 		}
+		void BindSurface(Surface& surface) {
+			texture = std::make_unique<Surface>(surface);
+			tex_width = (float)texture->GetWidth();
+			tex_height = (float)texture->GetHeight();
+			width_clamp = tex_width - 1.0f;
+			height_clamp = tex_height - 1.0f;
+		}
 	private:
 		// texture attributes
 		std::unique_ptr<Surface> texture;

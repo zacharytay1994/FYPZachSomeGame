@@ -26,6 +26,7 @@
 #include "Scene.h"
 #include "StartMenuScene.h"
 #include "DebuggingMenu.h"
+#include "FontList.h"
 
 #include <vector>
 #include <stack>
@@ -54,4 +55,6 @@ private:
 	std::vector<std::unique_ptr<Scene>>::iterator curScene;
 	// menu scenes stack
 	std::stack<std::unique_ptr<MenuSceneParent>> menuScenes;
+	// font list
+	std::shared_ptr<FontList> fontList;
 };

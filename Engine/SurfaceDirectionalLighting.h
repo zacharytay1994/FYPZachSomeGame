@@ -191,6 +191,10 @@ public:
 			{v1.pos, v1, intensity},
 			{v2.pos, v2, intensity} };
 		}
+
+		void BindDirectionalLight(const Vecf3& directionalLightIn) {
+			directionalLight = directionalLightIn;
+		}
 	private:
 		Vecf3 directionalLight = { -0.5f, 0.5f, -0.5f };
 		float diffuseLight = 1.0f;

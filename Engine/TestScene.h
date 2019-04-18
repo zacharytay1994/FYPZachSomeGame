@@ -35,7 +35,7 @@ public:
 			cameraPosition += Vecf4{ 1.0f, 0.0f, 0.0f, 0.0f } * !camRotInverse * cameraSpeed * dt;
 		}
 		//theta_x += 1.0f * dt;
-		theta_y += 0.5f * dt;
+		theta_y += 0.2f * dt;
 	}
 	virtual void Draw() override {
 		pipelinePerPixel->BeginFrame();

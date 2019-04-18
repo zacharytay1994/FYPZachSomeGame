@@ -144,12 +144,14 @@
     <ClInclude Include="ColorEffect.h" />
     <ClInclude Include="Colors.h" />
     <ClInclude Include="COMInitializer.h" />
+    <ClInclude Include="Console.h" />
     <ClInclude Include="ConsoleScene.h" />
     <ClInclude Include="Cube.h" />
     <ClInclude Include="DebuggingMenu.h" />
     <ClInclude Include="DefaultVertexShader.h" />
     <ClInclude Include="DXErr.h" />
     <ClInclude Include="Font.h" />
+    <ClInclude Include="FontList.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Graphics.h" />
     <ClInclude Include="IndexedLineList.h" />
@@ -271,6 +273,9 @@
     <Image Include="..\..\..\Memes\debuggingMenu2.bmp" />
     <Image Include="..\..\..\Memes\fontsheet3.bmp" />
     <Image Include="..\..\..\Memes\fontsheet4.bmp" />
+    <Image Include="..\..\..\Memes\fontsheet5.bmp" />
+    <Image Include="..\..\..\Memes\fontsheet6.bmp" />
+    <Image Include="..\..\..\Memes\fontsheet7.bmp" />
     <Image Include="..\..\..\Memes\greenimage.bmp" />
     <Image Include="..\..\..\Memes\makeshiftboardtile.bmp" />
     <Image Include="..\..\..\Memes\menunavi1.bmp" />

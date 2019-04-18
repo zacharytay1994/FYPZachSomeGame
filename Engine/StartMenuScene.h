@@ -5,9 +5,9 @@
 
 class StartMenuScene : public MenuSceneParent {
 public:
-	StartMenuScene(Graphics& gfx, std::stack<std::unique_ptr<MenuSceneParent>>& stackIn) 
+	StartMenuScene(Graphics& gfx, std::stack<std::unique_ptr<MenuSceneParent>>& stackIn, const std::shared_ptr<FontList>& fontList)
 		:
-		MenuSceneParent("Start Menu", "startmenutest1.bmp", gfx, stackIn, Vecf3(255.0f, 255.0f, 255.0f))
+		MenuSceneParent("Start Menu", "startmenutest1.bmp", gfx, stackIn, Vecf3(255.0f, 255.0f, 255.0f), fontList)
 	{
 		// buttons
 		clickableRects.emplace_back(Rect(Vecf2(50.0f * perX,50.0f * perY), 30.0f * perX, 20.0f * perY));
@@ -52,7 +52,7 @@ public:
 			// on click event
 			if (OnClick(e)) {
 				if (eventID == 1) {
-					menuScenes.push(std::make_unique<MenuNaviTestScene>(gfx, menuScenes));
+					menuScenes.push(std::make_unique<MenuNaviTestScene>(gfx, menuScenes, fontList));
 				}
 				else if (eventID == 3) {
 					testState = true;

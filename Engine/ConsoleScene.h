@@ -9,20 +9,23 @@
 #include "ZBuffer.h"
 #include "Board.h"
 #include "Font.h"
+#include "Console.h"
 
 #include <assert.h>
 
 class ConsoleScene : public Scene {
 public:
-	ConsoleScene(Graphics& gfx)
+	ConsoleScene(Graphics& gfx, const std::shared_ptr<FontList> fontList)
 		:
 		Scene("Console Scene"),
 		zBuffer(std::make_shared<ZBuffer>(gfx.ScreenWidth, gfx.ScreenHeight)),
 		consolePipeline(std::make_shared<Pipeline<SurfaceDirectionalLighting>>(gfx, zBuffer)),
 		planeList(PlaneVertex::GetPlane<Pipeline<SurfaceDirectionalLighting>::Vertex>(3.0f)),
-		surface(Surface("parchmentpaper.bmp"))
+		surface(Surface("parchmentpaper.bmp")),
+		fontList(fontList)
 	{
 		consolePipeline->effect.pixelShader.BindSurface(surface);
+		consolePipeline->effect.geomShader.BindDirectionalLight(Vecf3(0.0f, 0.0f, -0.6f));
 	}
 	virtual void Update(Keyboard&kbd, Mouse& mouse, float dt) override {
 		// camera movement
@@ -38,26 +41,10 @@ public:
 		if (kbd.KeyIsPressed('D')) {
 			//cameraPosition += Vecf4{ 1.0f, 0.0f, 0.0f, 0.0f } *!camRotInverse * cameraSpeed * dt;
 		}
-		if (!kbd.CharIsEmpty()) {
-			const char charHolder = kbd.ReadChar();
-			const int valRange = charHolder;
-			// evaluating top char in char buffer and placing font
-			if (charSize < charLimit) {
-				if (valRange >= 97 && valRange <= 122) {
-					font.PlaceFont(surface, charHolder, rowCount, columnCount);
-					consolePipeline->effect.pixelShader.BindSurface(surface);
-				}
-				if (charHolder == (' ')) {
-					rowCount = ((rowCount + 1) % font.charPerRow);
-					if (rowCount == 0) {
-						columnCount++;
-					}
-				}
-				charSize++;
-			}
-		}
+		console.Update(surface, kbd);
 		//theta_x += 1.0f * dt;
-		//theta_y += 0.5f * dt;
+		demoVal += 0.02;
+		theta_y += std::cos(demoVal) * dt/2;
 		//consolePipeline->effect.vertexShader.SetTime(dt);
 	}
 	virtual void Draw() override {
@@ -94,11 +81,8 @@ private:
 	Vecf3 lightPosition = { 0.0f, 0.0f, 0.6f };
 	const float cameraSpeed = 4.0f;
 	// font writing variables
-	Surface surface;
-	Font font = Font(Surface("fontsheet4.bmp"), 30, 54, 300, 300, 1500, 1500, 2, 2);
-	int rowCount = 0;
-	int columnCount = 0;
-	int charSize = 0;
-	const int charLimit = font.charPerRow * font.charPerColumn;
-
+	Surface surface; // surface to alter
+	const std::shared_ptr<FontList>& fontList;
+	Console<SurfaceDirectionalLighting> console = Console(fontList->CourierNew30by54, consolePipeline);
+	float demoVal = 0;
 };

@@ -25,13 +25,14 @@
 Game::Game( MainWindow& wnd )
 	:
 	wnd( wnd ),
-	gfx( wnd )
+	gfx( wnd ),
+	fontList(std::make_shared<FontList>())
 {
 	scenes.push_back(std::make_unique<TestScene>(gfx));
 	curScene = scenes.begin();
 
 	// push in start menu
-	menuScenes.push(std::make_unique<DebuggingMenu>(gfx, menuScenes));
+	menuScenes.push(std::make_unique<DebuggingMenu>(gfx, menuScenes, fontList));
 }
 
 void Game::Go()

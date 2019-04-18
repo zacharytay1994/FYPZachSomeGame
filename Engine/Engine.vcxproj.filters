@@ -40,6 +40,12 @@
     <Filter Include="Header Files\VertexOutputers">
       <UniqueIdentifier>{55f782eb-55bb-4fe7-8db9-66ddd5b70a28}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\MenuImages\FontSheets">
+      <UniqueIdentifier>{f1e7f435-2192-49a6-af5b-f13e58c1c2e4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\ConsoleFont">
+      <UniqueIdentifier>{c014faef-bba9-451f-8e92-d20b67c87655}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ChiliWin.h">
@@ -180,8 +186,14 @@
     <ClInclude Include="PlaneVertex.h">
       <Filter>Header Files\VertexOutputers</Filter>
     </ClInclude>
+    <ClInclude Include="Console.h">
+      <Filter>Header Files\ConsoleFont</Filter>
+    </ClInclude>
     <ClInclude Include="Font.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\ConsoleFont</Filter>
+    </ClInclude>
+    <ClInclude Include="FontList.h">
+      <Filter>Header Files\ConsoleFont</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -303,10 +315,19 @@
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="..\..\..\Memes\fontsheet3.bmp">
-      <Filter>Resource Files\MenuImages</Filter>
+      <Filter>Resource Files\MenuImages\FontSheets</Filter>
     </Image>
     <Image Include="..\..\..\Memes\fontsheet4.bmp">
-      <Filter>Resource Files</Filter>
+      <Filter>Resource Files\MenuImages\FontSheets</Filter>
+    </Image>
+    <Image Include="..\..\..\Memes\fontsheet5.bmp">
+      <Filter>Resource Files\MenuImages\FontSheets</Filter>
+    </Image>
+    <Image Include="..\..\..\Memes\fontsheet6.bmp">
+      <Filter>Resource Files\MenuImages\FontSheets</Filter>
+    </Image>
+    <Image Include="..\..\..\Memes\fontsheet7.bmp">
+      <Filter>Resource Files\MenuImages\FontSheets</Filter>
     </Image>
   </ItemGroup>
 </Project>

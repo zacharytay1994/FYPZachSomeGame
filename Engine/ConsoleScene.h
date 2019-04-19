@@ -41,7 +41,7 @@ public:
 		if (kbd.KeyIsPressed('D')) {
 			//cameraPosition += Vecf4{ 1.0f, 0.0f, 0.0f, 0.0f } *!camRotInverse * cameraSpeed * dt;
 		}
-		console.Update(surface, kbd);
+		console.Update(kbd);
 		//theta_x += 1.0f * dt;
 		demoVal += 0.02;
 		theta_y += std::cos(demoVal) * dt/2;
@@ -83,6 +83,6 @@ private:
 	// font writing variables
 	Surface surface; // surface to alter
 	const std::shared_ptr<FontList>& fontList;
-	Console<SurfaceDirectionalLighting> console = Console(fontList->CourierNew30by54, consolePipeline);
+	Console<SurfaceDirectionalLighting> console = Console(fontList->CourierNew30by54, consolePipeline, surface);
 	float demoVal = 0;
 };

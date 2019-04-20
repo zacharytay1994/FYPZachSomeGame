@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Surface.h"
+#include <string>
 
 class Font {
 public:

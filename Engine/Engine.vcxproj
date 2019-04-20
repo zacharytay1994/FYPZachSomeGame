@@ -148,6 +148,7 @@
     <ClInclude Include="ConsoleScene.h" />
     <ClInclude Include="Cube.h" />
     <ClInclude Include="DebuggingMenu.h" />
+    <ClInclude Include="DebugWorld.h" />
     <ClInclude Include="DefaultVertexShader.h" />
     <ClInclude Include="DXErr.h" />
     <ClInclude Include="Font.h" />

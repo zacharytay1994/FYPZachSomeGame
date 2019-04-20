@@ -46,6 +46,9 @@
     <Filter Include="Header Files\ConsoleFont">
       <UniqueIdentifier>{c014faef-bba9-451f-8e92-d20b67c87655}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Scenes\WorldScenes">
+      <UniqueIdentifier>{ea796933-7eec-44e4-9e8d-af3ca666bd98}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ChiliWin.h">
@@ -194,6 +197,9 @@
     </ClInclude>
     <ClInclude Include="FontList.h">
       <Filter>Header Files\ConsoleFont</Filter>
+    </ClInclude>
+    <ClInclude Include="DebugWorld.h">
+      <Filter>Header Files\Scenes\WorldScenes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

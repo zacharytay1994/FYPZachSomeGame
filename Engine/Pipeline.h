@@ -157,9 +157,9 @@ private:
 		trans.Transform(triangle.v2);
 
 		DrawTriangle(triangle);
-		/*gfx.DrawLine(triangle.v0.pos, triangle.v1.pos, Colors::Black);
-		gfx.DrawLine(triangle.v0.pos, triangle.v2.pos, Colors::Black);
-		gfx.DrawLine(triangle.v1.pos, triangle.v2.pos, Colors::Black);*/
+		/*gfx.DrawLine((Vecf2)triangle.v0.pos, (Vecf2)triangle.v1.pos, Colors::Black);
+		gfx.DrawLine((Vecf2)triangle.v0.pos, (Vecf2)triangle.v2.pos, Colors::Black);
+		gfx.DrawLine((Vecf2)triangle.v1.pos, (Vecf2)triangle.v2.pos, Colors::Black);*/
 		/*gfx.DrawLine(triangle.v0.pos, triangle.v0.pos + triangle.v0.normal * 300, Colors::Red);
 		gfx.DrawLine(triangle.v1.pos, triangle.v1.pos + triangle.v1.normal * 300, Colors::Red);
 		gfx.DrawLine(triangle.v2.pos, triangle.v2.pos + triangle.v2.normal * 300, Colors::Red);*/
@@ -270,12 +270,12 @@ private:
 			// loop for x
 			for (int x = xStart; x < xEnd; x++, leftToRight = leftToRight + changeX) {
 				// get z value
-				const float zValue = leftToRight.pos.z;
-				if (zBuffer->TestAndSet(x, y, zValue)) {
+				const float zValue = 1.0f/leftToRight.pos.w;
+				const outputGeom passIn = leftToRight * zValue;
+				if (zBuffer->TestAndSetZ(x, y, zValue, passIn.texpos)) {
 					// get w back from winv
 					const float w = 1.0f/leftToRight.pos.w;
 					// bring texture coordinates back to orthographic space
-					const outputGeom passIn = leftToRight * w;
 					gfx.PutPixel(x, y, effect.pixelShader(passIn));
 				}
 			}

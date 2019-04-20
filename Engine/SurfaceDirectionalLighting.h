@@ -184,7 +184,7 @@ public:
 	public:
 		Triangle<Output> operator()(const VertexShader::Output& v0, const VertexShader::Output& v1, const VertexShader::Output& v2) {
 			// calculating surface normal
-			Vecf3 surfaceNormal = ((v0.pos - v1.pos).GetNormalized() % (v2.pos - v1.pos)).GetNormalized();
+			surfaceNormal = ((v0.pos - v1.pos).GetNormalized() % (v2.pos - v1.pos)).GetNormalized();
 			// calculating intensity
 			float intensity = std::min(1.0f, std::max(0.0f, (-directionalLight * surfaceNormal)) * diffuseLight + ambientLight);
 			return { {v0.pos, v0, intensity},
@@ -195,7 +195,12 @@ public:
 		void BindDirectionalLight(const Vecf3& directionalLightIn) {
 			directionalLight = directionalLightIn;
 		}
+
+		Vecf3 GetSurfaceNormal() {
+			return surfaceNormal;
+		}
 	private:
+		Vecf3 surfaceNormal;
 		Vecf3 directionalLight = { -0.5f, 0.5f, -0.5f };
 		float diffuseLight = 1.0f;
 		float ambientLight = 0.2f;

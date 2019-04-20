@@ -21,6 +21,7 @@
 #include "MainWindow.h"
 #include "Game.h"
 #include "TestScene.h"
+#include "DebugWorld.h"
 
 Game::Game( MainWindow& wnd )
 	:
@@ -28,7 +29,7 @@ Game::Game( MainWindow& wnd )
 	gfx( wnd ),
 	fontList(std::make_shared<FontList>())
 {
-	scenes.push_back(std::make_unique<TestScene>(gfx));
+	scenes.push_back(std::make_unique<DebugWorld>(gfx));
 	curScene = scenes.begin();
 
 	// push in start menu

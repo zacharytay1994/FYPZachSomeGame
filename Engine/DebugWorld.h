@@ -25,8 +25,9 @@ public:
 	{
 		groundPipeline->effect.pixelShader.BindTexture("whiteimage.bmp");
 		entityPipeline->effect.pixelShader.BindTexture("greenimage.bmp");
-		entityHandler.AddEntity(1.0f, { 25, 25 });
+		entityHandler.AddEntity(1.0f, { 25, 0, 25 });
 		entityHandler.AddEntity(2.0f, { 50, 50 });
+		entityHandler.AddEntity(0.3f, { 75, 25, 75 });
 	}
 	virtual void Update(Keyboard&kbd, Mouse& mouse, float dt) override {
 		// camera movement
@@ -63,6 +64,7 @@ public:
 		//	ss2 << xVal << ',' << yVal << ',' << zVal << std::endl;
 		//	OutputDebugString(ss2.str().c_str());
 		//}
+		entityHandler.Update();
 	}
 	virtual void Draw() override {
 		groundPipeline->BeginFrame();

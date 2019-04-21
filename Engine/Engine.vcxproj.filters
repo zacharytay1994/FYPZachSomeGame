@@ -49,6 +49,12 @@
     <Filter Include="Header Files\Scenes\WorldScenes">
       <UniqueIdentifier>{ea796933-7eec-44e4-9e8d-af3ca666bd98}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Entity">
+      <UniqueIdentifier>{2568f8ff-56f7-41ea-9e9e-7d873b6e6c4c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\EntityTextures">
+      <UniqueIdentifier>{49c858ca-23e9-405e-9733-ce9daa7d3b9d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ChiliWin.h">
@@ -201,6 +207,15 @@
     <ClInclude Include="DebugWorld.h">
       <Filter>Header Files\Scenes\WorldScenes</Filter>
     </ClInclude>
+    <ClInclude Include="Entity.h">
+      <Filter>Header Files\Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="EntityOne.h">
+      <Filter>Header Files\Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="EntityHandler.h">
+      <Filter>Header Files\Entity</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DXErr.cpp">
@@ -334,6 +349,9 @@
     </Image>
     <Image Include="..\..\..\Memes\fontsheet7.bmp">
       <Filter>Resource Files\MenuImages\FontSheets</Filter>
+    </Image>
+    <Image Include="..\..\..\Memes\entitytextureone.bmp">
+      <Filter>Resource Files\EntityTextures</Filter>
     </Image>
   </ItemGroup>
 </Project>

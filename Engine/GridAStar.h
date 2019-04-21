@@ -42,7 +42,7 @@ private:
 	std::vector<NodeAStar> grid;
 	const Vecf2 gridStartPos;
 	const float gridSize;
-	float nodeRadius = 1.0f;
+	float nodeRadius = 0.05f;
 	float nodeDiameter = nodeRadius*2;
 	std::shared_ptr<WireframePipeline<SurfaceDirectionalLighting>> gridPipeline;
 	IndexedTriangleList<WireframePipeline<SurfaceDirectionalLighting>::Vertex> cubeList;

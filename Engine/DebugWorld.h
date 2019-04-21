@@ -19,17 +19,15 @@ public:
 		:
 		Scene("Debug world"),
 		groundZBuffer(std::make_shared<ZBuffer>(gfx.ScreenWidth, gfx.ScreenHeight)),
-		entityZBuffer(std::make_shared<ZBuffer>(gfx.ScreenWidth, gfx.ScreenHeight)),
 		groundPipeline(std::make_shared<Pipeline<SurfaceDirectionalLighting>>(gfx, groundZBuffer)),
-		entityPipeline(std::make_shared<Pipeline<SurfaceDirectionalLighting>>(gfx, entityZBuffer)),
 		planeList(PlaneVertex::GetPlaneHorizontal<Pipeline<SurfaceDirectionalLighting>::Vertex>(planeSize)),
+		entityHandler(gfx),
 		grid(gfx, planeSize)
 	{
 		groundPipeline->effect.pixelShader.BindTexture("whiteimage.bmp");
-		entityPipeline->effect.pixelShader.BindTexture("greenimage.bmp");
+		
 		entityHandler.AddEntity(1.0f, { 25, 0, 25 });
-		entityHandler.AddEntity(2.0f, { 50, 50 });
-		entityHandler.AddEntity(0.3f, { 75, 25, 75 });
+		entityHandler.AddSolid(1.0f, { 50, 0, 50 });
 	}
 	virtual void Update(Keyboard&kbd, Mouse& mouse, float dt) override {
 		// camera movement
@@ -49,7 +47,7 @@ public:
 	}
 	virtual void Draw() override {
 		groundPipeline->BeginFrame();
-		entityPipeline->BeginFrame();
+		
 		// transformation matrices
 		const Matf4 projectionMatrix = Matf4::Projection(4.0f, 3.0f, 1.0f, 20.0f);
 		const Matf4 viewMatrix = Matf4::Translation(-cameraPosition) * camRotInverse;
@@ -62,21 +60,14 @@ public:
 		groundPipeline->effect.vertexShader.BindProjection(projectionMatrix);
 		// draw board/world
 		groundPipeline->Draw(planeList);
+		// bind and draw external components
 		grid.Draw(viewMatrix, projectionMatrix);
-		// bind entity view transforms and draw all entities
-		entityPipeline->effect.vertexShader.BindView(viewMatrix);
-		entityPipeline->effect.vertexShader.BindProjection(projectionMatrix);
-		entityHandler.Draw(entityPipeline);
-		// setting other pipeline values
-
-		
+		entityHandler.Draw(viewMatrix, projectionMatrix);
 	}
 private:
 	// pipeline stuff
 	std::shared_ptr<ZBuffer> groundZBuffer;
-	std::shared_ptr<ZBuffer> entityZBuffer;
 	std::shared_ptr<Pipeline<SurfaceDirectionalLighting>> groundPipeline;
-	std::shared_ptr<Pipeline<SurfaceDirectionalLighting>> entityPipeline;
 	float time = 0.0f;
 	// indexed triangle list
 	const float planeSize = 10.0f;

@@ -44,11 +44,37 @@ public:
 	virtual void SetVelocity(const Vecf3& vel) {
 		velocity = vel;
 	}
+	virtual Vecf3 GetSpawnLocationOffset() {
+		return spawnLocationOffset;
+	}
+	virtual void CalculateBoundaries() {
+		leftBound = spawnLocationOffset.x - size / 2;
+		rightBound = spawnLocationOffset.x + size / 2;
+		farBound = spawnLocationOffset.z + size / 2;
+		nearBound = spawnLocationOffset.z - size / 2;
+		upBound = spawnLocationOffset.y + size / 2;
+		bottomBound = spawnLocationOffset.y - size / 2;
+	}
+	virtual bool PointCollide(const Vecf3& point) {
+		if (point.x > leftBound && point.x < rightBound &&
+			point.y > bottomBound && point.y < upBound &&
+			point.z > nearBound && point.z < farBound) {
+			return true;
+		}
+		return false;
+	}
 protected:
 	// 2d location based on board range (x, z) (0-99, 0-99)
 	Veci2 locationOnBoard2D; 
 	Veci3 locationOnBoard3D;
 	float size;
+	// boundaries
+	float leftBound = 0.0f;
+	float rightBound = 0.0f;
+	float farBound = 0.0f;
+	float nearBound = 0.0f;
+	float upBound = 0.0f;
+	float bottomBound = 0.0f;
 	// location offset in world space
 	Vecf3 spawnLocationOffset;
 	// movement vector

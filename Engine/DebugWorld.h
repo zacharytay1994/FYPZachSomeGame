@@ -7,6 +7,7 @@
 #include "ZBuffer.h"
 #include "PlaneVertex.h"
 #include "EntityHandler.h"
+#include "GridAStar.h"
 
 #include <string>
 #include <sstream>
@@ -21,7 +22,8 @@ public:
 		entityZBuffer(std::make_shared<ZBuffer>(gfx.ScreenWidth, gfx.ScreenHeight)),
 		groundPipeline(std::make_shared<Pipeline<SurfaceDirectionalLighting>>(gfx, groundZBuffer)),
 		entityPipeline(std::make_shared<Pipeline<SurfaceDirectionalLighting>>(gfx, entityZBuffer)),
-		planeList(PlaneVertex::GetPlaneHorizontal<Pipeline<SurfaceDirectionalLighting>::Vertex>(10.0f))
+		planeList(PlaneVertex::GetPlaneHorizontal<Pipeline<SurfaceDirectionalLighting>::Vertex>(planeSize)),
+		grid(gfx, planeSize)
 	{
 		groundPipeline->effect.pixelShader.BindTexture("whiteimage.bmp");
 		entityPipeline->effect.pixelShader.BindTexture("greenimage.bmp");
@@ -32,38 +34,17 @@ public:
 	virtual void Update(Keyboard&kbd, Mouse& mouse, float dt) override {
 		// camera movement
 		if (kbd.KeyIsPressed('W')) {
-			cameraPosition += Vecf4{ 0.0f, 0.0f, 1.0f, 0.0f } /**!camRotInverse*/ * cameraSpeed * dt;
-			OutputDebugStringW(L"test");
-			OutputDebugStringW(L"\n");
+			cameraPosition += Vecf4{ 0.0f, 0.0f, 1.0f, 0.0f } * cameraSpeed * dt;
 		}
 		if (kbd.KeyIsPressed('A')) {
-			cameraPosition += Vecf4{ -1.0f, 0.0f, 0.0f, 0.0f }/* *!camRotInverse*/ * cameraSpeed * dt;
+			cameraPosition += Vecf4{ -1.0f, 0.0f, 0.0f, 0.0f } * cameraSpeed * dt;
 		}
 		if (kbd.KeyIsPressed('S')) {
-			cameraPosition += Vecf4{ 0.0f, 0.0f, -1.0f, 0.0f } /**!camRotInverse*/ * cameraSpeed * dt;
+			cameraPosition += Vecf4{ 0.0f, 0.0f, -1.0f, 0.0f } * cameraSpeed * dt;
 		}
 		if (kbd.KeyIsPressed('D')) {
-			cameraPosition += Vecf4{ 1.0f, 0.0f, 0.0f, 0.0f } /**!camRotInverse*/ * cameraSpeed * dt;
+			cameraPosition += Vecf4{ 1.0f, 0.0f, 0.0f, 0.0f } * cameraSpeed * dt;
 		}
-		//theta_x += 1.0f * dt;
-		//theta_y = 0.2f * 60;
-		//std::wstringstream ss;
-		//ss << mouse.GetPosX() << ',' << mouse.GetPosY() << std::endl;
-		//OutputDebugString(ss.str().c_str());
-
-		//if (zBuffer->pointBuffer[mouse.GetPosY() * zBuffer->width + mouse.GetPosX()] != Vecf2(0.0f, 0.0f)) {
-		//	std::wstringstream ss2;
-		//	//ss2 << zBuffer->pointBuffer[mouse.GetPosY() * zBuffer->width + mouse.GetPosX()].x << ',' << zBuffer->pointBuffer[mouse.GetPosY() * zBuffer->width + mouse.GetPosX()].y << "test" << std::endl;
-		//	float xVal = zBuffer->pointBuffer[mouse.GetPosY() * zBuffer->width + mouse.GetPosX()].x;
-		//	float yVal = zBuffer->pointBuffer[mouse.GetPosY() * zBuffer->width + mouse.GetPosX()].y;
-		//	float zVal = zBuffer->At(mouse.GetPosX(), mouse.GetPosY())/* - cameraPosition.z*/;
-		//	/*xVal = ((xVal / 960.0f) - 1.0f) * zVal;
-		//	yVal = ((-yVal / 540.0f) - 1.0f) * zVal;*/
-		//	/*xVal = xVal * zVal;
-		//	yVal = yVal * zVal;*/
-		//	ss2 << xVal << ',' << yVal << ',' << zVal << std::endl;
-		//	OutputDebugString(ss2.str().c_str());
-		//}
 		entityHandler.Update();
 	}
 	virtual void Draw() override {
@@ -81,7 +62,7 @@ public:
 		groundPipeline->effect.vertexShader.BindProjection(projectionMatrix);
 		// draw board/world
 		groundPipeline->Draw(planeList);
-
+		grid.Draw(viewMatrix, projectionMatrix);
 		// bind entity view transforms and draw all entities
 		entityPipeline->effect.vertexShader.BindView(viewMatrix);
 		entityPipeline->effect.vertexShader.BindProjection(projectionMatrix);
@@ -98,6 +79,7 @@ private:
 	std::shared_ptr<Pipeline<SurfaceDirectionalLighting>> entityPipeline;
 	float time = 0.0f;
 	// indexed triangle list
+	const float planeSize = 10.0f;
 	IndexedTriangleList<Pipeline<SurfaceDirectionalLighting>::Vertex> planeList;
 	// orientation euler angles
 	float theta_x = 0.0f;
@@ -111,4 +93,5 @@ private:
 	const float cameraSpeed = 4.0f;
 	// world entities
 	EntityHandler entityHandler;
+	GridAStar grid;
 };

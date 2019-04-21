@@ -12,7 +12,7 @@
 #include <string>
 
 template<class Effect>
-class Pipeline {
+class WireframePipeline {
 public:
 	// gets Vertex from effect class
 	typedef typename Effect::Vertex Vertex;
@@ -21,17 +21,10 @@ public:
 	// output vertex from geom shader
 	typedef typename Effect::GeomShader::Output outputGeom;
 public:
-	Pipeline(Graphics& gfx)
+	WireframePipeline(Graphics& gfx)
 		:
-		Pipeline(gfx, std::make_shared<ZBuffer>(gfx.ScreenWidth, gfx.ScreenHeight))
+		gfx(gfx)
 	{}
-	Pipeline(Graphics& gfx, std::shared_ptr<ZBuffer> zBuffer)
-		:
-		gfx(gfx),
-		zBuffer(std::move(zBuffer))
-	{
-		//assert(zBuffer->height == gfx.ScreenHeight && zBuffer->width == gfx.ScreenWidth);
-	}
 	void Draw(IndexedTriangleList<Vertex> triangleList) { ProcessVertices(triangleList.vertices, triangleList.indices); }
 	void BeginFrame() {
 		zBuffer->Clear();
@@ -156,135 +149,16 @@ private:
 		trans.Transform(triangle.v1);
 		trans.Transform(triangle.v2);
 
-		DrawTriangle(triangle);
-		/*gfx.DrawLine((Vecf2)triangle.v0.pos, (Vecf2)triangle.v1.pos, Colors::Red);
-		gfx.DrawLine((Vecf2)triangle.v0.pos, (Vecf2)triangle.v2.pos, Colors::Red);
-		gfx.DrawLine((Vecf2)triangle.v1.pos, (Vecf2)triangle.v2.pos, Colors::Red);*/
+		gfx.DrawLine((Vecf2)triangle.v0.pos, (Vecf2)triangle.v1.pos, Colors::Black);
+		gfx.DrawLine((Vecf2)triangle.v0.pos, (Vecf2)triangle.v2.pos, Colors::Black);
+		gfx.DrawLine((Vecf2)triangle.v1.pos, (Vecf2)triangle.v2.pos, Colors::Black);
 		/*gfx.DrawLine(triangle.v0.pos, triangle.v0.pos + triangle.v0.normal * 300, Colors::Red);
 		gfx.DrawLine(triangle.v1.pos, triangle.v1.pos + triangle.v1.normal * 300, Colors::Red);
 		gfx.DrawLine(triangle.v2.pos, triangle.v2.pos + triangle.v2.normal * 300, Colors::Red);*/
-	}
-	void DrawTriangle(Triangle<outputGeom>& triangle) {
-		// get pointers to vertices
-		const outputGeom* v0 = &triangle.v0;
-		const outputGeom* v1 = &triangle.v1;
-		const outputGeom* v2 = &triangle.v2;
-
-		// sort vertices
-		if (v0->pos.y > v1->pos.y) { std::swap(v0, v1); }
-		if (v1->pos.y > v2->pos.y) { std::swap(v1, v2); }
-		if (v0->pos.y > v1->pos.y) { std::swap(v0, v1); }
-
-		// determine if flat top/bottom else
-		if (v1->pos.y == v2->pos.y) {
-			// draw flat bottom
-			if (v1->pos.x > v2->pos.x) { std::swap(v1, v2); }
-			DrawFlatBottomTriangle(*v0, *v1, *v2);
-		}
-		else if (v0->pos.y == v1->pos.y) {
-			// draw flat top
-			if (v0->pos.x > v1->pos.x) { std::swap(v0, v1); }
-			DrawFlatTopTriangle(*v0, *v1, *v2);
-		}
-		else {
-			// split triangle
-			// interpolate v3
-			const float alpha = (v1->pos.y - v0->pos.y) / (v2->pos.y - v0->pos.y);
-			// Interpolate(source, destination, rateofchange)
-			const outputGeom v3 = interpolate<outputGeom>(*v0, *v2, alpha);
-
-			// determine if major left/right
-			if (v3.pos.x > v1->pos.x) {
-				// major right
-				DrawFlatBottomTriangle(*v0, *v1, v3);
-				DrawFlatTopTriangle(*v1, v3, *v2);
-			}
-			else {
-				// major left
-				DrawFlatBottomTriangle(*v0, v3, *v1);
-				DrawFlatTopTriangle(v3, *v1, *v2);
-			}
-		}
-	}
-	void DrawFlatBottomTriangle(const outputGeom& v0, const outputGeom& v1, const outputGeom& v2) {
-		// get left and right rateofchange
-		const outputGeom changeLeft = (v1 - v0) / (v2.pos.y - v0.pos.y);
-		const outputGeom changeRight = (v2 - v0) / (v2.pos.y - v0.pos.y);
-
-		// get y start and end
-		const int yStart = std::max((int)ceil(v0.pos.y - 0.5f), 0);
-		const int yEnd = std::min((int)ceil(v2.pos.y - 0.5f), (int)Graphics::ScreenHeight - 1);
-
-		// create left and right interpolant
-		outputGeom leftInterpolant = v0;
-		outputGeom rightInterpolant = v0;
-
-		// pre-step interpolants
-		const float yPrestep = ((float)yStart + 0.5f - v0.pos.y);
-		leftInterpolant += changeLeft * yPrestep;
-		rightInterpolant += changeRight * yPrestep;
-
-		DrawFlatTriangle(yStart, yEnd, v1, v2, leftInterpolant, rightInterpolant, changeLeft, changeRight);
-	}
-	void DrawFlatTopTriangle(const outputGeom& v0, const outputGeom& v1, const outputGeom& v2) {
-		// get left and right rateofchange
-		const outputGeom changeLeft = (v2 - v0) / (v2.pos.y - v0.pos.y);
-		const outputGeom changeRight = (v2 - v1) / (v2.pos.y - v0.pos.y);
-
-		// get y start and end
-		const int yStart = std::max((int)ceil(v0.pos.y - 0.5f), 0);
-		const int yEnd = std::min((int)ceil(v2.pos.y - 0.5f), (int)Graphics::ScreenHeight - 1);
-
-		// create left and right interpolant
-		outputGeom leftInterpolant = v0;
-		outputGeom rightInterpolant = v1;
-
-		// pre-step interpolants
-		const float yPrestep = ((float)yStart + 0.5f - v0.pos.y);
-		leftInterpolant += changeLeft * yPrestep;
-		rightInterpolant += changeRight * yPrestep;
-
-		DrawFlatTriangle(yStart, yEnd, v0, v1, leftInterpolant, rightInterpolant, changeLeft, changeRight);
-	}
-	void DrawFlatTriangle(const int& yStart, const int& yEnd, const outputGeom& v0, const outputGeom& v1,
-		outputGeom& leftInterpolant, outputGeom& rightInterpolant, const outputGeom& changeLeft, const outputGeom& changeRight) {
-		// loop through y down the triangle
-		for (int y = yStart; y < yEnd; y++, leftInterpolant = leftInterpolant + changeLeft, rightInterpolant = rightInterpolant + changeRight) {
-			// get x rateofchange
-			const outputGeom changeX = (v1 - v0) / (v1.pos.x - v0.pos.x);
-
-			// get x start and end
-			const int xStart = std::max((int)ceil(leftInterpolant.pos.x - 0.5f), 0);
-			
-			const int xEnd = std::min((int)ceil(rightInterpolant.pos.x - 0.5f), (int)Graphics::ScreenWidth - 1);
-
-			float testvalue = rightInterpolant.pos.x - leftInterpolant.pos.x;
-
-			// create left to right interpolant
-			outputGeom leftToRight = leftInterpolant;
-
-			// pre-step interpolant
-			float xPrestep = ((float)xStart + 0.5f) - leftInterpolant.pos.x;
-			leftToRight += changeX * xPrestep;
-
-			// loop for x
-			for (int x = xStart; x < xEnd; x++, leftToRight = leftToRight + changeX) {
-				// get z value
-				const float zValue = 1.0f/leftToRight.pos.w;
-				const outputGeom passIn = leftToRight * zValue;
-				if (zBuffer->TestAndSetZ(x, y, zValue, passIn.texpos)) {
-					// get w back from winv
-					const float w = 1.0f/leftToRight.pos.w;
-					// bring texture coordinates back to orthographic space
-					gfx.PutPixel(x, y, effect.pixelShader(passIn));
-				}
-			}
-		}
 	}
 public:
 	Effect effect;
 private:
 	Graphics& gfx;
 	NDCTransformer<outputGeom> trans;
-	std::shared_ptr<ZBuffer> zBuffer;
 };

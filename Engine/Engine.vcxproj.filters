@@ -55,6 +55,12 @@
     <Filter Include="Resource Files\EntityTextures">
       <UniqueIdentifier>{49c858ca-23e9-405e-9733-ce9daa7d3b9d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\AStarSearch">
+      <UniqueIdentifier>{3cd01e47-590a-4d1f-ac09-6351f62d7130}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Pipelines">
+      <UniqueIdentifier>{2f8ab684-533e-4197-9b4e-6e6ac3806a22}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ChiliWin.h">
@@ -127,9 +133,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="TextureVertex.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Pipeline.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Triangle.h">
@@ -215,6 +218,18 @@
     </ClInclude>
     <ClInclude Include="EntityHandler.h">
       <Filter>Header Files\Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="NodeAStar.h">
+      <Filter>Header Files\AStarSearch</Filter>
+    </ClInclude>
+    <ClInclude Include="GridAStar.h">
+      <Filter>Header Files\AStarSearch</Filter>
+    </ClInclude>
+    <ClInclude Include="Pipeline.h">
+      <Filter>Header Files\Pipelines</Filter>
+    </ClInclude>
+    <ClInclude Include="WireframePipeline.h">
+      <Filter>Header Files\Pipelines</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

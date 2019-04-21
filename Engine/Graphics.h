@@ -77,7 +77,9 @@ public:
 				}
 				for (float i = point1.y; i < point2.y; i++) {
 					const float x = (i - intercept) / m;
-					PutPixel((int)x, (int)i, c);
+					if ((int)x > 0 && (int)x < ScreenWidth && (int)i > 0 && (int)i < ScreenHeight) {
+						PutPixel((int)x, (int)i, c);
+					}
 				}
 			}
 			else {
@@ -88,7 +90,9 @@ public:
 				// Draw line
 				for (float i = point1.x; i < point2.x; i++) {
 					const float y = m * i + intercept;
-					PutPixel((int)i, (int)y, c);
+					if ((int)i > 0 && (int)i < ScreenWidth && (int)y > 0 && (int)y < ScreenHeight) {
+						PutPixel((int)i, (int)y, c);
+					}
 				}
 			}
 		}
@@ -98,7 +102,10 @@ public:
 				std::swap(point1, point2);
 			}
 			for (float i = point1.y; i < point2.y; i++) {
-				PutPixel((int)point1.x, (int)i, c);
+				if ((int)point1.x > 0 && (int)point1.x < ScreenWidth && (int)i > 0 && (int)i < ScreenHeight) {
+					PutPixel((int)point1.x, (int)i, c);
+				}
+				
 			}
 		}
 		

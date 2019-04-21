@@ -158,6 +158,7 @@
     <ClInclude Include="FontList.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Graphics.h" />
+    <ClInclude Include="GridAStar.h" />
     <ClInclude Include="IndexedLineList.h" />
     <ClInclude Include="IndexedTriangleList.h" />
     <ClInclude Include="Keyboard.h" />
@@ -170,6 +171,7 @@
     <ClInclude Include="MenuSceneParent.h" />
     <ClInclude Include="Mouse.h" />
     <ClInclude Include="NDCTransformer.h" />
+    <ClInclude Include="NodeAStar.h" />
     <ClInclude Include="Pipeline.h" />
     <ClInclude Include="PlaneVertex.h" />
     <ClInclude Include="Rect.h" />
@@ -190,6 +192,7 @@
     <ClInclude Include="Vec2.h" />
     <ClInclude Include="Vec3.h" />
     <ClInclude Include="Vec4.h" />
+    <ClInclude Include="WireframePipeline.h" />
     <ClInclude Include="ZBuffer.h" />
   </ItemGroup>
   <ItemGroup>

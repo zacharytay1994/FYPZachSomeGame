@@ -21,13 +21,13 @@ public:
 		groundZBuffer(std::make_shared<ZBuffer>(gfx.ScreenWidth, gfx.ScreenHeight)),
 		groundPipeline(std::make_shared<Pipeline<SurfaceDirectionalLighting>>(gfx, groundZBuffer)),
 		planeList(PlaneVertex::GetPlaneHorizontal<Pipeline<SurfaceDirectionalLighting>::Vertex>(planeSize)),
-		entityHandler(gfx),
-		grid(gfx, planeSize)
+		entityHandler(gfx)
 	{
 		groundPipeline->effect.pixelShader.BindTexture("whiteimage.bmp");
-		
 		entityHandler.AddEntity(1.0f, { 25, 0, 25 });
-		entityHandler.AddSolid(1.0f, { 50, 0, 50 });
+		entityHandler.AddSolid(1.0f, { 45, 0, 45 });
+		entityHandler.AddSolid(2.0f, { 76, 0, 76 });
+		entityHandler.InitGrid();
 	}
 	virtual void Update(Keyboard&kbd, Mouse& mouse, float dt) override {
 		// camera movement
@@ -61,7 +61,6 @@ public:
 		// draw board/world
 		groundPipeline->Draw(planeList);
 		// bind and draw external components
-		grid.Draw(viewMatrix, projectionMatrix);
 		entityHandler.Draw(viewMatrix, projectionMatrix);
 	}
 private:
@@ -84,5 +83,4 @@ private:
 	const float cameraSpeed = 4.0f;
 	// world entities
 	EntityHandler entityHandler;
-	GridAStar grid;
 };

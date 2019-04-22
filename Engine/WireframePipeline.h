@@ -29,6 +29,9 @@ public:
 	void BeginFrame() {
 		zBuffer->Clear();
 	}
+	void SetIsOccupied(const bool& boolIn) {
+		isOccupied = boolIn;
+	}
 private:
 	void ProcessVertices(std::vector<Vertex>& vertices, std::vector<size_t>& indices) {
 		// create holder vector of output vertices
@@ -142,16 +145,23 @@ private:
 			PerspectiveTransform(triangle);
 		}
 	}
-
+	
 	void PerspectiveTransform(Triangle<outputGeom>& triangle) {
 		// NDC transform
 		trans.Transform(triangle.v0);
 		trans.Transform(triangle.v1);
 		trans.Transform(triangle.v2);
 
-		gfx.DrawLine((Vecf2)triangle.v0.pos, (Vecf2)triangle.v1.pos, Colors::Black);
-		gfx.DrawLine((Vecf2)triangle.v0.pos, (Vecf2)triangle.v2.pos, Colors::Black);
-		gfx.DrawLine((Vecf2)triangle.v1.pos, (Vecf2)triangle.v2.pos, Colors::Black);
+		if (!isOccupied) {
+			gfx.DrawLine((Vecf2)triangle.v0.pos, (Vecf2)triangle.v1.pos, Colors::Cyan);
+			gfx.DrawLine((Vecf2)triangle.v0.pos, (Vecf2)triangle.v2.pos, Colors::Cyan);
+			gfx.DrawLine((Vecf2)triangle.v1.pos, (Vecf2)triangle.v2.pos, Colors::Cyan);
+		}
+		else {
+			gfx.DrawLine((Vecf2)triangle.v0.pos, (Vecf2)triangle.v1.pos, Colors::Red);
+			gfx.DrawLine((Vecf2)triangle.v0.pos, (Vecf2)triangle.v2.pos, Colors::Red);
+			gfx.DrawLine((Vecf2)triangle.v1.pos, (Vecf2)triangle.v2.pos, Colors::Red);
+		}
 		/*gfx.DrawLine(triangle.v0.pos, triangle.v0.pos + triangle.v0.normal * 300, Colors::Red);
 		gfx.DrawLine(triangle.v1.pos, triangle.v1.pos + triangle.v1.normal * 300, Colors::Red);
 		gfx.DrawLine(triangle.v2.pos, triangle.v2.pos + triangle.v2.normal * 300, Colors::Red);*/
@@ -161,4 +171,5 @@ public:
 private:
 	Graphics& gfx;
 	NDCTransformer<outputGeom> trans;
+	bool isOccupied = false;
 };

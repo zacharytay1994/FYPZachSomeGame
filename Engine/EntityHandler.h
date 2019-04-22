@@ -4,6 +4,7 @@
 #include "EntityOne.h"
 #include "Graphics.h"
 #include "MatTemplate.h"
+#include "GridAStar.h"
 
 #include <vector>
 #include <memory>
@@ -13,7 +14,8 @@ public:
 	EntityHandler(Graphics& gfx) 
 		:
 		entityZBuffer(std::make_shared<ZBuffer>(gfx.ScreenWidth, gfx.ScreenHeight)),
-		entityPipeline(std::make_shared<Pipeline<SurfaceDirectionalLighting>>(gfx, entityZBuffer))
+		entityPipeline(std::make_shared<Pipeline<SurfaceDirectionalLighting>>(gfx, entityZBuffer)),
+		grid(gfx, planeSize)
 	{
 		entityPipeline->effect.pixelShader.BindTexture("greenimage.bmp");
 	}
@@ -23,12 +25,22 @@ public:
 		for (std::vector<std::unique_ptr<Entity>>::iterator x = entityBuffer.begin(); x != end; std::advance(x, 1)) {
 			(*x)->Update();
 		}
+		end = solidBuffer.end();
+		for (std::vector<std::unique_ptr<Entity>>::iterator x = solidBuffer.begin(); x != end; std::advance(x, 1)) {
+			(*x)->Update();
+		}
+		InitGrid();
+	}
+
+	void InitGrid() {
+		grid.UpdateWalkable(solidBuffer);
 	}
 
 	void Draw(const Matf4& viewMatrix, const Matf4& projectionMatrix) {
 		entityPipeline->BeginFrame();
 		entityPipeline->effect.vertexShader.BindView(viewMatrix);
 		entityPipeline->effect.vertexShader.BindProjection(projectionMatrix);
+		
 		// loop through normal entities
 		std::vector<std::unique_ptr<Entity>>::iterator end = entityBuffer.end();
 		for (std::vector<std::unique_ptr<Entity>>::iterator x = entityBuffer.begin(); x != end; std::advance(x, 1)) {
@@ -40,13 +52,13 @@ public:
 		// loop through solid entities
 		end = solidBuffer.end();
 		for (std::vector<std::unique_ptr<Entity>>::iterator x = solidBuffer.begin(); x != end; std::advance(x, 1)) {
-			translateVector = (*x)->GetSpawnLocationOffset();
+			translateVector = (*x)->Calculate3DLocationOffset();
+			(*x)->CalculateBoundaries();
 			worldTransform = Matf4::RotationZ(0.0f) * Matf4::RotationX(0.0f) * Matf4::RotationY(0.0f) * Matf4::Translation(translateVector);
 			entityPipeline->effect.vertexShader.BindWorld(worldTransform);
-			if (!(*x)->PointCollide({ 0.0f, 0.5f, 0.0f })) {
-				entityPipeline->Draw((*x)->GetCubeList());
-			}
+			entityPipeline->Draw((*x)->GetCubeList());
 		}
+		grid.Draw(viewMatrix, projectionMatrix);
 	}
 	// add entity (size, location)
 	void AddEntity(const float& size, const Veci2& loc) {
@@ -74,4 +86,8 @@ private:
 	// pipeline stuff 
 	std::shared_ptr<ZBuffer> entityZBuffer;
 	std::shared_ptr<Pipeline<SurfaceDirectionalLighting>> entityPipeline;
+
+	// grid stuff
+	const float planeSize = 10.0f;
+	GridAStar grid;
 };

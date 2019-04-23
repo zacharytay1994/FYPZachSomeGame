@@ -172,6 +172,7 @@
     <ClInclude Include="Mouse.h" />
     <ClInclude Include="NDCTransformer.h" />
     <ClInclude Include="NodeAStar.h" />
+    <ClInclude Include="Pathfinding.h" />
     <ClInclude Include="Pipeline.h" />
     <ClInclude Include="PlaneVertex.h" />
     <ClInclude Include="Rect.h" />

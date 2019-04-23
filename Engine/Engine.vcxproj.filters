@@ -231,6 +231,9 @@
     <ClInclude Include="WireframePipeline.h">
       <Filter>Header Files\Pipelines</Filter>
     </ClInclude>
+    <ClInclude Include="Pathfinding.h">
+      <Filter>Header Files\AStarSearch</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DXErr.cpp">

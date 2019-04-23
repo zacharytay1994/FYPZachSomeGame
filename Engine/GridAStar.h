@@ -11,6 +11,7 @@
 
 #include <vector>
 #include <memory>
+#include <algorithm>
 
 class GridAStar {
 public:
@@ -23,9 +24,11 @@ public:
 	{
 		const float gridEndX = gridStartPos.x + gridSize;
 		const float gridEndZ = gridStartPos.y - gridSize;
-		for (float x = gridStartPos.x + nodeRadius; x < gridEndX; x += nodeDiameter) {
-			for (float y = gridStartPos.y - nodeRadius; y > gridEndZ; y -= nodeDiameter) {
-				grid.emplace_back(std::make_unique<NodeAStar>(true, Vecf3( x, nodeRadius, y )));
+		int gridX = 0;
+		int gridY = 0;
+		for (float x = gridStartPos.x + nodeRadius, gridX = 0; x < gridEndX; x += nodeDiameter, gridX++) {
+			for (float y = gridStartPos.y - nodeRadius, gridY = 0; y > gridEndZ; y -= nodeDiameter, gridY++) {
+				grid.emplace_back(std::make_unique<NodeAStar>(true, Vecf3( x, nodeRadius, y ), (int)gridX, (int)gridY));
 			}
 		}
 	}
@@ -49,21 +52,59 @@ public:
 			translateVector = (*j)->GetWorldPos();
 			worldTransform = Matf4::RotationZ(0.0f) * Matf4::RotationX(0.0f) * Matf4::RotationY(0.0f) * Matf4::Translation(translateVector);
 			gridPipeline->effect.vertexShader.BindWorld(worldTransform);
-			if ((*j)->GetWalkable()) {
+			/*if ((*j)->GetWalkable()) {
 				gridPipeline->SetIsOccupied(false);
 			}
 			else if (!(*j)->GetWalkable()) {
 				gridPipeline->SetIsOccupied(true);
-			}
+			}*/
+			gridPipeline->SetIsOccupied(!(*j)->GetWalkable());
+			gridPipeline->SetVisualize((*j)->GetVisualize());
 			gridPipeline->Draw(cubeList);
 		}
 	}
+
+	NodeAStar* NodeFromWorldPosition(const Vecf3& worldPos) {
+		float perX = std::clamp(((worldPos.x + gridSize/2) / gridSize), 0.0f, 1.0f);
+		float perY = std::clamp((abs(worldPos.z - gridSize/2) / gridSize), 0.0f, 1.0f);
+
+		int x = (int)(perX *(gridSize / nodeDiameter));
+		int y = (int)(perY *(gridSize / nodeDiameter));
+		
+		int maxGridDimension = (int)(gridSize / nodeDiameter);
+		return grid[x * maxGridDimension + y].get();
+	}
+
+	std::vector<NodeAStar*> GetNeighbours(NodeAStar*& node) {
+		std::vector<NodeAStar*> neighbours;
+		// 3 by 3 grid search
+		int nodeGridX;
+		int nodeGridY;
+		for (int x = - 1; x <= 1; x++) {
+			for (int y = -1; y <= 1; y++) {
+				// if center cell skip, not neighbour
+				if (x == 0 && y == 0) {
+					continue;
+				}
+				// if cell is within grid
+				nodeGridX = node->gridX + x;
+				nodeGridY = node->gridY + y;
+				if (nodeGridX >= 0 && nodeGridX < gridCellSize &&
+					nodeGridY >= 0 && nodeGridY < gridCellSize) {
+					neighbours.push_back(grid[nodeGridX * gridCellSize + nodeGridY].get());
+				}
+			}
+		}
+		return neighbours;
+	}
+
 private:
 	std::vector<std::unique_ptr<NodeAStar>> grid;
 	const Vecf2 gridStartPos;
 	const float gridSize;
-	float nodeRadius = 0.5f;
+	float nodeRadius = 0.1f;
 	float nodeDiameter = nodeRadius*2;
+	const int gridCellSize = (int)(gridSize / nodeDiameter);
 	std::shared_ptr<WireframePipeline<SurfaceDirectionalLighting>> gridPipeline;
 	IndexedTriangleList<WireframePipeline<SurfaceDirectionalLighting>::Vertex> cubeList;
 	Vecf3 translateVector;

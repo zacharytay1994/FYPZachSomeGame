@@ -5,6 +5,7 @@
 #include "Graphics.h"
 #include "MatTemplate.h"
 #include "GridAStar.h"
+#include "Pathfinding.h"
 
 #include <vector>
 #include <memory>
@@ -15,25 +16,34 @@ public:
 		:
 		entityZBuffer(std::make_shared<ZBuffer>(gfx.ScreenWidth, gfx.ScreenHeight)),
 		entityPipeline(std::make_shared<Pipeline<SurfaceDirectionalLighting>>(gfx, entityZBuffer)),
-		grid(gfx, planeSize)
+		grid(std::make_shared<GridAStar>(gfx, planeSize)),
+		pathfinding(grid)
 	{
 		entityPipeline->effect.pixelShader.BindTexture("greenimage.bmp");
 	}
 
-	void Update() {
+	void Update(Keyboard&kbd, Mouse& mouse, float dt) {
 		std::vector<std::unique_ptr<Entity>>::iterator end = entityBuffer.end();
 		for (std::vector<std::unique_ptr<Entity>>::iterator x = entityBuffer.begin(); x != end; std::advance(x, 1)) {
 			(*x)->Update();
 		}
-		end = solidBuffer.end();
+		/*end = solidBuffer.end();
 		for (std::vector<std::unique_ptr<Entity>>::iterator x = solidBuffer.begin(); x != end; std::advance(x, 1)) {
 			(*x)->Update();
-		}
+		}*/
 		InitGrid();
+
+		if (kbd.KeyIsPressed('L')) {
+			pathfinding.FindPath({ -4.8f, 0.5f, 4.8f }, {4.8f, 0.0f, -4.8f});
+		}
 	}
 
 	void InitGrid() {
-		grid.UpdateWalkable(solidBuffer);
+		grid->UpdateWalkable(solidBuffer);
+	}
+
+	void Pathfind(const Vecf3& start, const Vecf3& end) {
+		pathfinding.FindPath(start, end);
 	}
 
 	void Draw(const Matf4& viewMatrix, const Matf4& projectionMatrix) {
@@ -58,7 +68,7 @@ public:
 			entityPipeline->effect.vertexShader.BindWorld(worldTransform);
 			entityPipeline->Draw((*x)->GetCubeList());
 		}
-		grid.Draw(viewMatrix, projectionMatrix);
+		grid->Draw(viewMatrix, projectionMatrix);
 	}
 	// add entity (size, location)
 	void AddEntity(const float& size, const Veci2& loc) {
@@ -89,5 +99,6 @@ private:
 
 	// grid stuff
 	const float planeSize = 10.0f;
-	GridAStar grid;
+	std::shared_ptr<GridAStar> grid;
+	Pathfinding pathfinding;
 };

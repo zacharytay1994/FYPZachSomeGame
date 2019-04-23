@@ -24,10 +24,24 @@ public:
 		entityHandler(gfx)
 	{
 		groundPipeline->effect.pixelShader.BindTexture("whiteimage.bmp");
-		entityHandler.AddEntity(1.0f, { 25, 0, 25 });
-		entityHandler.AddSolid(1.0f, { 45, 0, 45 });
+		//entityHandler.AddEntity(1.0f, { 25, 0, 25 });
+		entityHandler.AddSolid(1.0f, { 55, 0, 45 });
 		entityHandler.AddSolid(2.0f, { 76, 0, 76 });
+		entityHandler.AddSolid(1.0f, { 25, 0, 25 });
+		entityHandler.AddSolid(0.5f, { 36, 0, 46 });
+		entityHandler.AddSolid(1.5f, { 75, 0, 22 });
+		entityHandler.AddSolid(1.0f, { 50, 0, 66 });
+		entityHandler.AddSolid(1.5f, { 75, 0, 50 });
+
+		entityHandler.AddSolid(1.2f, { 50, 0, 20 });
+		entityHandler.AddSolid(1.0f, { 45, 0, 79 });
+		entityHandler.AddSolid(0.5f, { 21, 0, 69 });
+		entityHandler.AddSolid(1.5f, { 35, 0, 70 });
+		entityHandler.AddSolid(1.0f, { 10, 0, 30 });
+		entityHandler.AddSolid(1.5f, { 10, 0, 50 });
+
 		entityHandler.InitGrid();
+		entityHandler.Pathfind({1.8f, 0.5f, 4.8f}, {-1.8f, 0.5f, -4.8f});
 	}
 	virtual void Update(Keyboard&kbd, Mouse& mouse, float dt) override {
 		// camera movement
@@ -43,7 +57,7 @@ public:
 		if (kbd.KeyIsPressed('D')) {
 			cameraPosition += Vecf4{ 1.0f, 0.0f, 0.0f, 0.0f } * cameraSpeed * dt;
 		}
-		entityHandler.Update();
+		entityHandler.Update(kbd, mouse, dt);
 	}
 	virtual void Draw() override {
 		groundPipeline->BeginFrame();
@@ -77,7 +91,7 @@ private:
 	float theta_z = 0.0f;
 	// projection inverse matrices and camera stuff
 	Matf4 camRotInverse = Matf4::Identity() * Matf4::RotationX(-0.8f);
-	Vecf3 cameraPosition = { 0.0f, 5.0f, 0.0f };
+	Vecf3 cameraPosition = { 0.0f, 5.0f, -5.0f };
 	Vecf3 modelPosition = { 0.0f, 0.0f, 2.5f };
 	Vecf3 lightPosition = { 0.0f, 0.0f, 0.6f };
 	const float cameraSpeed = 4.0f;

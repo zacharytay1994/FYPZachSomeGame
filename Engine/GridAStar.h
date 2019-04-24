@@ -102,7 +102,7 @@ private:
 	std::vector<std::unique_ptr<NodeAStar>> grid;
 	const Vecf2 gridStartPos;
 	const float gridSize;
-	float nodeRadius = 0.1f;
+	float nodeRadius = 0.005f;
 	float nodeDiameter = nodeRadius*2;
 	const int gridCellSize = (int)(gridSize / nodeDiameter);
 	std::shared_ptr<WireframePipeline<SurfaceDirectionalLighting>> gridPipeline;

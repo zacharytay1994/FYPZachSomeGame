@@ -12,6 +12,8 @@
 #include <string>
 #include <sstream>
 #include <memory>
+#include <chrono>
+#include <ctime>
 
 class DebugWorld : public Scene {
 public:
@@ -41,7 +43,13 @@ public:
 		entityHandler.AddSolid(1.5f, { 10, 0, 50 });
 
 		entityHandler.InitGrid();
+		auto begin = std::chrono::high_resolution_clock::now();
 		entityHandler.Pathfind({1.8f, 0.5f, 4.8f}, {-1.8f, 0.5f, -4.8f});
+		auto end = std::chrono::high_resolution_clock::now();
+		std::chrono::duration<double> elapsed_seconds = end - begin;
+		std::wstringstream ss;
+		ss << "Path has been found in : "<< elapsed_seconds.count()*1000 << "ms" << std::endl;
+		OutputDebugString(ss.str().c_str());
 	}
 	virtual void Update(Keyboard&kbd, Mouse& mouse, float dt) override {
 		// camera movement

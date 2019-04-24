@@ -11,6 +11,12 @@ public:
 		gridX(gridX),
 		gridY(gridY)
 	{}
+	bool operator>(NodeAStar& rhs) {
+		if (rhs.GetfCost() < GetfCost()) {
+			return true;
+		}
+		return false;
+	}
 	Vecf3 GetWorldPos() {
 		return worldPos;
 	}
@@ -35,6 +41,18 @@ public:
 	bool GetVisualize() {
 		return visualize;
 	}
+	bool GetInClosed() {
+		return inClosed;
+	}
+	void SetInClosed(bool boolIn) {
+		inClosed = boolIn;
+	}
+	bool GetInOpen() {
+		return inOpen;
+	}
+	void SetInOpen(bool boolIn) {
+		inOpen = boolIn;
+	}
 public:
 	// distance from start node to this node
 	int gCost = 0;
@@ -48,4 +66,7 @@ private:
 	// parent node
 	NodeAStar* parent;
 	bool visualize = false;
+	// open and closed set
+	bool inClosed = false;
+	bool inOpen = false;
 };

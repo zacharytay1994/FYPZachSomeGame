@@ -7,7 +7,7 @@
 #include "ZBuffer.h"
 #include "PlaneVertex.h"
 #include "EntityHandler.h"
-#include "GridAStar.h"
+#include "Pathfinding.h"
 
 #include <string>
 #include <sstream>
@@ -23,7 +23,8 @@ public:
 		groundZBuffer(std::make_shared<ZBuffer>(gfx.ScreenWidth, gfx.ScreenHeight)),
 		groundPipeline(std::make_shared<Pipeline<SurfaceDirectionalLighting>>(gfx, groundZBuffer)),
 		planeList(PlaneVertex::GetPlaneHorizontal<Pipeline<SurfaceDirectionalLighting>::Vertex>(planeSize)),
-		entityHandler(gfx)
+		entityHandler(gfx),
+		pathfinding(gfx)
 	{
 		groundPipeline->effect.pixelShader.BindTexture("whiteimage.bmp");
 		//entityHandler.AddEntity(1.0f, { 25, 0, 25 });
@@ -42,9 +43,9 @@ public:
 		entityHandler.AddSolid(1.0f, { 10, 0, 30 });
 		entityHandler.AddSolid(1.5f, { 10, 0, 50 });
 
-		entityHandler.InitGrid();
+		pathfinding.UpdateGridObstacles(entityHandler.solidBuffer);
 		auto begin = std::chrono::high_resolution_clock::now();
-		entityHandler.Pathfind({1.8f, 0.5f, 4.8f}, {-1.8f, 0.5f, -4.8f});
+		pathfinding.FindPath({1.8f, 0.5f, 4.8f}, {-1.8f, 0.5f, -4.8f});
 		auto end = std::chrono::high_resolution_clock::now();
 		std::chrono::duration<double> elapsed_seconds = end - begin;
 		std::wstringstream ss;
@@ -70,7 +71,7 @@ public:
 	virtual void Draw() override {
 		groundPipeline->BeginFrame();
 		
-		// transformation matrices
+		// world and camera transformation matrices
 		const Matf4 projectionMatrix = Matf4::Projection(4.0f, 3.0f, 1.0f, 20.0f);
 		const Matf4 viewMatrix = Matf4::Translation(-cameraPosition) * camRotInverse;
 		const Vecf3 translate = { 0.0f, 0.0f, 0.0f };
@@ -80,10 +81,12 @@ public:
 		groundPipeline->effect.vertexShader.BindWorld(worldTransform);
 		groundPipeline->effect.vertexShader.BindView(viewMatrix);
 		groundPipeline->effect.vertexShader.BindProjection(projectionMatrix);
-		// draw board/world
+		// draw world
 		groundPipeline->Draw(planeList);
+
 		// bind and draw external components
 		entityHandler.Draw(viewMatrix, projectionMatrix);
+		pathfinding.DrawGrid(viewMatrix, projectionMatrix);
 	}
 private:
 	// pipeline stuff
@@ -105,4 +108,5 @@ private:
 	const float cameraSpeed = 4.0f;
 	// world entities
 	EntityHandler entityHandler;
+	Pathfinding pathfinding;
 };

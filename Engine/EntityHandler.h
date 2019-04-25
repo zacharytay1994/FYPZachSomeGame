@@ -4,8 +4,6 @@
 #include "EntityOne.h"
 #include "Graphics.h"
 #include "MatTemplate.h"
-#include "GridAStar.h"
-#include "Pathfinding.h"
 
 #include <vector>
 #include <memory>
@@ -15,9 +13,7 @@ public:
 	EntityHandler(Graphics& gfx) 
 		:
 		entityZBuffer(std::make_shared<ZBuffer>(gfx.ScreenWidth, gfx.ScreenHeight)),
-		entityPipeline(std::make_shared<Pipeline<SurfaceDirectionalLighting>>(gfx, entityZBuffer)),
-		grid(std::make_shared<GridAStar>(gfx, planeSize)),
-		pathfinding(grid)
+		entityPipeline(std::make_shared<Pipeline<SurfaceDirectionalLighting>>(gfx, entityZBuffer))
 	{
 		entityPipeline->effect.pixelShader.BindTexture("greenimage.bmp");
 	}
@@ -27,23 +23,6 @@ public:
 		for (std::vector<std::unique_ptr<Entity>>::iterator x = entityBuffer.begin(); x != end; std::advance(x, 1)) {
 			(*x)->Update();
 		}
-		/*end = solidBuffer.end();
-		for (std::vector<std::unique_ptr<Entity>>::iterator x = solidBuffer.begin(); x != end; std::advance(x, 1)) {
-			(*x)->Update();
-		}*/
-		InitGrid();
-
-		if (kbd.KeyIsPressed('L')) {
-			pathfinding.FindPath({ -4.8f, 0.5f, 4.8f }, {4.8f, 0.0f, -4.8f});
-		}
-	}
-
-	void InitGrid() {
-		grid->UpdateWalkable(solidBuffer);
-	}
-
-	void Pathfind(const Vecf3& start, const Vecf3& end) {
-		pathfinding.FindPath(start, end);
 	}
 
 	void Draw(const Matf4& viewMatrix, const Matf4& projectionMatrix) {
@@ -68,7 +47,6 @@ public:
 			entityPipeline->effect.vertexShader.BindWorld(worldTransform);
 			entityPipeline->Draw((*x)->GetCubeList());
 		}
-		grid->Draw(viewMatrix, projectionMatrix);
 	}
 	// add entity (size, location)
 	void AddEntity(const float& size, const Veci2& loc) {
@@ -87,18 +65,15 @@ public:
 		(*(solidBuffer.end() - 1))->Calculate3DLocationOffset();
 		(*(solidBuffer.end() - 1))->CalculateBoundaries();
 	}
+public:
+	std::vector <std::unique_ptr<Entity>> solidBuffer;
 private:
 	std::vector<std::unique_ptr<Entity>> entityBuffer;
-	std::vector <std::unique_ptr<Entity>> solidBuffer;
+	
 	Vecf3 translateVector;
 	Matf4 worldTransform;
 
 	// pipeline stuff 
 	std::shared_ptr<ZBuffer> entityZBuffer;
 	std::shared_ptr<Pipeline<SurfaceDirectionalLighting>> entityPipeline;
-
-	// grid stuff
-	const float planeSize = 10.0f;
-	std::shared_ptr<GridAStar> grid;
-	Pathfinding pathfinding;
 };

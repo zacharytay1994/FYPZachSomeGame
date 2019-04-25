@@ -52,12 +52,6 @@ public:
 			translateVector = (*j)->GetWorldPos();
 			worldTransform = Matf4::RotationZ(0.0f) * Matf4::RotationX(0.0f) * Matf4::RotationY(0.0f) * Matf4::Translation(translateVector);
 			gridPipeline->effect.vertexShader.BindWorld(worldTransform);
-			/*if ((*j)->GetWalkable()) {
-				gridPipeline->SetIsOccupied(false);
-			}
-			else if (!(*j)->GetWalkable()) {
-				gridPipeline->SetIsOccupied(true);
-			}*/
 			gridPipeline->SetIsOccupied(!(*j)->GetWalkable());
 			gridPipeline->SetVisualize((*j)->GetVisualize());
 			gridPipeline->Draw(cubeList);
@@ -102,7 +96,7 @@ private:
 	std::vector<std::unique_ptr<NodeAStar>> grid;
 	const Vecf2 gridStartPos;
 	const float gridSize;
-	float nodeRadius = 0.005f;
+	float nodeRadius = 0.05f;
 	float nodeDiameter = nodeRadius*2;
 	const int gridCellSize = (int)(gridSize / nodeDiameter);
 	std::shared_ptr<WireframePipeline<SurfaceDirectionalLighting>> gridPipeline;

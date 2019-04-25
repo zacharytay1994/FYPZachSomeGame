@@ -1,76 +1,48 @@
 #pragma once
 
 #include "GridAStar.h"
+#include "Graphics.h"
+#include "Entity.h"
+#include "MatTemplate.h"
 
-#include <sstream>
 #include <vector>
 #include <algorithm>
 #include <queue>
 #include <utility>
-#include <unordered_set>
-
-#include <chrono>
-#include <ctime>
 
 class Pathfinding {
 public:
-	Pathfinding(const std::shared_ptr<GridAStar>& grid) 
+	Pathfinding(Graphics& gfx) 
 		:
-		grid(grid)
+		grid(std::make_unique<GridAStar>(gfx, 10.0f))
 	{}
 
 	void FindPath(const Vecf3& startPos, const Vecf3& endPos) {
-		// custom comparator for priority queue
+		// custom comparator for priority queue, max heap to min heap
 		auto nodePointerGreaterComparator = [](NodeAStar*& p1, NodeAStar* p2) {
 			return *p1 > *p2;
 		};
 
+		// create min heap
 		std::priority_queue<NodeAStar*, std::vector<NodeAStar*>, decltype(nodePointerGreaterComparator)> minHeap(nodePointerGreaterComparator);
 
+		// calls .get() on unique_ptrs in grid, to create temp stored_ptrs
 		NodeAStar* startNode = grid->NodeFromWorldPosition(startPos);
 		NodeAStar* endNode = grid->NodeFromWorldPosition(endPos);
 
-		/*std::wstringstream ss;
-		ss << startNode->GetGridX() << ',' << startNode->GetGridY() << std::endl;
-		OutputDebugString(ss.str().c_str());*/
-
 		// add start node to the open set
-		//openSet.push_back(startNode);
-		startNode->SetInOpen(true);
 		minHeap.push(startNode);
-		//uopenSet.insert(startNode);
+		startNode->SetInOpen(true);
 
 		// loop
 		while (minHeap.size() > 0) {
-			// .get() storeed pointer to object pointed to by the unique pointer
 			//NodeAStar* currentNode = openSet[0];
 			NodeAStar* currentNode = minHeap.top();
-			//get the node in openset with the lowest fcost
-			//int indexHolder = 0;
-			////auto begin = std::chrono::high_resolution_clock::now();
-			//
-			//for (int i = 1; i < openSet.size(); i++) {
-			//	if (openSet[i]->GetfCost() < currentNode->GetfCost() || // if lower fcost
-			//		(openSet[i]->GetfCost() == currentNode->GetfCost() && // if same fcost, take the one with lower hcost
-			//			openSet[i]->hCost < currentNode->hCost)) {
-			//		currentNode = openSet[i];
-			//		indexHolder = i;
-			//	}
-			//}
-
-			/*auto end = std::chrono::high_resolution_clock::now();
-			std::chrono::duration<double> elapsed_seconds = end - begin;
-			std::wstringstream ss;
-			ss << "Tradional time taken : " << elapsed_seconds.count() * 1000 << "ms" << std::endl;
-			OutputDebugString(ss.str().c_str());*/
 			
 		    //erase currentNode from openSet
-			//openSet.erase(openSet.begin() + indexHolder);
 			minHeap.pop();
-			//openSet.erase(currentNode);
 			currentNode->SetInOpen(false);
 			// add currentNode to closedSet
-			//closeSet.insert(currentNode);
 			currentNode->SetInClosed(true);
 
 			// if currentNode is equal to endNode, we have reached our destination
@@ -99,42 +71,12 @@ public:
 					// if not in openset, add to openset
 					if (!inOpenSet) {
 						minHeap.push(n);
-						//openSet.push_back(n);
 						n->SetInOpen(true);
 					}
 				}
 			}
 		}
 	}
-
-	// realized too late i could have used algorithm .find() maybe next time
-	//bool InCloseSet(NodeAStar*& node) {
-	//	/*std::vector<NodeAStar*>::iterator end = closeSet.end();
-	//	for (std::vector<NodeAStar*>::iterator i = closeSet.begin(); i != end; std::advance(i, 1)) {
-	//		if (node == *i) {
-	//			return true;
-	//		}
-	//	}
-	//	return false;*/
-	//	if (closeSet.count(node) != 0) {
-	//		return true;
-	//	}
-	//	return false;
-	//}
-
-	 //bool InOpenSet(NodeAStar*& node) {
-		// /*std::vector<NodeAStar*>::iterator end = openSet.end();
-		// for (std::vector<NodeAStar*>::iterator i = openSet.begin(); i != end; std::advance(i, 1)) {
-		//	 if (node == *i) {
-		//		 return true;
-		//	 }
-		// }
-		// return false;*/
-		// if (openSet.count(node) != 0) {
-		//	 return true;
-		// }
-		// return false;
-	 //}
 
 	// finding distance between nodes
 	int GetDistanceBetweenNodes(NodeAStar*& node1, NodeAStar*& node2) {
@@ -161,10 +103,17 @@ public:
 
 		std::reverse(path.begin(), path.end());
 	}
+
+	// update grid with obstacle entities from solidBuffer in entityHandler
+	void UpdateGridObstacles(std::vector<std::unique_ptr<Entity>>& solidBuffer) {
+		grid->UpdateWalkable(solidBuffer);
+	}
+
+	// draw all grid cells
+	void DrawGrid(const Matf4& viewMatrix, const Matf4& projectionMatrix) {
+		grid->Draw(viewMatrix, projectionMatrix);
+	}
+
 private:
-	const std::shared_ptr<GridAStar>& grid;
-	//std::vector<NodeAStar*> openSet;
-	//std::vector<NodeAStar*> closeSet;
-	//std::unordered_set<NodeAStar*> openSet;
-	//std::unordered_set<NodeAStar*> closeSet;
+	std::unique_ptr<GridAStar> grid;
 };

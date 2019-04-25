@@ -33,10 +33,10 @@ public:
 		// add start node to the open set
 		minHeap.push(startNode);
 		startNode->SetInOpen(true);
+		nodesToReset.push_back(startNode);
 
 		// loop
 		while (minHeap.size() > 0) {
-			//NodeAStar* currentNode = openSet[0];
 			NodeAStar* currentNode = minHeap.top();
 			
 		    //erase currentNode from openSet
@@ -47,7 +47,7 @@ public:
 
 			// if currentNode is equal to endNode, we have reached our destination
 			if (currentNode == endNode) {
-				RetracePath(startNode, endNode);
+				currentPath = RetracePath(startNode, endNode);
 				return;
 			}
 
@@ -73,6 +73,7 @@ public:
 						minHeap.push(n);
 						n->SetInOpen(true);
 					}
+					nodesToReset.push_back(n);
 				}
 			}
 		}
@@ -90,7 +91,7 @@ public:
 	}
 
 	// retrace path using parent nodes
-	void RetracePath(NodeAStar* startNode, NodeAStar* endNode) {
+	std::vector<NodeAStar*> RetracePath(NodeAStar* startNode, NodeAStar* endNode) {
 		std::vector<NodeAStar*> path;
 		NodeAStar* currentNode = endNode;
 
@@ -102,6 +103,19 @@ public:
 		}
 
 		std::reverse(path.begin(), path.end());
+		for (NodeAStar* n : nodesToReset) {
+			ResetNode(n);
+		}
+		nodesToReset.clear();
+		return path;
+	}
+
+	void ResetNode(NodeAStar*& node) {
+		node->gCost = 0;
+		node->hCost = 0;
+		node->SetInClosed(false);
+		node->SetInOpen(false);
+		//node->SetVisualize(false);
 	}
 
 	// update grid with obstacle entities from solidBuffer in entityHandler
@@ -113,7 +127,18 @@ public:
 	void DrawGrid(const Matf4& viewMatrix, const Matf4& projectionMatrix) {
 		grid->Draw(viewMatrix, projectionMatrix);
 	}
+	// draw on path grid cells
+	void DrawGridPath(const Matf4& viewMatrix, const Matf4& projectionMatrix) {
+		grid->DrawPath(viewMatrix, projectionMatrix, currentPath);
+	}
+
+	void RedefineGrid(const float& radius, std::vector<std::unique_ptr<Entity>>& solidBuffer) {
+		grid->RedefineGrid(radius, solidBuffer);
+	}
 
 private:
 	std::unique_ptr<GridAStar> grid;
+	std::vector<NodeAStar*> currentPath;
+	// nodes to reset
+	std::vector<NodeAStar*> nodesToReset;
 };

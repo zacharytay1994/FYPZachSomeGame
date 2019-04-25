@@ -66,7 +66,25 @@ public:
 		if (kbd.KeyIsPressed('D')) {
 			cameraPosition += Vecf4{ 1.0f, 0.0f, 0.0f, 0.0f } * cameraSpeed * dt;
 		}
+		if (kbd.KeyIsPressed('Y')) {
+			//testingsize = (testingsize >= 0.5f) ? 0.005f : testingsize + 0.05f;
+			pathfinding.RedefineGrid(0.005f, entityHandler.solidBuffer);
+		}
+		if (kbd.KeyIsPressed('U')) {
+			pathfinding.RedefineGrid(0.01f, entityHandler.solidBuffer);
+		}
+		if (kbd.KeyIsPressed('I')) {
+			pathfinding.RedefineGrid(0.05f, entityHandler.solidBuffer);
+		}
+		if (kbd.KeyIsPressed('O')) {
+			pathfinding.RedefineGrid(0.2f, entityHandler.solidBuffer);
+		}
+		if (kbd.KeyIsPressed('P')) {
+			pathfinding.RedefineGrid(0.5f, entityHandler.solidBuffer);
+		}
 		entityHandler.Update(kbd, mouse, dt);
+		testingval = (testingval >= 9.5f)?0.0f:testingval + 1.0f * dt;
+		pathfinding.FindPath({ 0.0f, 0.5f, 4.8f }, { -5.0f + testingval, 0.5f, -4.8f });
 	}
 	virtual void Draw() override {
 		groundPipeline->BeginFrame();
@@ -85,8 +103,9 @@ public:
 		groundPipeline->Draw(planeList);
 
 		// bind and draw external components
+		//pathfinding.DrawGrid(viewMatrix, projectionMatrix);
+		pathfinding.DrawGridPath(viewMatrix, projectionMatrix);
 		entityHandler.Draw(viewMatrix, projectionMatrix);
-		pathfinding.DrawGrid(viewMatrix, projectionMatrix);
 	}
 private:
 	// pipeline stuff
@@ -109,4 +128,6 @@ private:
 	// world entities
 	EntityHandler entityHandler;
 	Pathfinding pathfinding;
+	float testingval = 0.0f;
+	float testingsize = 0.005f;
 };

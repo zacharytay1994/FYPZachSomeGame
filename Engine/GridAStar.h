@@ -44,11 +44,44 @@ public:
 			}
 		}
 	}
+	void RedefineGrid(const float& radius, std::vector<std::unique_ptr<Entity>>& solidBuffer) {
+		grid.clear();
+		nodeRadius = radius;
+		nodeDiameter = nodeRadius * 2;
+		IndexedTriangleList<WireframePipeline<SurfaceDirectionalLighting>::Vertex> temp = TexCube::GetPlain<WireframePipeline<SurfaceDirectionalLighting>::Vertex>(nodeDiameter);
+		cubeList.vertices = temp.vertices;
+		cubeList.indices = temp.indices;
+		gridCellSize = (int)(gridSize / nodeDiameter);
+		const float gridEndX = gridStartPos.x + gridSize;
+		const float gridEndZ = gridStartPos.y - gridSize;
+		int gridX = 0;
+		int gridY = 0;
+		for (float x = gridStartPos.x + nodeRadius, gridX = 0; x < gridEndX; x += nodeDiameter, gridX++) {
+			for (float y = gridStartPos.y - nodeRadius, gridY = 0; y > gridEndZ; y -= nodeDiameter, gridY++) {
+				grid.emplace_back(std::make_unique<NodeAStar>(true, Vecf3(x, nodeRadius, y), (int)gridX, (int)gridY));
+			}
+		}
+		UpdateWalkable(solidBuffer);
+	}
 	void Draw(const Matf4& viewMatrix, const Matf4& projectionMatrix) {
 		gridPipeline->effect.vertexShader.BindView(viewMatrix);
 		gridPipeline->effect.vertexShader.BindProjection(projectionMatrix);
 		std::vector<std::unique_ptr<NodeAStar>>::iterator gridEnd = grid.end();
 		for (std::vector<std::unique_ptr<NodeAStar>>::iterator j = grid.begin(); j != gridEnd; std::advance(j, 1)) {
+			translateVector = (*j)->GetWorldPos();
+			worldTransform = Matf4::RotationZ(0.0f) * Matf4::RotationX(0.0f) * Matf4::RotationY(0.0f) * Matf4::Translation(translateVector);
+			gridPipeline->effect.vertexShader.BindWorld(worldTransform);
+			gridPipeline->SetIsOccupied(!(*j)->GetWalkable());
+			gridPipeline->SetVisualize((*j)->GetVisualize());
+			gridPipeline->Draw(cubeList);
+		}
+	}
+
+	void DrawPath(const Matf4& viewMatrix, const Matf4& projectionMatrix, std::vector<NodeAStar*>& path) {
+		gridPipeline->effect.vertexShader.BindView(viewMatrix);
+		gridPipeline->effect.vertexShader.BindProjection(projectionMatrix);
+		std::vector<NodeAStar*>::iterator gridEnd = path.end();
+		for (std::vector<NodeAStar*>::iterator j = path.begin(); j != gridEnd; std::advance(j, 1)) {
 			translateVector = (*j)->GetWorldPos();
 			worldTransform = Matf4::RotationZ(0.0f) * Matf4::RotationX(0.0f) * Matf4::RotationY(0.0f) * Matf4::Translation(translateVector);
 			gridPipeline->effect.vertexShader.BindWorld(worldTransform);
@@ -98,7 +131,7 @@ private:
 	const float gridSize;
 	float nodeRadius = 0.05f;
 	float nodeDiameter = nodeRadius*2;
-	const int gridCellSize = (int)(gridSize / nodeDiameter);
+	int gridCellSize = (int)(gridSize / nodeDiameter);
 	std::shared_ptr<WireframePipeline<SurfaceDirectionalLighting>> gridPipeline;
 	IndexedTriangleList<WireframePipeline<SurfaceDirectionalLighting>::Vertex> cubeList;
 	Vecf3 translateVector;

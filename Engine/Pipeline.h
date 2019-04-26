@@ -157,9 +157,9 @@ private:
 		trans.Transform(triangle.v2);
 
 		DrawTriangle(triangle);
-		/*gfx.DrawLine((Vecf2)triangle.v0.pos, (Vecf2)triangle.v1.pos, Colors::Red);
+		gfx.DrawLine((Vecf2)triangle.v0.pos, (Vecf2)triangle.v1.pos, Colors::Red);
 		gfx.DrawLine((Vecf2)triangle.v0.pos, (Vecf2)triangle.v2.pos, Colors::Red);
-		gfx.DrawLine((Vecf2)triangle.v1.pos, (Vecf2)triangle.v2.pos, Colors::Red);*/
+		gfx.DrawLine((Vecf2)triangle.v1.pos, (Vecf2)triangle.v2.pos, Colors::Red);
 		/*gfx.DrawLine(triangle.v0.pos, triangle.v0.pos + triangle.v0.normal * 300, Colors::Red);
 		gfx.DrawLine(triangle.v1.pos, triangle.v1.pos + triangle.v1.normal * 300, Colors::Red);
 		gfx.DrawLine(triangle.v2.pos, triangle.v2.pos + triangle.v2.normal * 300, Colors::Red);*/

@@ -22,11 +22,11 @@ public:
 		Scene("Debug world"),
 		groundZBuffer(std::make_shared<ZBuffer>(gfx.ScreenWidth, gfx.ScreenHeight)),
 		groundPipeline(std::make_shared<Pipeline<SurfaceDirectionalLighting>>(gfx, groundZBuffer)),
-		planeList(PlaneVertex::GetPlaneHorizontal<Pipeline<SurfaceDirectionalLighting>::Vertex>(planeSize)),
+		planeList(PlaneVertex::GetPlaneHorizontalSplit<Pipeline<SurfaceDirectionalLighting>::Vertex>(planeSize, 4)),
 		entityHandler(gfx),
 		pathfinding(gfx)
 	{
-		groundPipeline->effect.pixelShader.BindTexture("whiteimage.bmp");
+		groundPipeline->effect.pixelShader.BindTexture("test.bmp");
 		//entityHandler.AddEntity(1.0f, { 25, 0, 25 });
 		entityHandler.AddSolid(1.0f, { 55, 0, 45 });
 		entityHandler.AddSolid(2.0f, { 76, 0, 76 });

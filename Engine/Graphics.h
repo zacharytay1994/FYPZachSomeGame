@@ -28,6 +28,7 @@
 #include "Vec3.h"
 #include "Surface.h"
 #include "TextureVertex.h"
+#include "ZBuffer.h"
 
 class Graphics
 {
@@ -108,8 +109,6 @@ public:
 				
 			}
 		}
-		
-		
 	};
 	void DrawTriangle(const Vecf3& p1, const Vecf3& p2, const Vecf3& p3, Color c);
 	void DrawTriangleTex(const TextureVertex& v0, const TextureVertex& v1, const TextureVertex& v2, Surface& tex);

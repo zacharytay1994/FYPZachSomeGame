@@ -8,6 +8,7 @@
 #include "Graphics.h"
 #include "TexCube.h"
 #include "Vec2.h"
+#include "ZBuffer.h"
 
 #include <vector>
 #include <memory>
@@ -15,10 +16,10 @@
 
 class GridAStar {
 public:
-	GridAStar(Graphics& gfx, const float& planeSize)
+	GridAStar(Graphics& gfx, const float& planeSize, std::shared_ptr<ZBuffer>& zBuffer)
 		:
-		gridPipeline(std::make_shared<WireframePipeline<SurfaceDirectionalLighting>>(gfx)),
-		cubeList(TexCube::GetPlain<WireframePipeline<SurfaceDirectionalLighting>::Vertex>(nodeDiameter)),
+		gridPipeline(std::make_shared<Pipeline<SurfaceDirectionalLighting>>(gfx, zBuffer)),
+		cubeList(TexCube::GetPlain<Pipeline<SurfaceDirectionalLighting>::Vertex>(nodeDiameter)),
 		gridSize(planeSize),
 		gridStartPos(Vecf2(-planeSize/2, planeSize/2))
 	{
@@ -26,11 +27,12 @@ public:
 		const float gridEndZ = gridStartPos.y - gridSize;
 		int gridX = 0;
 		int gridY = 0;
-		for (float x = gridStartPos.x + nodeRadius, gridX = 0; x < gridEndX; x += nodeDiameter, gridX++) {
-			for (float y = gridStartPos.y - nodeRadius, gridY = 0; y > gridEndZ; y -= nodeDiameter, gridY++) {
+		for (float y = gridStartPos.y - nodeRadius, gridY = 0; y > gridEndZ; y -= nodeDiameter, gridY++) {
+			for (float x = gridStartPos.x + nodeRadius, gridX = 0; x < gridEndX; x += nodeDiameter, gridX++) {
 				grid.emplace_back(std::make_unique<NodeAStar>(true, Vecf3( x, nodeRadius, y ), (int)gridX, (int)gridY));
 			}
 		}
+		gridPipeline->effect.pixelShader.BindTexture("greenimage.bmp");
 	}
 	void UpdateWalkable(std::vector<std::unique_ptr<Entity>>& solidBuffer) {
 		std::vector<std::unique_ptr<Entity>>::iterator end = solidBuffer.end();
@@ -56,8 +58,8 @@ public:
 		const float gridEndZ = gridStartPos.y - gridSize;
 		int gridX = 0;
 		int gridY = 0;
-		for (float x = gridStartPos.x + nodeRadius, gridX = 0; x < gridEndX; x += nodeDiameter, gridX++) {
-			for (float y = gridStartPos.y - nodeRadius, gridY = 0; y > gridEndZ; y -= nodeDiameter, gridY++) {
+		for (float y = gridStartPos.y - nodeRadius, gridY = 0; y > gridEndZ; y -= nodeDiameter, gridY++) {
+			for (float x = gridStartPos.x + nodeRadius, gridX = 0; x < gridEndX; x += nodeDiameter, gridX++) {
 				grid.emplace_back(std::make_unique<NodeAStar>(true, Vecf3(x, nodeRadius, y), (int)gridX, (int)gridY));
 			}
 		}
@@ -99,7 +101,7 @@ public:
 		int y = (int)(perY *(gridSize / nodeDiameter));
 		
 		int maxGridDimension = (int)(gridSize / nodeDiameter);
-		return grid[x * maxGridDimension + y].get();
+		return grid[y * maxGridDimension + x].get();
 	}
 
 	std::vector<NodeAStar*> GetNeighbours(NodeAStar*& node) {
@@ -118,22 +120,24 @@ public:
 				nodeGridY = node->gridY + y;
 				if (nodeGridX >= 0 && nodeGridX < gridCellSize &&
 					nodeGridY >= 0 && nodeGridY < gridCellSize) {
-					neighbours.push_back(grid[nodeGridX * gridCellSize + nodeGridY].get());
+					neighbours.push_back(grid[nodeGridY * gridCellSize + nodeGridX].get());
 				}
 			}
 		}
 		return neighbours;
 	}
-
-private:
+public:
 	std::vector<std::unique_ptr<NodeAStar>> grid;
+private:
 	const Vecf2 gridStartPos;
 	const float gridSize;
 	float nodeRadius = 0.05f;
 	float nodeDiameter = nodeRadius*2;
 	int gridCellSize = (int)(gridSize / nodeDiameter);
-	std::shared_ptr<WireframePipeline<SurfaceDirectionalLighting>> gridPipeline;
-	IndexedTriangleList<WireframePipeline<SurfaceDirectionalLighting>::Vertex> cubeList;
+	std::shared_ptr<Pipeline<SurfaceDirectionalLighting>> gridPipeline;
+	IndexedTriangleList<Pipeline<SurfaceDirectionalLighting>::Vertex> cubeList;
 	Vecf3 translateVector;
 	Matf4 worldTransform;
+
+	std::shared_ptr<ZBuffer> zbuffer;
 };

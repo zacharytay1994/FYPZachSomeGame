@@ -10,9 +10,9 @@
 
 class EntityHandler {
 public:
-	EntityHandler(Graphics& gfx) 
+	EntityHandler(Graphics& gfx, std::shared_ptr<ZBuffer>& zbuffer) 
 		:
-		entityZBuffer(std::make_shared<ZBuffer>(gfx.ScreenWidth, gfx.ScreenHeight)),
+		entityZBuffer(zbuffer),
 		entityPipeline(std::make_shared<Pipeline<SurfaceDirectionalLighting>>(gfx, entityZBuffer))
 	{
 		entityPipeline->effect.pixelShader.BindTexture("greenimage.bmp");

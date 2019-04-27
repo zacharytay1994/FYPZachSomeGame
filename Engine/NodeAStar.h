@@ -20,6 +20,9 @@ public:
 	Vecf3 GetWorldPos() {
 		return worldPos;
 	}
+	void UpdateWorldPos(const float& heightDisplaced) {
+		worldPos.y += heightDisplaced;
+	}
 	bool GetWalkable() {
 		return walkable;
 	}
@@ -60,6 +63,8 @@ public:
 	int hCost = 0;
 	const int gridX;
 	const int gridY;
+	// terrain variables
+	float heightValue;
 private:
 	bool walkable;
 	Vecf3 worldPos;

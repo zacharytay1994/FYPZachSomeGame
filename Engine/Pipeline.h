@@ -36,6 +36,12 @@ public:
 	void BeginFrame() {
 		zBuffer->Clear();
 	}
+	void SetIsOccupied(const bool& boolIn) {
+		isOccupied = boolIn;
+	}
+	void SetVisualize(const bool& boolIn) {
+		visualize = boolIn;
+	}
 private:
 	void ProcessVertices(std::vector<Vertex>& vertices, std::vector<size_t>& indices) {
 		// create holder vector of output vertices
@@ -221,8 +227,8 @@ private:
 
 		// pre-step interpolants
 		const float yPrestep = ((float)yStart + 0.5f - v0.pos.y);
-		leftInterpolant += changeLeft * yPrestep;
-		rightInterpolant += changeRight * yPrestep;
+		leftInterpolant = leftInterpolant + (changeLeft * yPrestep);
+		rightInterpolant = rightInterpolant + (changeRight * yPrestep);
 
 		DrawFlatTriangle(yStart, yEnd, v1, v2, leftInterpolant, rightInterpolant, changeLeft, changeRight);
 	}
@@ -241,8 +247,8 @@ private:
 
 		// pre-step interpolants
 		const float yPrestep = ((float)yStart + 0.5f - v0.pos.y);
-		leftInterpolant += changeLeft * yPrestep;
-		rightInterpolant += changeRight * yPrestep;
+		leftInterpolant = leftInterpolant + (changeLeft * yPrestep);
+		rightInterpolant = rightInterpolant + (changeRight * yPrestep);
 
 		DrawFlatTriangle(yStart, yEnd, v0, v1, leftInterpolant, rightInterpolant, changeLeft, changeRight);
 	}
@@ -265,7 +271,7 @@ private:
 
 			// pre-step interpolant
 			float xPrestep = ((float)xStart + 0.5f) - leftInterpolant.pos.x;
-			leftToRight += changeX * xPrestep;
+			leftToRight = leftToRight + (changeX * xPrestep);
 
 			// loop for x
 			for (int x = xStart; x < xEnd; x++, leftToRight = leftToRight + changeX) {
@@ -287,4 +293,6 @@ private:
 	Graphics& gfx;
 	NDCTransformer<outputGeom> trans;
 	std::shared_ptr<ZBuffer> zBuffer;
+	bool isOccupied = false;
+	bool visualize = false;
 };

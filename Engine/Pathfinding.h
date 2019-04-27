@@ -4,6 +4,8 @@
 #include "Graphics.h"
 #include "Entity.h"
 #include "MatTemplate.h"
+#include "Terrain.h"
+#include "ZBuffer.h"
 
 #include <vector>
 #include <algorithm>
@@ -12,9 +14,9 @@
 
 class Pathfinding {
 public:
-	Pathfinding(Graphics& gfx) 
+	Pathfinding(Graphics& gfx, std::shared_ptr<ZBuffer>& zBuffer)
 		:
-		grid(std::make_unique<GridAStar>(gfx, 10.0f))
+		grid(std::make_unique<GridAStar>(gfx, 10.0f, zBuffer))
 	{}
 
 	void FindPath(const Vecf3& startPos, const Vecf3& endPos) {
@@ -53,8 +55,8 @@ public:
 
 			// find/update fcost of neighbours and add them to the openset
 			for (NodeAStar* n : grid->GetNeighbours(currentNode)) {
-				// if not traversable or already in closeSet, skip
-				if (!n->GetWalkable() || n->GetInClosed()) {
+				// if not traversable or already in closeSet or too high to traverse, skip
+				if (!n->GetWalkable() || n->GetInClosed() || TooHighToTraverse(currentNode, n) || TooLowToTraverse(currentNode, n)) {
 					continue;
 				}
 				// if newgCost < gCost (need updating), or if not in openset, update/calculate fcost, add to openset
@@ -136,9 +138,35 @@ public:
 		grid->RedefineGrid(radius, solidBuffer);
 	}
 
+	void BindHeightMap(Terrain& terrain) {
+		std::vector<float>& heightDisplacementGrid = terrain.GetHeightDisplacementGrid();
+		for (int y = 0; y < 100; y++) {
+			for (int x = 0; x < 100; x++) {
+				grid->grid[y * 100 + x]->heightValue = heightDisplacementGrid[y * 101 + x];
+				grid->grid[y * 100 + x]->UpdateWorldPos(heightDisplacementGrid[y * 101 + x]);
+			}
+		}
+	}
+
+	bool TooHighToTraverse(NodeAStar*& currentNode, NodeAStar*& neighbour) {
+		if ((neighbour->heightValue - currentNode->heightValue) > maxVerticalTraverse) {
+			return true;
+		}
+		return false;
+	}
+
+	bool TooLowToTraverse(NodeAStar*& currentNode, NodeAStar*& neighbour) {
+		if ((neighbour->heightValue - currentNode->heightValue) < -maxVerticalTraverse) {
+			return true;
+		}
+		return false;
+	}
+
 private:
 	std::unique_ptr<GridAStar> grid;
 	std::vector<NodeAStar*> currentPath;
 	// nodes to reset
 	std::vector<NodeAStar*> nodesToReset;
+	// vertical heuristics
+	float maxVerticalTraverse = 0.2;
 };

@@ -64,6 +64,9 @@
     <Filter Include="Header Files\Terrain">
       <UniqueIdentifier>{bd00a474-7e9e-465f-810e-ebe2d6f76c53}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\HeightMaps">
+      <UniqueIdentifier>{e4e46750-7a46-4773-89b6-29da3538bc4a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ChiliWin.h">
@@ -379,6 +382,9 @@
     </Image>
     <Image Include="..\..\..\Memes\entitytextureone.bmp">
       <Filter>Resource Files\EntityTextures</Filter>
+    </Image>
+    <Image Include="..\..\..\Memes\heightmap1.bmp">
+      <Filter>Resource Files\HeightMaps</Filter>
     </Image>
   </ItemGroup>
 </Project>

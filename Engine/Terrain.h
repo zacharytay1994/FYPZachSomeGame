@@ -13,7 +13,7 @@ public:
 	Terrain(const std::string& string) 
 		:
 		terrainList(PlaneVertex::GetPlaneHorizontalSplit<Pipeline<SurfaceDirectionalLighting>::Vertex>(10.0f, 100)),
-		heightmap(string, 100 + 1, 100 + 1, 0.0f, 3.0f)
+		heightmap(string, 100 + 1, 100 + 1, 0.0f, 5.0f)
 	{
 		AlterVertices();
 	}
@@ -23,6 +23,9 @@ public:
 				terrainList.vertices[y*heightmap.width + x].pos.y = (float)(heightmap.heightDisplacementGrid[y*heightmap.width + x]);
 			}
 		}
+	}
+	std::vector<float>& GetHeightDisplacementGrid() {
+		return heightmap.heightDisplacementGrid;
 	}
 public:
 	IndexedTriangleList<Pipeline<SurfaceDirectionalLighting>::Vertex> terrainList;

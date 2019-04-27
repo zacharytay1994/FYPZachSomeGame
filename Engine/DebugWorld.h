@@ -24,9 +24,9 @@ public:
 		groundZBuffer(std::make_shared<ZBuffer>(gfx.ScreenWidth, gfx.ScreenHeight)),
 		groundPipeline(std::make_shared<Pipeline<SurfaceDirectionalLighting>>(gfx, groundZBuffer)),
 		planeList(PlaneVertex::GetPlaneHorizontalSplit<Pipeline<SurfaceDirectionalLighting>::Vertex>(planeSize, 100)),
-		entityHandler(gfx),
-		pathfinding(gfx),
-		terrain("test.bmp")
+		entityHandler(gfx, groundZBuffer),
+		pathfinding(gfx, groundZBuffer),
+		terrain("heightmap1.bmp")
 	{
 		groundPipeline->effect.pixelShader.BindTexture("whiteimage.bmp");
 		//entityHandler.AddEntity(1.0f, { 25, 0, 25 });
@@ -46,6 +46,7 @@ public:
 		entityHandler.AddSolid(1.5f, { 10, 0, 50 });
 
 		pathfinding.UpdateGridObstacles(entityHandler.solidBuffer);
+		pathfinding.BindHeightMap(terrain);
 		auto begin = std::chrono::high_resolution_clock::now();
 		pathfinding.FindPath({1.8f, 0.5f, 4.8f}, {-1.8f, 0.5f, -4.8f});
 		auto end = std::chrono::high_resolution_clock::now();
@@ -67,6 +68,18 @@ public:
 		}
 		if (kbd.KeyIsPressed('D')) {
 			cameraPosition += Vecf4{ 1.0f, 0.0f, 0.0f, 0.0f } * cameraSpeed * dt;
+		}
+		if (kbd.KeyIsPressed('N')) {
+			cameraPosition += Vecf4{ 0.0f, 1.0f, 0.0f, 0.0f } *cameraSpeed * dt;
+		}
+		if (kbd.KeyIsPressed('M')) {
+			cameraPosition += Vecf4{ 0.0f, -1.0f, 0.0f, 0.0f } *cameraSpeed * dt;
+		}
+		if (kbd.KeyIsPressed('J')) {
+			camY += 1.0f * dt;
+		}
+		if (kbd.KeyIsPressed('K')) {
+			camY -= 1.0f * dt;
 		}
 		if (kbd.KeyIsPressed('Y')) {
 			//testingsize = (testingsize >= 0.5f) ? 0.005f : testingsize + 0.05f;
@@ -93,6 +106,7 @@ public:
 		
 		// world and camera transformation matrices
 		const Matf4 projectionMatrix = Matf4::Projection(4.0f, 3.0f, 1.0f, 20.0f);
+		camRotInverse = Matf4::Identity() * Matf4::RotationY(camY) * Matf4::RotationX(-0.8f);
 		const Matf4 viewMatrix = Matf4::Translation(-cameraPosition) * camRotInverse;
 		const Vecf3 translate = { 0.0f, 0.0f, 0.0f };
 		const Matf4 worldTransform = Matf4::RotationZ(theta_z) * Matf4::RotationX(theta_x) * Matf4::RotationY(theta_y) * Matf4::Translation(translate);
@@ -105,8 +119,8 @@ public:
 
 		// bind and draw external components
 		//pathfinding.DrawGrid(viewMatrix, projectionMatrix);
-		groundPipeline->Draw(terrain.terrainList);
 		entityHandler.Draw(viewMatrix, projectionMatrix);
+		groundPipeline->Draw(terrain.terrainList);
 		pathfinding.DrawGridPath(viewMatrix, projectionMatrix);
 	}
 private:
@@ -122,11 +136,12 @@ private:
 	float theta_y = 0.0f;
 	float theta_z = 0.0f;
 	// projection inverse matrices and camera stuff
-	Matf4 camRotInverse = Matf4::Identity() * Matf4::RotationX(-0.8f);
+	Matf4 camRotInverse = Matf4::Identity() * Matf4::RotationX(-0.8f) * Matf4::RotationY(camY);
 	Vecf3 cameraPosition = { 0.0f, 5.0f, -5.0f };
 	Vecf3 modelPosition = { 0.0f, 0.0f, 2.5f };
 	Vecf3 lightPosition = { 0.0f, 0.0f, 0.6f };
 	const float cameraSpeed = 4.0f;
+	float camY = 0.0f;
 	// world entities
 	EntityHandler entityHandler;
 	Pathfinding pathfinding;

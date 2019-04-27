@@ -8,6 +8,7 @@
 #include "PlaneVertex.h"
 #include "EntityHandler.h"
 #include "Pathfinding.h"
+#include "Terrain.h"
 
 #include <string>
 #include <sstream>
@@ -22,11 +23,12 @@ public:
 		Scene("Debug world"),
 		groundZBuffer(std::make_shared<ZBuffer>(gfx.ScreenWidth, gfx.ScreenHeight)),
 		groundPipeline(std::make_shared<Pipeline<SurfaceDirectionalLighting>>(gfx, groundZBuffer)),
-		planeList(PlaneVertex::GetPlaneHorizontalSplit<Pipeline<SurfaceDirectionalLighting>::Vertex>(planeSize, 4)),
+		planeList(PlaneVertex::GetPlaneHorizontalSplit<Pipeline<SurfaceDirectionalLighting>::Vertex>(planeSize, 100)),
 		entityHandler(gfx),
-		pathfinding(gfx)
+		pathfinding(gfx),
+		terrain("test.bmp")
 	{
-		groundPipeline->effect.pixelShader.BindTexture("test.bmp");
+		groundPipeline->effect.pixelShader.BindTexture("whiteimage.bmp");
 		//entityHandler.AddEntity(1.0f, { 25, 0, 25 });
 		entityHandler.AddSolid(1.0f, { 55, 0, 45 });
 		entityHandler.AddSolid(2.0f, { 76, 0, 76 });
@@ -100,12 +102,12 @@ public:
 		groundPipeline->effect.vertexShader.BindView(viewMatrix);
 		groundPipeline->effect.vertexShader.BindProjection(projectionMatrix);
 		// draw world
-		groundPipeline->Draw(planeList);
 
 		// bind and draw external components
 		//pathfinding.DrawGrid(viewMatrix, projectionMatrix);
-		pathfinding.DrawGridPath(viewMatrix, projectionMatrix);
+		groundPipeline->Draw(terrain.terrainList);
 		entityHandler.Draw(viewMatrix, projectionMatrix);
+		pathfinding.DrawGridPath(viewMatrix, projectionMatrix);
 	}
 private:
 	// pipeline stuff
@@ -130,4 +132,5 @@ private:
 	Pathfinding pathfinding;
 	float testingval = 0.0f;
 	float testingsize = 0.005f;
+	Terrain terrain;
 };

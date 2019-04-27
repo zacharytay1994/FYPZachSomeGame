@@ -79,7 +79,7 @@ public:
 		std::vector<size_t> indicesList;
 		x = 0;
 		y = 0;
-		for (x = 0, y = 0; (y + 1)*split + (x + 1) < noOfVertices; x = (x + 1) % (split + 1), x == 0 ? y++ : y += 0) {
+		for (x = 0, y = 0; (y + 1)*split + (x + 1) <= noOfVertices; x = (x + 1) % (split + 1), x == 0 ? y++ : y += 0) {
 			if (x < split && y < split) {
 				indicesList.push_back((y)*(split + 1) + x);
 				indicesList.push_back((y)*(split + 1) + (x+1));

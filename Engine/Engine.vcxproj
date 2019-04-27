@@ -159,6 +159,7 @@
     <ClInclude Include="Game.h" />
     <ClInclude Include="Graphics.h" />
     <ClInclude Include="GridAStar.h" />
+    <ClInclude Include="HeightMap.h" />
     <ClInclude Include="IndexedLineList.h" />
     <ClInclude Include="IndexedTriangleList.h" />
     <ClInclude Include="Keyboard.h" />
@@ -183,6 +184,7 @@
     <ClInclude Include="StartMenuScene.h" />
     <ClInclude Include="Surface.h" />
     <ClInclude Include="SurfaceDirectionalLighting.h" />
+    <ClInclude Include="Terrain.h" />
     <ClInclude Include="Tessellate.h" />
     <ClInclude Include="TestScene.h" />
     <ClInclude Include="TexCube.h" />

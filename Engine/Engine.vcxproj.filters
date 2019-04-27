@@ -61,6 +61,9 @@
     <Filter Include="Header Files\Pipelines">
       <UniqueIdentifier>{2f8ab684-533e-4197-9b4e-6e6ac3806a22}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Terrain">
+      <UniqueIdentifier>{bd00a474-7e9e-465f-810e-ebe2d6f76c53}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ChiliWin.h">
@@ -233,6 +236,12 @@
     </ClInclude>
     <ClInclude Include="Pathfinding.h">
       <Filter>Header Files\AStarSearch</Filter>
+    </ClInclude>
+    <ClInclude Include="HeightMap.h">
+      <Filter>Header Files\Terrain</Filter>
+    </ClInclude>
+    <ClInclude Include="Terrain.h">
+      <Filter>Header Files\Terrain</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -14,9 +14,10 @@
 
 class Pathfinding {
 public:
-	Pathfinding(Graphics& gfx, std::shared_ptr<ZBuffer>& zBuffer)
+	Pathfinding(Graphics& gfx, std::shared_ptr<ZBuffer>& zBuffer, const float& worldSize, const int& gridSize, const float& gridCellSize)
 		:
-		grid(std::make_unique<GridAStar>(gfx, 10.0f, zBuffer))
+		grid(std::make_unique<GridAStar>(gfx, worldSize, zBuffer, gridCellSize)),
+		gridSize(gridSize)
 	{}
 
 	void FindPath(const Vecf3& startPos, const Vecf3& endPos) {
@@ -140,10 +141,10 @@ public:
 
 	void BindHeightMap(Terrain& terrain) {
 		std::vector<float>& heightDisplacementGrid = terrain.GetHeightDisplacementGrid();
-		for (int y = 0; y < 100; y++) {
-			for (int x = 0; x < 100; x++) {
-				grid->grid[y * 100 + x]->heightValue = heightDisplacementGrid[y * 101 + x];
-				grid->grid[y * 100 + x]->UpdateWorldPos(heightDisplacementGrid[y * 101 + x]);
+		for (int y = 0; y < gridSize; y++) {
+			for (int x = 0; x < gridSize; x++) {
+				grid->grid[y * gridSize + x]->heightValue = heightDisplacementGrid[y * (gridSize + 1) + x];
+				grid->grid[y * gridSize + x]->UpdateWorldPos(heightDisplacementGrid[y * (gridSize + 1) + x]);
 			}
 		}
 	}
@@ -169,4 +170,5 @@ private:
 	std::vector<NodeAStar*> nodesToReset;
 	// vertical heuristics
 	float maxVerticalTraverse = 0.2;
+	int gridSize;
 };

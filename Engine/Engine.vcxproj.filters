@@ -246,6 +246,9 @@
     <ClInclude Include="Terrain.h">
       <Filter>Header Files\Terrain</Filter>
     </ClInclude>
+    <ClInclude Include="TerrainWithPath.h">
+      <Filter>Header Files\Terrain</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DXErr.cpp">
@@ -385,6 +388,12 @@
     </Image>
     <Image Include="..\..\..\Memes\heightmap1.bmp">
       <Filter>Resource Files\HeightMaps</Filter>
+    </Image>
+    <Image Include="..\..\..\Memes\heightmap2.bmp">
+      <Filter>Resource Files\HeightMaps</Filter>
+    </Image>
+    <Image Include="..\..\..\Memes\sandimage2.bmp">
+      <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>
 </Project>

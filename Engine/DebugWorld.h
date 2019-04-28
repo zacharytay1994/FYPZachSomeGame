@@ -9,6 +9,7 @@
 #include "EntityHandler.h"
 #include "Pathfinding.h"
 #include "Terrain.h"
+#include "TerrainWithPath.h"
 
 #include <string>
 #include <sstream>
@@ -21,14 +22,15 @@ public:
 	DebugWorld(Graphics& gfx)
 		:
 		Scene("Debug world"),
-		groundZBuffer(std::make_shared<ZBuffer>(gfx.ScreenWidth, gfx.ScreenHeight)),
-		groundPipeline(std::make_shared<Pipeline<SurfaceDirectionalLighting>>(gfx, groundZBuffer)),
-		planeList(PlaneVertex::GetPlaneHorizontalSplit<Pipeline<SurfaceDirectionalLighting>::Vertex>(planeSize, 100)),
-		entityHandler(gfx, groundZBuffer),
-		pathfinding(gfx, groundZBuffer),
-		terrain("heightmap1.bmp")
+		sceneZBuffer(std::make_shared<ZBuffer>(gfx.ScreenWidth, gfx.ScreenHeight)),
+		//groundPipeline(std::make_shared<Pipeline<SurfaceDirectionalLighting>>(gfx, sceneZBuffer)),
+		//planeList(PlaneVertex::GetPlaneHorizontalSplit<Pipeline<SurfaceDirectionalLighting>::Vertex>(planeSize, 100)),
+		entityHandler(gfx, sceneZBuffer),
+		/*pathfinding(gfx, sceneZBuffer),
+		terrain("heightmap1.bmp"),*/
+		terrainWithPath(gfx, sceneZBuffer, "heightmap2.bmp", "sandimage2.bmp", 20.0f, 100, 0.0f, 5.0f)
 	{
-		groundPipeline->effect.pixelShader.BindTexture("whiteimage.bmp");
+		//groundPipeline->effect.pixelShader.BindTexture("whiteimage.bmp");
 		//entityHandler.AddEntity(1.0f, { 25, 0, 25 });
 		entityHandler.AddSolid(1.0f, { 55, 0, 45 });
 		entityHandler.AddSolid(2.0f, { 76, 0, 76 });
@@ -45,15 +47,16 @@ public:
 		entityHandler.AddSolid(1.0f, { 10, 0, 30 });
 		entityHandler.AddSolid(1.5f, { 10, 0, 50 });
 
-		pathfinding.UpdateGridObstacles(entityHandler.solidBuffer);
-		pathfinding.BindHeightMap(terrain);
-		auto begin = std::chrono::high_resolution_clock::now();
+		//pathfinding.UpdateGridObstacles(entityHandler.solidBuffer);
+		terrainWithPath.SyncWithWorldEntities(entityHandler.solidBuffer);
+		//pathfinding.BindHeightMap(terrain);
+		/*auto begin = std::chrono::high_resolution_clock::now();
 		pathfinding.FindPath({1.8f, 0.5f, 4.8f}, {-1.8f, 0.5f, -4.8f});
 		auto end = std::chrono::high_resolution_clock::now();
 		std::chrono::duration<double> elapsed_seconds = end - begin;
 		std::wstringstream ss;
 		ss << "Path has been found in : "<< elapsed_seconds.count()*1000 << "ms" << std::endl;
-		OutputDebugString(ss.str().c_str());
+		OutputDebugString(ss.str().c_str());*/
 	}
 	virtual void Update(Keyboard&kbd, Mouse& mouse, float dt) override {
 		// camera movement
@@ -81,30 +84,15 @@ public:
 		if (kbd.KeyIsPressed('K')) {
 			camY -= 1.0f * dt;
 		}
-		if (kbd.KeyIsPressed('Y')) {
-			//testingsize = (testingsize >= 0.5f) ? 0.005f : testingsize + 0.05f;
-			pathfinding.RedefineGrid(0.005f, entityHandler.solidBuffer);
-		}
-		if (kbd.KeyIsPressed('U')) {
-			pathfinding.RedefineGrid(0.01f, entityHandler.solidBuffer);
-		}
-		if (kbd.KeyIsPressed('I')) {
-			pathfinding.RedefineGrid(0.05f, entityHandler.solidBuffer);
-		}
-		if (kbd.KeyIsPressed('O')) {
-			pathfinding.RedefineGrid(0.2f, entityHandler.solidBuffer);
-		}
-		if (kbd.KeyIsPressed('P')) {
-			pathfinding.RedefineGrid(0.5f, entityHandler.solidBuffer);
-		}
 		entityHandler.Update(kbd, mouse, dt);
-		testingval = (testingval >= 9.5f)?0.0f:testingval + 1.0f * dt;
-		pathfinding.FindPath({ 0.0f, 0.5f, 4.8f }, { -5.0f + testingval, 0.5f, -4.8f });
+		testingval = (testingval >= 19.5f)?0.0f:testingval + 1.0f * dt;
+		//pathfinding.FindPath({ 0.0f, 0.5f, 4.8f }, { -5.0f + testingval, 0.5f, -4.8f });
+		terrainWithPath.FindPath({ 0.0f, 0.5f, 9.8f }, { -5.0f + testingval, 0.5f, -9.8f });
 	}
 	virtual void Draw() override {
-		groundPipeline->BeginFrame();
+		sceneZBuffer->Clear();
 		
-		// world and camera transformation matrices
+		// scene world and camera transformation matrices
 		const Matf4 projectionMatrix = Matf4::Projection(4.0f, 3.0f, 1.0f, 20.0f);
 		camRotInverse = Matf4::Identity() * Matf4::RotationY(camY) * Matf4::RotationX(-0.8f);
 		const Matf4 viewMatrix = Matf4::Translation(-cameraPosition) * camRotInverse;
@@ -112,25 +100,27 @@ public:
 		const Matf4 worldTransform = Matf4::RotationZ(theta_z) * Matf4::RotationX(theta_x) * Matf4::RotationY(theta_y) * Matf4::Translation(translate);
 		const Matf4 orientation = Matf4::RotationZ(theta_z) * Matf4::RotationX(theta_x) * Matf4::RotationY(theta_y);
 		// binding transformation matrices to pipelines
-		groundPipeline->effect.vertexShader.BindWorld(worldTransform);
+		/*groundPipeline->effect.vertexShader.BindWorld(worldTransform);
 		groundPipeline->effect.vertexShader.BindView(viewMatrix);
-		groundPipeline->effect.vertexShader.BindProjection(projectionMatrix);
+		groundPipeline->effect.vertexShader.BindProjection(projectionMatrix);*/
 		// draw world
 
 		// bind and draw external components
 		//pathfinding.DrawGrid(viewMatrix, projectionMatrix);
 		entityHandler.Draw(viewMatrix, projectionMatrix);
-		groundPipeline->Draw(terrain.terrainList);
-		pathfinding.DrawGridPath(viewMatrix, projectionMatrix);
+		//groundPipeline->Draw(terrain.terrainList);
+		//pathfinding.DrawGridPath(viewMatrix, projectionMatrix);
+		terrainWithPath.DrawFoundPath(viewMatrix, projectionMatrix);
+		terrainWithPath.Draw(worldTransform, viewMatrix, projectionMatrix);
 	}
 private:
 	// pipeline stuff
-	std::shared_ptr<ZBuffer> groundZBuffer;
-	std::shared_ptr<Pipeline<SurfaceDirectionalLighting>> groundPipeline;
+	std::shared_ptr<ZBuffer> sceneZBuffer;
+	//std::shared_ptr<Pipeline<SurfaceDirectionalLighting>> groundPipeline;
 	float time = 0.0f;
 	// indexed triangle list
 	const float planeSize = 10.0f;
-	IndexedTriangleList<Pipeline<SurfaceDirectionalLighting>::Vertex> planeList;
+	//IndexedTriangleList<Pipeline<SurfaceDirectionalLighting>::Vertex> planeList;
 	// orientation euler angles
 	float theta_x = 0.0f;
 	float theta_y = 0.0f;
@@ -144,8 +134,10 @@ private:
 	float camY = 0.0f;
 	// world entities
 	EntityHandler entityHandler;
-	Pathfinding pathfinding;
+	/*Pathfinding pathfinding;
 	float testingval = 0.0f;
 	float testingsize = 0.005f;
-	Terrain terrain;
+	Terrain terrain;*/
+	float testingval = 0.0f;
+	TerrainWithPath terrainWithPath;
 };

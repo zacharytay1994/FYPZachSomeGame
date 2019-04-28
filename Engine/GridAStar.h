@@ -16,12 +16,13 @@
 
 class GridAStar {
 public:
-	GridAStar(Graphics& gfx, const float& planeSize, std::shared_ptr<ZBuffer>& zBuffer)
+	GridAStar(Graphics& gfx, const float& planeSize, std::shared_ptr<ZBuffer>& zBuffer, const float& nodeRadius)
 		:
 		gridPipeline(std::make_shared<Pipeline<SurfaceDirectionalLighting>>(gfx, zBuffer)),
 		cubeList(TexCube::GetPlain<Pipeline<SurfaceDirectionalLighting>::Vertex>(nodeDiameter)),
 		gridSize(planeSize),
-		gridStartPos(Vecf2(-planeSize/2, planeSize/2))
+		gridStartPos(Vecf2(-planeSize/2, planeSize/2)),
+		nodeRadius(nodeRadius)
 	{
 		const float gridEndX = gridStartPos.x + gridSize;
 		const float gridEndZ = gridStartPos.y - gridSize;
@@ -131,7 +132,7 @@ public:
 private:
 	const Vecf2 gridStartPos;
 	const float gridSize;
-	float nodeRadius = 0.05f;
+	float nodeRadius;
 	float nodeDiameter = nodeRadius*2;
 	int gridCellSize = (int)(gridSize / nodeDiameter);
 	std::shared_ptr<Pipeline<SurfaceDirectionalLighting>> gridPipeline;

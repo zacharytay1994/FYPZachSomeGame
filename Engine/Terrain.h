@@ -10,10 +10,10 @@
 
 class Terrain {
 public:
-	Terrain(const std::string& string) 
+	Terrain(const std::string& string, const float& worldSize, const int& gridSize, const float& minHeight, const float& maxHeight) 
 		:
-		terrainList(PlaneVertex::GetPlaneHorizontalSplit<Pipeline<SurfaceDirectionalLighting>::Vertex>(10.0f, 100)),
-		heightmap(string, 100 + 1, 100 + 1, 0.0f, 5.0f)
+		terrainList(PlaneVertex::GetPlaneHorizontalSplit<Pipeline<SurfaceDirectionalLighting>::Vertex>(worldSize, gridSize)),
+		heightmap(string, gridSize + 1, gridSize + 1, minHeight, maxHeight)
 	{
 		AlterVertices();
 	}

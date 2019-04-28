@@ -2,6 +2,7 @@
 
 #include "Vec3.h"
 
+// a struct that represents a node used in the a*search algorithm and its grid
 class NodeAStar {
 public:
 	NodeAStar(const bool& walkable, const Vecf3& worldPos, const int& gridX, const int& gridY) 

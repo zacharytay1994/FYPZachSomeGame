@@ -163,6 +163,7 @@ private:
 		trans.Transform(triangle.v2);
 
 		DrawTriangle(triangle);
+		// drawline functions which I sometimes use for debugging
 		/*gfx.DrawLine((Vecf2)triangle.v0.pos, (Vecf2)triangle.v1.pos, Colors::Red);
 		gfx.DrawLine((Vecf2)triangle.v0.pos, (Vecf2)triangle.v2.pos, Colors::Red);
 		gfx.DrawLine((Vecf2)triangle.v1.pos, (Vecf2)triangle.v2.pos, Colors::Red);*/

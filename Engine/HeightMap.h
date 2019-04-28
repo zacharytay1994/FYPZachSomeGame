@@ -19,7 +19,7 @@ public:
 	{
 		FillHeightMap();
 	}
-
+	// fills height/y buffer with values based on the average color channels of pixels at positions on the passed in image scaled to fit the vertex and node grid size
 	void FillHeightMap() {
 		float unitX = (float)(image.GetWidth() / width);
 		float unitY = (float)(image.GetHeight() / height);

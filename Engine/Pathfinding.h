@@ -12,6 +12,7 @@
 #include <queue>
 #include <utility>
 
+// mainly a*search pathfinding algorithm, and other basic functions
 class Pathfinding {
 public:
 	Pathfinding(Graphics& gfx, std::shared_ptr<ZBuffer>& zBuffer, const float& worldSize, const int& gridSize, const float& gridCellSize)
@@ -19,7 +20,7 @@ public:
 		grid(std::make_unique<GridAStar>(gfx, worldSize, zBuffer, gridCellSize)),
 		gridSize(gridSize)
 	{}
-
+	// executes a*search algorithm and CALLS: this::RetracePath(), if path is found, nothing if not
 	void FindPath(const Vecf3& startPos, const Vecf3& endPos) {
 		// custom comparator for priority queue, max heap to min heap
 		auto nodePointerGreaterComparator = [](NodeAStar*& p1, NodeAStar* p2) {
@@ -94,25 +95,34 @@ public:
 	}
 
 	// retrace path using parent nodes
+	// resets nodes CALLS: this::ResetNode()
 	std::vector<NodeAStar*> RetracePath(NodeAStar* startNode, NodeAStar* endNode) {
+		// container to hold path trace
 		std::vector<NodeAStar*> path;
+		// starting from the end node
 		NodeAStar* currentNode = endNode;
 
-		// traversing backwards through parent
+		// traversing backwards through parent nodes of each node back to the start node
 		while (startNode != currentNode) {
+			// for rendering purposes non relating to the algorithm
 			currentNode->SetVisualize(true);
+			// places current node in trace container
 			path.push_back(currentNode);
+			// current node traverses backwards to parent node
 			currentNode = currentNode->GetParent();
 		}
-
+		// resets all changed attributes of nodes used in previous FindPath() calculation
+		// CALLS: this::ResetNode()
 		std::reverse(path.begin(), path.end());
 		for (NodeAStar* n : nodesToReset) {
 			ResetNode(n);
 		}
+		// clears nodesToReset container for next FindPath() call
 		nodesToReset.clear();
 		return path;
 	}
-
+	// resets all changed attributes of nodes
+	// CALLEDBY: this::RetracePath()
 	void ResetNode(NodeAStar*& node) {
 		node->gCost = 0;
 		node->hCost = 0;
@@ -121,24 +131,28 @@ public:
 		//node->SetVisualize(false);
 	}
 
-	// update grid with obstacle entities from solidBuffer in entityHandler
+	// update grid with obstacle entities from solidBuffer in entityHandler, 
+	// CALLS: GridAStar.h, CALLEDBY: TerrainWithPath::SyncWithWorldEntities
 	void UpdateGridObstacles(std::vector<std::unique_ptr<Entity>>& solidBuffer) {
 		grid->UpdateWalkable(solidBuffer);
 	}
 
 	// draw all grid cells
+	// CALLS: GridAStar::Draw()
 	void DrawGrid(const Matf4& viewMatrix, const Matf4& projectionMatrix) {
 		grid->Draw(viewMatrix, projectionMatrix);
 	}
 	// draw on path grid cells
+	// CALLS: GridAStar::DrawPath(), CALLEDBY: TerrainWithPath::Draw()
 	void DrawGridPath(const Matf4& viewMatrix, const Matf4& projectionMatrix) {
 		grid->DrawPath(viewMatrix, projectionMatrix, currentPath);
 	}
-
+	// redefine node grid, no longer used at the moment
 	void RedefineGrid(const float& radius, std::vector<std::unique_ptr<Entity>>& solidBuffer) {
 		grid->RedefineGrid(radius, solidBuffer);
 	}
-
+	// sets the height value of nodes in the world grid to their respective heights based on the heightmap used for terrain generation,
+	// CALLEDBY: TerrainWithPath::SyncTerrainWithHeightMap()
 	void BindHeightMap(Terrain& terrain) {
 		std::vector<float>& heightDisplacementGrid = terrain.GetHeightDisplacementGrid();
 		for (int y = 0; y < gridSize; y++) {
@@ -148,27 +162,33 @@ public:
 			}
 		}
 	}
-
+	// if distance between nodes upward is too large vertically to traverse
+	// CALLEDBY this::FindPath()
 	bool TooHighToTraverse(NodeAStar*& currentNode, NodeAStar*& neighbour) {
-		if ((neighbour->heightValue - currentNode->heightValue) > maxVerticalTraverse) {
+		if ((neighbour->heightValue - currentNode->heightValue) > maxUpwardTraversal) {
 			return true;
 		}
 		return false;
 	}
-
+	// if distance between nodes downward is too large vertically to traverse
+	// CALLEDBY this::FindPath()
 	bool TooLowToTraverse(NodeAStar*& currentNode, NodeAStar*& neighbour) {
-		if ((neighbour->heightValue - currentNode->heightValue) < -maxVerticalTraverse) {
+		if ((neighbour->heightValue - currentNode->heightValue) < -maxDownwardTraversal) {
 			return true;
 		}
 		return false;
 	}
 
 private:
+	// grid of nodes/gridcells used in pathfinding
 	std::unique_ptr<GridAStar> grid;
+	// stores the last path calculated by FindPath();
 	std::vector<NodeAStar*> currentPath;
-	// nodes to reset
+	// container of nodes used in previous calculations to reset
 	std::vector<NodeAStar*> nodesToReset;
 	// vertical heuristics
-	float maxVerticalTraverse = 0.2;
+	float maxUpwardTraversal = 0.2;
+	float maxDownwardTraversal = 0.2;
+	// grid size
 	int gridSize;
 };

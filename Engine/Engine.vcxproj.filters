@@ -261,6 +261,12 @@
     <ClInclude Include="TurretOne.h">
       <Filter>Header Files\Entity\Turrets</Filter>
     </ClInclude>
+    <ClInclude Include="ProjectileParent.h">
+      <Filter>Header Files\Entity\Projectile</Filter>
+    </ClInclude>
+    <ClInclude Include="ProjectileOne.h">
+      <Filter>Header Files\Entity\Projectile</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DXErr.cpp">

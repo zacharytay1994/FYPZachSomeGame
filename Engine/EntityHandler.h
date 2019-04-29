@@ -3,8 +3,9 @@
 #include "Entity.h"
 #include "EntityOne.h"
 #include "TurretOne.h"
-#include "HeightMap.h"
+#include "ProjectileOne.h"
 
+#include "HeightMap.h"
 #include "Graphics.h"
 #include "MatTemplate.h"
 
@@ -24,10 +25,22 @@ public:
 	}
 
 	void Update(Keyboard&kbd, Mouse& mouse, float dt) {
+		// update normal entity buffer
 		std::vector<std::unique_ptr<Entity>>::iterator end = entityBuffer.end();
 		for (std::vector<std::unique_ptr<Entity>>::iterator x = entityBuffer.begin(); x != end; std::advance(x, 1)) {
 			(*x)->Update();
 		}
+		// update turret entities buffer
+		std::vector<std::unique_ptr<TurretParent>>::iterator tEnd = turretBuffer.end();
+		for (std::vector<std::unique_ptr<TurretParent>>::iterator x = turretBuffer.begin(); x != tEnd; std::advance(x, 1)) {
+			(*x)->Update();
+		}
+		// update projectile entities buffer
+		std::vector<std::unique_ptr<ProjectileParent>>::iterator pEnd = projectileBuffer.end();
+		for (std::vector<std::unique_ptr<ProjectileParent>>::iterator x = projectileBuffer.begin(); x != pEnd; std::advance(x, 1)) {
+			(*x)->Update();
+		}
+		GetProjectilesFromTurrets();
 	}
 
 	void Draw(const Matf4& viewMatrix, const Matf4& projectionMatrix) {
@@ -35,7 +48,7 @@ public:
 		entityPipeline->effect.vertexShader.BindView(viewMatrix);
 		entityPipeline->effect.vertexShader.BindProjection(projectionMatrix);
 		
-		// loop through normal entity buffer
+		// loop through and render normal entity buffer
 		std::vector<std::unique_ptr<Entity>>::iterator end = entityBuffer.end();
 		for (std::vector<std::unique_ptr<Entity>>::iterator x = entityBuffer.begin(); x != end; std::advance(x, 1)) {
 			translateVector = (*x)->Calculate3DLocationOffset();
@@ -43,15 +56,23 @@ public:
 			entityPipeline->effect.vertexShader.BindWorld(worldTransform);
 			entityPipeline->Draw((*x)->GetCubeList());
 		}
-		// loop through turret buffer
-		end = turretBuffer.end();
-		for (std::vector<std::unique_ptr<Entity>>::iterator x = turretBuffer.begin(); x != end; std::advance(x, 1)) {
-			translateVector = (*x)->Calculate3DLocationOffset();
+		// loop through and render turret buffer
+		std::vector<std::unique_ptr<TurretParent>>::iterator tEnd = turretBuffer.end();
+		for (std::vector<std::unique_ptr<TurretParent>>::iterator x = turretBuffer.begin(); x != tEnd; std::advance(x, 1)) {
+			translateVector = (*x)->GetSpawnLocationOffset();
 			worldTransform = Matf4::RotationZ(0.0f) * Matf4::RotationX(0.0f) * Matf4::RotationY(0.0f) * Matf4::Translation(translateVector);
 			entityPipeline->effect.vertexShader.BindWorld(worldTransform);
 			entityPipeline->Draw((*x)->GetCubeList());
 		}
-		// loop through solid entities
+		// loop through and render projectile buffer
+		std::vector<std::unique_ptr<ProjectileParent>>::iterator pEnd = projectileBuffer.end();
+		for (std::vector<std::unique_ptr<ProjectileParent>>::iterator x = projectileBuffer.begin(); x != pEnd; std::advance(x, 1)) {
+			translateVector = (*x)->GetSpawnLocationOffset();
+			worldTransform = Matf4::RotationZ(0.0f) * Matf4::RotationX(0.0f) * Matf4::RotationY(0.0f) * Matf4::Translation(translateVector);
+			entityPipeline->effect.vertexShader.BindWorld(worldTransform);
+			entityPipeline->Draw((*x)->GetCubeList());
+		}
+		// loop through and render solid entities
 		end = solidBuffer.end();
 		for (std::vector<std::unique_ptr<Entity>>::iterator x = solidBuffer.begin(); x != end; std::advance(x, 1)) {
 			translateVector = (*x)->Calculate3DLocationOffset();
@@ -60,6 +81,7 @@ public:
 			entityPipeline->effect.vertexShader.BindWorld(worldTransform);
 			entityPipeline->Draw((*x)->GetCubeList());
 		}
+		//OutputDebugString(ss.str().c_str());
 	}
 	void SetHeightMap(std::shared_ptr<HeightMap>& heightmapIn) {
 		heightmap = heightmapIn;
@@ -84,13 +106,33 @@ public:
 	void AddTurret(const float& size, const Veci2& loc) {
 		float temp = heightmap->heightDisplacementGrid[loc.y*heightmap->width + loc.x];
 		turretBuffer.emplace_back(std::make_unique<TurretOne>(size, loc, temp, worldSize, gridSize));
+		(*(turretBuffer.end() - 1))->Calculate3DLocationOffset();
+	}
+	/*void AddProjectile(const float& size, const Vecf3& loc) {
+		projectileBuffer.emplace_back(std::make_unique<ProjectileOne>(size, loc));
+	}*/
+	void GetProjectilesFromTurrets() {
+		// loop through all turrets
+		std::vector<std::unique_ptr<TurretParent>>::iterator end = turretBuffer.end();
+		std::vector<int>::iterator projectileHolderEnd;
+		for (std::vector<std::unique_ptr<TurretParent>>::iterator x = turretBuffer.begin(); x != end; std::advance(x, 1)) {
+			projectileHolderEnd = (*x)->ProjectileHolder.end();
+			for (std::vector<int>::iterator start = (*x)->ProjectileHolder.begin(); start != projectileHolderEnd; std::advance(start, 1)) {
+				switch (*start) {
+				case 0:
+					projectileBuffer.emplace_back(std::make_unique<ProjectileOne>((*x)->GetSpawnLocationOffset()));
+					break;
+				}
+			}
+			(*x)->ProjectileHolder.clear();
+		}
 	}
 public:
 	std::vector <std::unique_ptr<Entity>> solidBuffer;
 private:
 	std::vector<std::unique_ptr<Entity>> entityBuffer;
-	std::vector<std::unique_ptr<Entity>> turretBuffer;
-	std::vector<std::unique_ptr<Entity>> projectileBuffer;
+	std::vector<std::unique_ptr<TurretParent>> turretBuffer;
+	std::vector<std::unique_ptr<ProjectileParent>> projectileBuffer;
 	
 	Vecf3 translateVector;
 	Matf4 worldTransform;

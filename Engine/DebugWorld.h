@@ -33,10 +33,10 @@ public:
 		entityHandler(gfx, sceneZBuffer, worldSize, gridSize)
 	{
 		//entityHandler.AddSolid(1.0f, { 55, 0, 45 });
-		
-		// make known to world terrain of solid obstacle entities
+		// let entityHandler know about the heightmap to implicitly place some entities
 		entityHandler.SetHeightMap(terrainWithPath.GetHeightMap());
-		entityHandler.AddTurret(0.5f, { 50, 45 });
+		entityHandler.AddTurret(0.5f, { 25, 50 });
+		// make known to world terrain of solid obstacle entities
 		terrainWithPath.SyncWithWorldEntities(entityHandler.solidBuffer);
 	}
 	virtual void Update(Keyboard&kbd, Mouse& mouse, float dt) override {
@@ -69,7 +69,7 @@ public:
 		entityHandler.Update(kbd, mouse, dt);
 		// updating world terrain, shifting worldEndPos per frame FindPath(worldStartPos, worldEndPos)
 		testingval = (testingval >= (worldSize - 0.5f))?0.0f:testingval + 1.0f * dt;
-		terrainWithPath.FindPath({ 0.0f, (worldSize/gridSize)/2.0f, (worldSize/2.0f - 0.2f) }, { -(worldSize/2.0f) + testingval, (worldSize / gridSize) / 2.0f, -(worldSize / 2.0f - 0.2f) });
+		//terrainWithPath.FindPath({ 0.0f, (worldSize/gridSize)/2.0f, (worldSize/2.0f - 0.2f) }, { -(worldSize/2.0f) + testingval, (worldSize / gridSize) / 2.0f, -(worldSize / 2.0f - 0.2f) });
 	}
 	virtual void Draw() override {
 		// clearing shared zbuffer between all pipelines per frame
@@ -86,7 +86,7 @@ public:
 		entityHandler.Draw(viewMatrix, projectionMatrix);
 		// draws world terrain and path found TerrainWithPath::FindPath()
 		terrainWithPath.Draw(worldTransform, viewMatrix, projectionMatrix);
-		terrainWithPath.DrawPath(viewMatrix, projectionMatrix);
+		//terrainWithPath.DrawPath(viewMatrix, projectionMatrix);
 	}
 private:
 	// shared zbuffer of scene

@@ -2,6 +2,8 @@
 
 #include "Entity.h"
 
+#include <vector>
+
 class TurretParent : public Entity {
 public:
 	TurretParent(const float& size, const Veci3& loc, const float& worldSize, const int& gridSize)
@@ -14,5 +16,9 @@ public:
 	{}
 	virtual void Update() = 0;
 	virtual void Draw() = 0;
-private:
+	enum class ProjectileType {
+		ProjectileOne
+	};
+public:
+	std::vector<int> ProjectileHolder;
 };

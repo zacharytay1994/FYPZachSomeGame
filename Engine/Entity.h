@@ -5,6 +5,7 @@
 #include "IndexedTriangleList.h"
 #include "Pipeline.h"
 #include "TexCube.h"
+#include "SurfaceDirectionalLighting.h"
 
 
 class Entity {
@@ -22,9 +23,17 @@ public:
 		:
 		Entity(size, { (float)loc.x, 0.0f, (float)loc.y }, worldSize, gridSize)
 	{}
+	// constructor mainly for turret entities who implicitly have their y coordinate set for them
 	Entity(const float& size, const Veci2& loc, const float& heightDisplaced, const float& worldSize, const int& gridSize)
 		:
 		Entity(size, {(float)loc.x, heightDisplaced, (float)loc.y}, worldSize, gridSize)
+	{}
+	// constructor for basic projectiles
+	Entity(const float& size, const Vecf3& loc)
+		:
+		size(size),
+		cubeList(TexCube::GetPlain<Pipeline<SurfaceDirectionalLighting>::Vertex>(size)),
+		spawnLocationOffset(loc)
 	{}
 	virtual void Update() = 0;
 	virtual void Draw() = 0;
@@ -41,7 +50,7 @@ public:
 		return cubeList;
 	}
 	virtual Vecf3 Calculate3DLocationOffset() {
-		float yOffset = size / 2 + 0.0f * cellDiameter;
+		float yOffset = (size / 2) - cellRadius;
 		float xOffset = (-(worldSize/2) + cellRadius) + locationOnBoard3D.x * cellDiameter;
 		float zOffset = ((worldSize/2) - cellRadius) - locationOnBoard3D.z * cellDiameter;
 		spawnLocationOffset = { xOffset, yOffset + locationOnBoard3D.y, zOffset };

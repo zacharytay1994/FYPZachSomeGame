@@ -176,6 +176,8 @@
     <ClInclude Include="Pathfinding.h" />
     <ClInclude Include="Pipeline.h" />
     <ClInclude Include="PlaneVertex.h" />
+    <ClInclude Include="ProjectileOne.h" />
+    <ClInclude Include="ProjectileParent.h" />
     <ClInclude Include="Rect.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="Scene.h" />

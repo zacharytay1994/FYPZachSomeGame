@@ -19,11 +19,11 @@ class GridAStar {
 public:
 	GridAStar(Graphics& gfx, const float& worldSize, std::shared_ptr<ZBuffer>& zBuffer, const float& nodeRadius)
 		:
+		nodeRadius(nodeRadius),
 		gridPipeline(std::make_shared<Pipeline<SurfaceDirectionalLighting>>(gfx, zBuffer)),
 		cubeList(TexCube::GetPlain<Pipeline<SurfaceDirectionalLighting>::Vertex>(nodeDiameter)),
 		worldSize(worldSize),
-		gridStartPos(Vecf2(-worldSize /2, worldSize /2)),
-		nodeRadius(nodeRadius)
+		gridStartPos(Vecf2(-worldSize /2, worldSize /2))
 	{
 		// finds grid cell end using grid cell start
 		const float gridEndX = gridStartPos.x + worldSize;
@@ -36,6 +36,7 @@ public:
 				grid.emplace_back(std::make_unique<NodeAStar>(true, Vecf3( x, nodeRadius, y ), (int)gridX, (int)gridY));
 			}
 		}
+		NodeAStar* test = grid[3999].get();
 		// bind texture to pipeline
 		gridPipeline->effect.pixelShader.BindTexture("greenimage.bmp");
 	}

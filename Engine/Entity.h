@@ -9,10 +9,10 @@
 
 class Entity {
 public:
-	Entity(const float& size, const Veci3& loc, const float& worldSize, const int& gridSize)
+	Entity(const float& size, const Vecf3& loc, const float& worldSize, const int& gridSize)
 		:
 		size(size),
-		locationOnBoard2D({ loc.x, loc.z }),
+		locationOnBoard2D({ (int)loc.x, (int)loc.z }),
 		locationOnBoard3D(loc),
 		worldSize(worldSize),
 		gridSize(gridSize),
@@ -20,11 +20,11 @@ public:
 	{}
 	Entity(const float& size, const Veci2& loc, const float& worldSize, const int& gridSize)
 		:
-		Entity(size, { loc.x, 0, loc.y }, worldSize, gridSize)
+		Entity(size, { (float)loc.x, 0.0f, (float)loc.y }, worldSize, gridSize)
 	{}
 	Entity(const float& size, const Veci2& loc, const float& heightDisplaced, const float& worldSize, const int& gridSize)
 		:
-		Entity(size, {loc.x, (int)heightDisplaced, loc.y}, worldSize, gridSize)
+		Entity(size, {(float)loc.x, heightDisplaced, (float)loc.y}, worldSize, gridSize)
 	{}
 	virtual void Update() = 0;
 	virtual void Draw() = 0;
@@ -34,7 +34,7 @@ public:
 	virtual void Set2DLocation(const Veci2& loc) {
 		locationOnBoard2D = loc;
 	}
-	virtual void Set3DLocation(const Veci3& loc) {
+	virtual void Set3DLocation(const Vecf3& loc) {
 		locationOnBoard3D = loc;
 	}
 	virtual IndexedTriangleList<Pipeline<SurfaceDirectionalLighting>::Vertex> GetCubeList() {
@@ -72,7 +72,7 @@ public:
 protected:
 	// 2d location based on board range (x, z) (0-99, 0-99), y coordinate is always world coordinate not (0-99)
 	Veci2 locationOnBoard2D; 
-	Veci3 locationOnBoard3D;
+	Vecf3 locationOnBoard3D;
 	float size;
 	float worldSize;
 	int gridSize;

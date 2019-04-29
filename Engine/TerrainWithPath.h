@@ -15,7 +15,7 @@ class TerrainWithPath {
 public:
 	TerrainWithPath(Graphics& gfx, std::shared_ptr<ZBuffer>& zBuffer, const std::string& heightmap, const std::string& groundtexture, const float& worldSize, const int& gridSize, const float& minHeight, const float& maxHeight)
 		:
-		pathfinding(gfx, zBuffer, worldSize, gridSize, (float)((worldSize / gridSize) / 2.0f)),
+		pathfinding(gfx, zBuffer, worldSize, gridSize, (worldSize / (float)gridSize) / 2.0f),
 		terrain(heightmap, worldSize, gridSize, minHeight, maxHeight),
 		groundPipeline(std::make_unique<Pipeline<SurfaceDirectionalLighting>>(gfx, zBuffer)),
 		worldSize(worldSize),

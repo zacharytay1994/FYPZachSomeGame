@@ -293,6 +293,7 @@
     <Image Include="..\..\..\Memes\greenimage.bmp" />
     <Image Include="..\..\..\Memes\heightmap1.bmp" />
     <Image Include="..\..\..\Memes\heightmap2.bmp" />
+    <Image Include="..\..\..\Memes\heightmap3.bmp" />
     <Image Include="..\..\..\Memes\makeshiftboardtile.bmp" />
     <Image Include="..\..\..\Memes\menunavi1.bmp" />
     <Image Include="..\..\..\Memes\menunavi2.bmp" />

@@ -15,9 +15,10 @@
 // mainly a*search pathfinding algorithm, and other basic functions
 class Pathfinding {
 public:
-	Pathfinding(Graphics& gfx, std::shared_ptr<ZBuffer>& zBuffer, const float& worldSize, const int& gridSize, const float& gridCellSize)
+	Pathfinding(Graphics& gfx, std::shared_ptr<ZBuffer>& zBuffer, const float& worldSize, const int& gridSize, const float& gridCellRadius)
 		:
-		grid(std::make_unique<GridAStar>(gfx, worldSize, zBuffer, gridCellSize)),
+		grid(std::make_unique<GridAStar>(gfx, worldSize, zBuffer, gridCellRadius)),
+		nodeDiameter(gridCellRadius * 2.0f),
 		gridSize(gridSize)
 	{}
 	// executes a*search algorithm and CALLS: this::RetracePath(), if path is found, nothing if not
@@ -187,8 +188,9 @@ private:
 	// container of nodes used in previous calculations to reset
 	std::vector<NodeAStar*> nodesToReset;
 	// vertical heuristics
-	float maxUpwardTraversal = 0.2;
-	float maxDownwardTraversal = 0.2;
+	float nodeDiameter;
+	float maxUpwardTraversal = nodeDiameter * 5.0f;
+	float maxDownwardTraversal = nodeDiameter * 5.0f;
 	// grid size
 	int gridSize;
 };

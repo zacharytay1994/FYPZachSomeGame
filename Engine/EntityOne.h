@@ -25,7 +25,7 @@ public:
 	}
 	virtual void Update() override {
 		// changing location based on velocity
-		Set3DLocation(locationOnBoard3D + (Veci3)velocity);
+		Set3DLocation(locationOnBoard3D + velocity);
 		// testing simple commands
 		if (locationOnBoard3D.x < 0 || locationOnBoard3D.x > 99) {
 			velocity.x *= -1;

@@ -35,9 +35,17 @@ public:
 		entityPipeline->effect.vertexShader.BindView(viewMatrix);
 		entityPipeline->effect.vertexShader.BindProjection(projectionMatrix);
 		
-		// loop through normal entities
+		// loop through normal entity buffer
 		std::vector<std::unique_ptr<Entity>>::iterator end = entityBuffer.end();
 		for (std::vector<std::unique_ptr<Entity>>::iterator x = entityBuffer.begin(); x != end; std::advance(x, 1)) {
+			translateVector = (*x)->Calculate3DLocationOffset();
+			worldTransform = Matf4::RotationZ(0.0f) * Matf4::RotationX(0.0f) * Matf4::RotationY(0.0f) * Matf4::Translation(translateVector);
+			entityPipeline->effect.vertexShader.BindWorld(worldTransform);
+			entityPipeline->Draw((*x)->GetCubeList());
+		}
+		// loop through turret buffer
+		end = turretBuffer.end();
+		for (std::vector<std::unique_ptr<Entity>>::iterator x = turretBuffer.begin(); x != end; std::advance(x, 1)) {
 			translateVector = (*x)->Calculate3DLocationOffset();
 			worldTransform = Matf4::RotationZ(0.0f) * Matf4::RotationX(0.0f) * Matf4::RotationY(0.0f) * Matf4::Translation(translateVector);
 			entityPipeline->effect.vertexShader.BindWorld(worldTransform);
@@ -75,12 +83,14 @@ public:
 	}
 	void AddTurret(const float& size, const Veci2& loc) {
 		float temp = heightmap->heightDisplacementGrid[loc.y*heightmap->width + loc.x];
-		entityBuffer.emplace_back(std::make_unique<TurretOne>(size, loc, temp, worldSize, gridSize));
+		turretBuffer.emplace_back(std::make_unique<TurretOne>(size, loc, temp, worldSize, gridSize));
 	}
 public:
 	std::vector <std::unique_ptr<Entity>> solidBuffer;
 private:
 	std::vector<std::unique_ptr<Entity>> entityBuffer;
+	std::vector<std::unique_ptr<Entity>> turretBuffer;
+	std::vector<std::unique_ptr<Entity>> projectileBuffer;
 	
 	Vecf3 translateVector;
 	Matf4 worldTransform;

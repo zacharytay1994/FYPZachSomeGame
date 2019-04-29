@@ -407,5 +407,8 @@
     <Image Include="..\..\..\Memes\sandimage2.bmp">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="..\..\..\Memes\heightmap3.bmp">
+      <Filter>Resource Files\HeightMaps</Filter>
+    </Image>
   </ItemGroup>
 </Project>

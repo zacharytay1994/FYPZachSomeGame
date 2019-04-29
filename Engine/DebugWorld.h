@@ -23,23 +23,14 @@ public:
 		:
 		Scene("Debug world"),
 		sceneZBuffer(std::make_shared<ZBuffer>(gfx.ScreenWidth, gfx.ScreenHeight)),
-		entityHandler(gfx, sceneZBuffer),
-		terrainWithPath(gfx, sceneZBuffer, "heightmap2.bmp", "sandimage2.bmp", 20.0f, 100, 0.0f, 5.0f) // TerrainWithPath(graphics, zbuffer, heightmap, surface texture, world size, grid size, min world height, max world height)
+		terrainWithPath(gfx, sceneZBuffer, "heightmap2.bmp", "whiteimage.bmp", 20.0f, 100, 0.0f, 5.0f), // TerrainWithPath(graphics, zbuffer, heightmap, surface texture, world size, grid size, min world height, max world height)
+		entityHandler(gfx, sceneZBuffer, 20.0f, 100)
 	{
-		entityHandler.AddSolid(1.0f, { 55, 0, 45 });
-		entityHandler.AddSolid(2.0f, { 76, 0, 76 });
-		entityHandler.AddSolid(1.0f, { 25, 0, 25 });
-		entityHandler.AddSolid(0.5f, { 36, 0, 46 });
-		entityHandler.AddSolid(1.5f, { 75, 0, 22 });
-		entityHandler.AddSolid(1.0f, { 50, 0, 66 });
-		entityHandler.AddSolid(1.5f, { 75, 0, 50 });
-		entityHandler.AddSolid(1.2f, { 50, 0, 20 });
-		entityHandler.AddSolid(1.0f, { 45, 0, 79 });
-		entityHandler.AddSolid(0.5f, { 21, 0, 69 });
-		entityHandler.AddSolid(1.5f, { 35, 0, 70 });
-		entityHandler.AddSolid(1.0f, { 10, 0, 30 });
-		entityHandler.AddSolid(1.5f, { 10, 0, 50 });
+		//entityHandler.AddSolid(1.0f, { 55, 0, 45 });
+		
 		// make known to world terrain of solid obstacle entities
+		entityHandler.SetHeightMap(terrainWithPath.GetHeightMap());
+		entityHandler.AddTurret(0.5f, { 45, 79 });
 		terrainWithPath.SyncWithWorldEntities(entityHandler.solidBuffer);
 	}
 	virtual void Update(Keyboard&kbd, Mouse& mouse, float dt) override {
@@ -71,8 +62,8 @@ public:
 		// updating all entities in the entity buffer
 		entityHandler.Update(kbd, mouse, dt);
 		// updating world terrain, shifting worldEndPos per frame FindPath(worldStartPos, worldEndPos)
-		testingval = (testingval >= 19.5f)?0.0f:testingval + 1.0f * dt;
-		terrainWithPath.FindPath({ 0.0f, 0.5f, 9.8f }, { -5.0f + testingval, 0.5f, -9.8f });
+		/*testingval = (testingval >= 19.5f)?0.0f:testingval + 1.0f * dt;
+		terrainWithPath.FindPath({ 0.0f, 0.5f, 9.8f }, { -5.0f + testingval, 0.5f, -9.8f });*/
 	}
 	virtual void Draw() override {
 		// clearing shared zbuffer between all pipelines per frame
@@ -89,6 +80,7 @@ public:
 		entityHandler.Draw(viewMatrix, projectionMatrix);
 		// draws world terrain and path found TerrainWithPath::FindPath()
 		terrainWithPath.Draw(worldTransform, viewMatrix, projectionMatrix);
+		//terrainWithPath.DrawPath(viewMatrix, projectionMatrix);
 	}
 private:
 	// shared zbuffer of scene
@@ -110,4 +102,7 @@ private:
 	TerrainWithPath terrainWithPath;
 	// other testing variables
 	float testingval = 0.0f;
+	// world variables
+	const float worldSize = 20.0f;
+	const int gridSize = 100;
 };

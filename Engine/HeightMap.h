@@ -42,5 +42,4 @@ public:
 	const float maxHeight;
 	const float unitHeight = (maxHeight - minHeight) / 255.0f;
 	std::vector<float> heightDisplacementGrid;
-	
 };

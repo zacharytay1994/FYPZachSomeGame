@@ -9,16 +9,22 @@
 
 class Entity {
 public:
-	Entity(const float& size, const Veci3& loc)
+	Entity(const float& size, const Veci3& loc, const float& worldSize, const int& gridSize)
 		:
 		size(size),
 		locationOnBoard2D({ loc.x, loc.z }),
 		locationOnBoard3D(loc),
+		worldSize(worldSize),
+		gridSize(gridSize),
 		cubeList(TexCube::GetPlain<Pipeline<SurfaceDirectionalLighting>::Vertex>(size))
 	{}
-	Entity(const float& size, const Veci2& loc) 
+	Entity(const float& size, const Veci2& loc, const float& worldSize, const int& gridSize)
 		:
-		Entity(size, {loc.x, 0, loc.y})
+		Entity(size, { loc.x, 0, loc.y }, worldSize, gridSize)
+	{}
+	Entity(const float& size, const Veci2& loc, const float& heightDisplaced, const float& worldSize, const int& gridSize)
+		:
+		Entity(size, {loc.x, (int)heightDisplaced, loc.y}, worldSize, gridSize)
 	{}
 	virtual void Update() = 0;
 	virtual void Draw() = 0;
@@ -35,10 +41,10 @@ public:
 		return cubeList;
 	}
 	virtual Vecf3 Calculate3DLocationOffset() {
-		float yOffset = size / 2 + locationOnBoard3D.y * 0.1f;
-		float xOffset = (-5.0f + 0.05f) + locationOnBoard3D.x * 0.1f;
-		float zOffset = (5.0f - 0.05f) - locationOnBoard3D.z * 0.1f;
-		spawnLocationOffset = { xOffset, yOffset, zOffset };
+		float yOffset = size / 2 + 0.0f * cellDiameter;
+		float xOffset = (-(worldSize/2) + cellRadius) + locationOnBoard3D.x * cellDiameter;
+		float zOffset = ((worldSize/2) - cellRadius) - locationOnBoard3D.z * cellDiameter;
+		spawnLocationOffset = { xOffset, yOffset + locationOnBoard3D.y, zOffset };
 		return spawnLocationOffset;
 	}
 	virtual void SetVelocity(const Vecf3& vel) {
@@ -64,10 +70,14 @@ public:
 		return false;
 	}
 protected:
-	// 2d location based on board range (x, z) (0-99, 0-99)
+	// 2d location based on board range (x, z) (0-99, 0-99), y coordinate is always world coordinate not (0-99)
 	Veci2 locationOnBoard2D; 
 	Veci3 locationOnBoard3D;
 	float size;
+	float worldSize;
+	int gridSize;
+	float cellDiameter = worldSize / gridSize;
+	float cellRadius = cellDiameter / 2;
 	// boundaries
 	float leftBound = 0.0f;
 	float rightBound = 0.0f;
@@ -75,7 +85,7 @@ protected:
 	float nearBound = 0.0f;
 	float upBound = 0.0f;
 	float bottomBound = 0.0f;
-	// location offset in world space
+	// world coordinates
 	Vecf3 spawnLocationOffset;
 	// movement vector
 	Vecf3 velocity = { 0.0f, 0.0f, 0.0f };

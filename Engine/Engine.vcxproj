@@ -193,6 +193,8 @@
     <ClInclude Include="TextureEffectPerPixel.h" />
     <ClInclude Include="TextureVertex.h" />
     <ClInclude Include="Triangle.h" />
+    <ClInclude Include="TurretOne.h" />
+    <ClInclude Include="TurretParent.h" />
     <ClInclude Include="Vec2.h" />
     <ClInclude Include="Vec3.h" />
     <ClInclude Include="Vec4.h" />

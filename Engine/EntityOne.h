@@ -23,7 +23,7 @@ public:
 	{
 		SetVelocity({ 1.0f, 0.0f, -1.0f });
 	}
-	virtual void Update() override {
+	virtual void Update(Keyboard&kbd, Mouse& mouse, float dt) override {
 		// changing location based on velocity
 		Set3DLocation(locationOnBoard3D + velocity);
 		// testing simple commands

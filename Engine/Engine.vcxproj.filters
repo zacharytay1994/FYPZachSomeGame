@@ -73,6 +73,9 @@
     <Filter Include="Header Files\Entity\Projectile">
       <UniqueIdentifier>{22883ee1-a916-441f-9bab-3433be1767b5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Physics">
+      <UniqueIdentifier>{f6b0b592-8ee1-4f6e-a0ee-538960166e8d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ChiliWin.h">
@@ -266,6 +269,9 @@
     </ClInclude>
     <ClInclude Include="ProjectileOne.h">
       <Filter>Header Files\Entity\Projectile</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics.h">
+      <Filter>Header Files\Physics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

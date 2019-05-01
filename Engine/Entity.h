@@ -7,6 +7,9 @@
 #include "TexCube.h"
 #include "SurfaceDirectionalLighting.h"
 
+#include "Keyboard.h"
+#include "Mouse.h"
+
 
 class Entity {
 public:
@@ -35,7 +38,7 @@ public:
 		cubeList(TexCube::GetPlain<Pipeline<SurfaceDirectionalLighting>::Vertex>(size)),
 		spawnLocationOffset(loc)
 	{}
-	virtual void Update() = 0;
+	virtual void Update(Keyboard&kbd, Mouse& mouse, float dt) = 0;
 	virtual void Draw() = 0;
 	virtual Veci2 Get2DLocation() {
 		return locationOnBoard2D;

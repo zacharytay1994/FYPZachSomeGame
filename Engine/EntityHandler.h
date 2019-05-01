@@ -12,6 +12,9 @@
 #include <vector>
 #include <memory>
 
+#include <sstream>
+#include <string>
+
 class EntityHandler {
 public:
 	EntityHandler(Graphics& gfx, std::shared_ptr<ZBuffer>& zbuffer, const float& worldSize, const int& gridSize) 
@@ -28,17 +31,17 @@ public:
 		// update normal entity buffer
 		std::vector<std::unique_ptr<Entity>>::iterator end = entityBuffer.end();
 		for (std::vector<std::unique_ptr<Entity>>::iterator x = entityBuffer.begin(); x != end; std::advance(x, 1)) {
-			(*x)->Update();
+			(*x)->Update(kbd, mouse, dt);
 		}
 		// update turret entities buffer
 		std::vector<std::unique_ptr<TurretParent>>::iterator tEnd = turretBuffer.end();
 		for (std::vector<std::unique_ptr<TurretParent>>::iterator x = turretBuffer.begin(); x != tEnd; std::advance(x, 1)) {
-			(*x)->Update();
+			(*x)->Update(kbd, mouse, dt);
 		}
 		// update projectile entities buffer
 		std::vector<std::unique_ptr<ProjectileParent>>::iterator pEnd = projectileBuffer.end();
 		for (std::vector<std::unique_ptr<ProjectileParent>>::iterator x = projectileBuffer.begin(); x != pEnd; std::advance(x, 1)) {
-			(*x)->Update();
+			(*x)->Update(kbd, mouse, dt);
 		}
 		GetProjectilesFromTurrets();
 	}
@@ -65,12 +68,14 @@ public:
 			entityPipeline->Draw((*x)->GetCubeList());
 		}
 		// loop through and render projectile buffer
+		int counttest = 0;
 		std::vector<std::unique_ptr<ProjectileParent>>::iterator pEnd = projectileBuffer.end();
 		for (std::vector<std::unique_ptr<ProjectileParent>>::iterator x = projectileBuffer.begin(); x != pEnd; std::advance(x, 1)) {
 			translateVector = (*x)->GetSpawnLocationOffset();
 			worldTransform = Matf4::RotationZ(0.0f) * Matf4::RotationX(0.0f) * Matf4::RotationY(0.0f) * Matf4::Translation(translateVector);
 			entityPipeline->effect.vertexShader.BindWorld(worldTransform);
 			entityPipeline->Draw((*x)->GetCubeList());
+			counttest++;
 		}
 		// loop through and render solid entities
 		end = solidBuffer.end();
@@ -81,6 +86,7 @@ public:
 			entityPipeline->effect.vertexShader.BindWorld(worldTransform);
 			entityPipeline->Draw((*x)->GetCubeList());
 		}
+		ss << counttest << std::endl;
 		//OutputDebugString(ss.str().c_str());
 	}
 	void SetHeightMap(std::shared_ptr<HeightMap>& heightmapIn) {
@@ -117,14 +123,16 @@ public:
 		std::vector<int>::iterator projectileHolderEnd;
 		for (std::vector<std::unique_ptr<TurretParent>>::iterator x = turretBuffer.begin(); x != end; std::advance(x, 1)) {
 			projectileHolderEnd = (*x)->ProjectileHolder.end();
-			for (std::vector<int>::iterator start = (*x)->ProjectileHolder.begin(); start != projectileHolderEnd; std::advance(start, 1)) {
+			std::vector<Vecf3>::iterator velStart = (*x)->VelocityHolder.begin();
+			for (std::vector<int>::iterator start = (*x)->ProjectileHolder.begin(); start != projectileHolderEnd; std::advance(start, 1), std::advance(velStart, 1)) {
 				switch (*start) {
 				case 0:
-					projectileBuffer.emplace_back(std::make_unique<ProjectileOne>((*x)->GetSpawnLocationOffset()));
+					projectileBuffer.emplace_back(std::make_unique<ProjectileOne>((*x)->GetSpawnLocationOffset(), (*velStart)));
 					break;
 				}
 			}
 			(*x)->ProjectileHolder.clear();
+			(*x)->VelocityHolder.clear();
 		}
 	}
 public:
@@ -146,4 +154,6 @@ private:
 	// world variables
 	const float worldSize;
 	const int gridSize;
+
+	std::wstringstream ss;
 };

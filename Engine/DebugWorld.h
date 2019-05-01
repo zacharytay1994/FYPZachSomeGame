@@ -29,13 +29,14 @@ public:
 		:
 		Scene("Debug world"),
 		sceneZBuffer(std::make_shared<ZBuffer>(gfx.ScreenWidth, gfx.ScreenHeight)),
-		terrainWithPath(gfx, sceneZBuffer, "heightmap3.bmp", "whiteimage.bmp", worldSize, gridSize, 0.0f, 5.0f), // TerrainWithPath(graphics, zbuffer, heightmap, surface texture, world size, grid size, min world height, max world height)
+		terrainWithPath(gfx, sceneZBuffer, "heightmap3.bmp", "whiteimage.bmp", worldSize, gridSize, 0.0f, 10.0f), // TerrainWithPath(graphics, zbuffer, heightmap, surface texture, world size, grid size, min world height, max world height)
 		entityHandler(gfx, sceneZBuffer, worldSize, gridSize)
 	{
 		//entityHandler.AddSolid(1.0f, { 55, 0, 45 });
 		// let entityHandler know about the heightmap to implicitly place some entities
 		entityHandler.SetHeightMap(terrainWithPath.GetHeightMap());
 		entityHandler.AddTurret(0.5f, { 25, 50 });
+		//entityHandler.AddTurret(0.5f, { 25, 25 });
 		// make known to world terrain of solid obstacle entities
 		terrainWithPath.SyncWithWorldEntities(entityHandler.solidBuffer);
 	}

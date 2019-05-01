@@ -14,11 +14,12 @@ public:
 		:
 		Entity(size, loc, heightDisplaced, worldSize, gridSize)
 	{}
-	virtual void Update() = 0;
+	virtual void Update(Keyboard&kbd, Mouse& mouse, float dt) = 0;
 	virtual void Draw() = 0;
 	enum class ProjectileType {
 		ProjectileOne
 	};
 public:
 	std::vector<int> ProjectileHolder;
+	std::vector<Vecf3> VelocityHolder;
 };

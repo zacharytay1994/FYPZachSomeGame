@@ -4,6 +4,11 @@
 
 #include <vector>
 
+struct ProjectileData {
+	const int projectileType;
+	Vecf3 targetLocationInWorld;
+};
+
 class TurretParent : public Entity {
 public:
 	TurretParent(const float& size, const Veci3& loc, const float& worldSize, const int& gridSize)
@@ -19,7 +24,12 @@ public:
 	enum class ProjectileType {
 		ProjectileOne
 	};
+	virtual void SpawnProjectile(const ProjectileType& type, const Vecf3& targetLoc) {
+		struct ProjectileData data = { static_cast<int>(type), targetLoc };
+		ProjectileData.push_back(data);
+	}
 public:
 	std::vector<int> ProjectileHolder;
 	std::vector<Vecf3> VelocityHolder;
+	std::vector<ProjectileData> ProjectileData;
 };

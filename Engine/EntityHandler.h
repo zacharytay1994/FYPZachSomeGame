@@ -2,6 +2,7 @@
 
 #include "Entity.h"
 #include "EntityOne.h"
+#include "TurretParent.h"
 #include "TurretOne.h"
 #include "ProjectileOne.h"
 
@@ -120,19 +121,17 @@ public:
 	void GetProjectilesFromTurrets() {
 		// loop through all turrets
 		std::vector<std::unique_ptr<TurretParent>>::iterator end = turretBuffer.end();
-		std::vector<int>::iterator projectileHolderEnd;
+		std::vector<ProjectileData>::iterator projectileDataEnd;
 		for (std::vector<std::unique_ptr<TurretParent>>::iterator x = turretBuffer.begin(); x != end; std::advance(x, 1)) {
-			projectileHolderEnd = (*x)->ProjectileHolder.end();
-			std::vector<Vecf3>::iterator velStart = (*x)->VelocityHolder.begin();
-			for (std::vector<int>::iterator start = (*x)->ProjectileHolder.begin(); start != projectileHolderEnd; std::advance(start, 1), std::advance(velStart, 1)) {
-				switch (*start) {
+			projectileDataEnd = (*x)->ProjectileData.end();
+			for (std::vector<ProjectileData>::iterator start = (*x)->ProjectileData.begin(); start != projectileDataEnd; std::advance(start, 1)) {
+				switch ((*start).projectileType) {
 				case 0:
-					projectileBuffer.emplace_back(std::make_unique<ProjectileOne>((*x)->GetSpawnLocationOffset(), (*velStart)));
+					projectileBuffer.emplace_back(std::make_unique<ProjectileOne>((*x)->GetSpawnLocationOffset(), (*start).targetLocationInWorld));
 					break;
 				}
 			}
-			(*x)->ProjectileHolder.clear();
-			(*x)->VelocityHolder.clear();
+			(*x)->ProjectileData.clear();
 		}
 	}
 public:

@@ -36,6 +36,7 @@ public:
 		// let entityHandler know about the heightmap to implicitly place some entities
 		entityHandler.SetHeightMap(terrainWithPath.GetHeightMap());
 		entityHandler.AddTurret(0.5f, { 25, 50 });
+		entityHandler.AddTurret(0.5f, { 55, 50 });
 		//entityHandler.AddTurret(0.5f, { 25, 25 });
 		// make known to world terrain of solid obstacle entities
 		terrainWithPath.SyncWithWorldEntities(entityHandler.solidBuffer);

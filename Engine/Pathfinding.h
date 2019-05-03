@@ -179,6 +179,13 @@ public:
 		}
 		return false;
 	}
+	std::vector<Vecf3> GetPointsOfPath() {
+		std::vector<Vecf3> holder;
+		for (NodeAStar* n : currentPath) {
+			holder.push_back(n->GetWorldPos());
+		}
+		return holder;
+	}
 
 private:
 	// grid of nodes/gridcells used in pathfinding

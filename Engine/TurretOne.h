@@ -1,7 +1,6 @@
 #pragma once
 
 #include "TurretParent.h"
-#include "ProjectileOne.h"
 #include "Physics.h"
 
 #include <sstream>
@@ -9,9 +8,9 @@
 
 class TurretOne : public TurretParent {
 public:
-	TurretOne(const float& size, const Veci2& loc, const float& heightDisplaced, const float& worldSize, const int& gridSize)
+	TurretOne(const float& size, const Veci2& loc, const float& heightDisplaced, const float& worldSize, const int& gridSize, const int& rateOfFire)
 		:
-		TurretParent(size, loc, heightDisplaced, worldSize, gridSize)
+		TurretParent(size, loc, heightDisplaced, worldSize, gridSize, rateOfFire)
 	{}
 	virtual void Update(Keyboard&kbd, Mouse& mouse, float dt) override {
 		if (kbd.KeyIsPressed('P')) {
@@ -23,7 +22,7 @@ public:
 		if (kbd.KeyIsPressed('I')) {
 			SpawnProjectile(ProjectileType::ProjectileOne, spawnLocationOffset + Vecf3(-2.0f, 0.0f, 0.0f));
 		}
-		SpawnProjectile(ProjectileType::ProjectileOne, spawnLocationOffset + Vecf3(1.0f, 4.0f, -5.0f));
+		FireAtRate(ProjectileType::ProjectileThree, {0.0f, 0.0f, 0.0f});
 	}
 	virtual void Draw() override {
 

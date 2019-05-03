@@ -151,6 +151,7 @@
     <ClInclude Include="DebugWorld.h" />
     <ClInclude Include="DefaultVertexShader.h" />
     <ClInclude Include="DXErr.h" />
+    <ClInclude Include="EnemyParent.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="EntityHandler.h" />
     <ClInclude Include="EntityOne.h" />
@@ -179,6 +180,8 @@
     <ClInclude Include="PlaneVertex.h" />
     <ClInclude Include="ProjectileOne.h" />
     <ClInclude Include="ProjectileParent.h" />
+    <ClInclude Include="ProjectileThree.h" />
+    <ClInclude Include="ProjectileTwo.h" />
     <ClInclude Include="Rect.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="Scene.h" />

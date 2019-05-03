@@ -10,7 +10,8 @@ public:
 		lob
 	};
 public:
-	ProjectileParent(const float& size, const Vecf3& loc, const Vecf3& targetLocation, const float& projectileSpeed, const ProjectionType& projectionType)
+	ProjectileParent(const float& size, const Vecf3& loc, const Vecf3& targetLocation, const float& projectileSpeed,
+		const ProjectionType& projectionType)
 		:
 		Entity(size, loc),
 		targetLocation(targetLocation),
@@ -18,7 +19,16 @@ public:
 	{
 		SetVelocity(static_cast<int>(projectionType));
 	}
-	virtual void Update(Keyboard&kbd, Mouse& mouse, float dt) = 0;
+	virtual void Update(Keyboard&kbd, Mouse& mouse, float dt) {
+		// Update location with velocity
+		spawnLocationOffset += velocity * dt;
+		// change velocity due to gravitational acceleration
+		velocity += gravitationalAcc * dt;
+
+		// extra updates specified by the child
+		ChildUpdates(kbd, mouse, dt);
+	}
+	virtual void ChildUpdates(Keyboard&kbd, Mouse& mouse, float dt) = 0;
 	virtual void Draw() = 0;
 	virtual bool CalculateAngleOfProjection(float& theta, const int& type) {
 		if (Physics::GetProjectionAngleElevated(spawnLocationOffset, targetLocation, projectileSpeed, theta, type)) {

@@ -2,28 +2,41 @@
 
 #include "Entity.h"
 #include "EntityOne.h"
+
+// types of turrets
 #include "TurretParent.h"
 #include "TurretOne.h"
+
+// types of projectiles
 #include "ProjectileOne.h"
+#include "ProjectileTwo.h"
+#include "ProjectileThree.h"
+
+// typed of enemies
+#include "EnemyParent.h"
 
 #include "HeightMap.h"
 #include "Graphics.h"
 #include "MatTemplate.h"
+#include "TerrainWithPath.h"
 
 #include <vector>
 #include <memory>
+#include <random>
 
 #include <sstream>
 #include <string>
 
 class EntityHandler {
 public:
-	EntityHandler(Graphics& gfx, std::shared_ptr<ZBuffer>& zbuffer, const float& worldSize, const int& gridSize) 
+	EntityHandler(Graphics& gfx, std::shared_ptr<ZBuffer>& zbuffer, const float& worldSize, const int& gridSize,
+		std::shared_ptr<TerrainWithPath>& terrainWithPath) 
 		:
 		entityZBuffer(zbuffer),
 		entityPipeline(std::make_shared<Pipeline<SurfaceDirectionalLighting>>(gfx, entityZBuffer)),
 		worldSize(worldSize),
-		gridSize(gridSize)
+		gridSize(gridSize),
+		terrainWithPath(terrainWithPath)
 	{
 		entityPipeline->effect.pixelShader.BindTexture("greenimage.bmp");
 	}
@@ -44,6 +57,16 @@ public:
 		for (std::vector<std::unique_ptr<ProjectileParent>>::iterator x = projectileBuffer.begin(); x != pEnd; std::advance(x, 1)) {
 			(*x)->Update(kbd, mouse, dt);
 		}
+		// update enemy entities buffer
+		std::vector<std::unique_ptr<EnemyParent>>::iterator eEnd = enemyBuffer.end();
+		for (std::vector<std::unique_ptr<EnemyParent>>::iterator x = enemyBuffer.begin(); x != eEnd; std::advance(x, 1)) {
+			(*x)->Update(kbd, mouse, dt);
+			// check if enemy needs new path, find it a new path
+			if ((*x)->needPath) {
+				QueryPathfinder((*x));
+			}
+		}
+		// entity handler functions
 		GetProjectilesFromTurrets();
 	}
 
@@ -112,12 +135,25 @@ public:
 	}
 	void AddTurret(const float& size, const Veci2& loc) {
 		float temp = heightmap->heightDisplacementGrid[loc.y*heightmap->width + loc.x];
-		turretBuffer.emplace_back(std::make_unique<TurretOne>(size, loc, temp, worldSize, gridSize));
+		turretBuffer.emplace_back(std::make_unique<TurretOne>(size, loc, temp, worldSize, gridSize, 1));
 		(*(turretBuffer.end() - 1))->Calculate3DLocationOffset();
 	}
-	/*void AddProjectile(const float& size, const Vecf3& loc) {
-		projectileBuffer.emplace_back(std::make_unique<ProjectileOne>(size, loc));
-	}*/
+	void PopulateRandomTurrets(const int& amount) {
+		std::random_device rand;
+		std::mt19937 rng(rand());
+		std::uniform_int_distribution<std::mt19937::result_type> gridDistribution(0, 99);
+		std::uniform_int_distribution<std::mt19937::result_type> rateOfFireDistribution(1, 5);
+		Veci2 gridLocation;
+		float height;
+		int rateOfFire;
+		for (int i = 0; i < amount; i++) {
+			gridLocation = { (int)(gridDistribution(rng)), (int)(gridDistribution(rng)) };
+			rateOfFire = (int)(rateOfFireDistribution(rng));
+			height = heightmap->heightDisplacementGrid[gridLocation.y*heightmap->width + gridLocation.x];
+			turretBuffer.emplace_back(std::make_unique<TurretOne>(0.5f, gridLocation, height, worldSize, gridSize, rateOfFire));
+			(*(turretBuffer.end() - 1))->Calculate3DLocationOffset();
+		}
+	}
 	void GetProjectilesFromTurrets() {
 		// loop through all turrets
 		std::vector<std::unique_ptr<TurretParent>>::iterator end = turretBuffer.end();
@@ -129,10 +165,20 @@ public:
 				case 0:
 					projectileBuffer.emplace_back(std::make_unique<ProjectileOne>((*x)->GetSpawnLocationOffset(), (*start).targetLocationInWorld));
 					break;
+				case 1:
+					projectileBuffer.emplace_back(std::make_unique<ProjectileTwo>((*x)->GetSpawnLocationOffset(), (*start).targetLocationInWorld));
+					break;
+				case 2:
+					projectileBuffer.emplace_back(std::make_unique<ProjectileThree>((*x)->GetSpawnLocationOffset(), (*start).targetLocationInWorld));
+					break;
 				}
 			}
 			(*x)->ProjectileData.clear();
 		}
+	}
+	void QueryPathfinder(std::unique_ptr<EnemyParent>& enemy) {
+		enemy->SetCurrentPath(terrainWithPath->FindAndReturnPath(enemy->GetSpawnLocationOffset(), enemy->targetDestination));
+		enemy->needPath = false;
 	}
 public:
 	std::vector <std::unique_ptr<Entity>> solidBuffer;
@@ -140,6 +186,9 @@ private:
 	std::vector<std::unique_ptr<Entity>> entityBuffer;
 	std::vector<std::unique_ptr<TurretParent>> turretBuffer;
 	std::vector<std::unique_ptr<ProjectileParent>> projectileBuffer;
+	// enemy buffers
+	std::vector<std::unique_ptr<EnemyParent>> enemyBuffer;
+	std::vector<std::unique_ptr<EnemyParent>> enemiesAwaitingPath;
 	
 	Vecf3 translateVector;
 	Matf4 worldTransform;
@@ -153,6 +202,7 @@ private:
 	// world variables
 	const float worldSize;
 	const int gridSize;
+	std::shared_ptr<TerrainWithPath>& terrainWithPath;
 
 	std::wstringstream ss;
 };

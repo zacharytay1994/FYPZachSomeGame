@@ -29,17 +29,16 @@ public:
 		:
 		Scene("Debug world"),
 		sceneZBuffer(std::make_shared<ZBuffer>(gfx.ScreenWidth, gfx.ScreenHeight)),
-		terrainWithPath(gfx, sceneZBuffer, "heightmap3.bmp", "whiteimage.bmp", worldSize, gridSize, 0.0f, 10.0f), // TerrainWithPath(graphics, zbuffer, heightmap, surface texture, world size, grid size, min world height, max world height)
-		entityHandler(gfx, sceneZBuffer, worldSize, gridSize)
+		terrainWithPath(std::make_shared<TerrainWithPath>(gfx, sceneZBuffer, "heightmap2.bmp", "whiteimage.bmp", worldSize, gridSize, 0.0f, 10.0f)), // TerrainWithPath(graphics, zbuffer, heightmap, surface texture, world size, grid size, min world height, max world height)
+		entityHandler(gfx, sceneZBuffer, worldSize, gridSize, terrainWithPath)
 	{
 		//entityHandler.AddSolid(1.0f, { 55, 0, 45 });
 		// let entityHandler know about the heightmap to implicitly place some entities
-		entityHandler.SetHeightMap(terrainWithPath.GetHeightMap());
-		entityHandler.AddTurret(0.5f, { 25, 50 });
-		entityHandler.AddTurret(0.5f, { 55, 50 });
+		entityHandler.SetHeightMap(terrainWithPath->GetHeightMap());
+		entityHandler.PopulateRandomTurrets(10);
 		//entityHandler.AddTurret(0.5f, { 25, 25 });
 		// make known to world terrain of solid obstacle entities
-		terrainWithPath.SyncWithWorldEntities(entityHandler.solidBuffer);
+		terrainWithPath->SyncWithWorldEntities(entityHandler.solidBuffer);
 	}
 	virtual void Update(Keyboard&kbd, Mouse& mouse, float dt) override {
 		// camera movement
@@ -87,7 +86,7 @@ public:
 		// draws all entities in entity handler
 		entityHandler.Draw(viewMatrix, projectionMatrix);
 		// draws world terrain and path found TerrainWithPath::FindPath()
-		terrainWithPath.Draw(worldTransform, viewMatrix, projectionMatrix);
+		terrainWithPath->Draw(worldTransform, viewMatrix, projectionMatrix);
 		//terrainWithPath.DrawPath(viewMatrix, projectionMatrix);
 	}
 private:
@@ -107,9 +106,8 @@ private:
 	// entityHandler object, handles all scene objects that inherit the entity class
 	EntityHandler entityHandler;
 	// object that represents the scene terrain and pathing grid, handles pathfinding and terrain rendering
-	TerrainWithPath terrainWithPath;
+	std::shared_ptr<TerrainWithPath> terrainWithPath;
 	// other testing variables
 	float testingval = 0.0f;
 	// world variables
-	
 };

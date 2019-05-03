@@ -49,6 +49,15 @@ public:
 		pathfinding.FindPath(startPos, endPos);
 	}
 
+	std::vector<Vecf3> GetPathInWorldCoordinates() {
+		return pathfinding.GetPointsOfPath();
+	}
+
+	std::vector<Vecf3> FindAndReturnPath(const Vecf3& startPos, const Vecf3& endPos) {
+		FindPath(startPos, endPos);
+		return GetPathInWorldCoordinates();
+	}
+
 	std::shared_ptr<HeightMap>& GetHeightMap() {
 		return terrain.GetHeightMap();
 	}

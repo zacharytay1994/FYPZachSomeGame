@@ -14,6 +14,7 @@
 
 // typed of enemies
 #include "EnemyParent.h"
+#include "EnemyOne.h"
 
 #include "HeightMap.h"
 #include "Graphics.h"
@@ -101,6 +102,14 @@ public:
 			entityPipeline->Draw((*x)->GetCubeList());
 			counttest++;
 		}
+		// loop through and render enemy entities
+		std::vector<std::unique_ptr<EnemyParent>>::iterator eEnd = enemyBuffer.end();
+		for (std::vector<std::unique_ptr<EnemyParent>>::iterator x = enemyBuffer.begin(); x != eEnd; std::advance(x, 1)) {
+			translateVector = (*x)->GetSpawnLocationOffset();
+			worldTransform = Matf4::RotationZ(0.0f) * Matf4::RotationX(0.0f) * Matf4::RotationY(0.0f) * Matf4::Translation(translateVector);
+			entityPipeline->effect.vertexShader.BindWorld(worldTransform);
+			entityPipeline->Draw((*x)->GetCubeList());
+		}
 		// loop through and render solid entities
 		end = solidBuffer.end();
 		for (std::vector<std::unique_ptr<Entity>>::iterator x = solidBuffer.begin(); x != end; std::advance(x, 1)) {
@@ -137,6 +146,9 @@ public:
 		float temp = heightmap->heightDisplacementGrid[loc.y*heightmap->width + loc.x];
 		turretBuffer.emplace_back(std::make_unique<TurretOne>(size, loc, temp, worldSize, gridSize, 1));
 		(*(turretBuffer.end() - 1))->Calculate3DLocationOffset();
+	}
+	void AddEnemy(const float& size, const Vecf3& loc) {
+		enemyBuffer.emplace_back(std::make_unique<EnemyOne>(size, loc));
 	}
 	void PopulateRandomTurrets(const int& amount) {
 		std::random_device rand;
@@ -177,8 +189,11 @@ public:
 		}
 	}
 	void QueryPathfinder(std::unique_ptr<EnemyParent>& enemy) {
-		enemy->SetCurrentPath(terrainWithPath->FindAndReturnPath(enemy->GetSpawnLocationOffset(), enemy->targetDestination));
-		enemy->needPath = false;
+		std::vector<Vecf3> holder;
+		if (terrainWithPath->FindAndReturnPath(enemy->GetSpawnLocationOffset(), enemy->targetDestination, holder)) {
+			enemy->SetCurrentPath(holder);
+			enemy->needPath = false;
+		}
 	}
 public:
 	std::vector <std::unique_ptr<Entity>> solidBuffer;

@@ -22,7 +22,7 @@ public:
 		gridSize(gridSize)
 	{}
 	// executes a*search algorithm and CALLS: this::RetracePath(), if path is found, nothing if not
-	void FindPath(const Vecf3& startPos, const Vecf3& endPos) {
+	bool FindPath(const Vecf3& startPos, const Vecf3& endPos) {
 		// custom comparator for priority queue, max heap to min heap
 		auto nodePointerGreaterComparator = [](NodeAStar*& p1, NodeAStar* p2) {
 			return *p1 > *p2;
@@ -53,7 +53,7 @@ public:
 			// if currentNode is equal to endNode, we have reached our destination
 			if (currentNode == endNode) {
 				currentPath = RetracePath(startNode, endNode);
-				return;
+				return true;
 			}
 
 			// find/update fcost of neighbours and add them to the openset
@@ -82,6 +82,7 @@ public:
 				}
 			}
 		}
+		return false;
 	}
 
 	// finding distance between nodes
@@ -196,8 +197,8 @@ private:
 	std::vector<NodeAStar*> nodesToReset;
 	// vertical heuristics
 	float nodeDiameter;
-	float maxUpwardTraversal = nodeDiameter * 5.0f;
-	float maxDownwardTraversal = nodeDiameter * 5.0f;
+	float maxUpwardTraversal = nodeDiameter * 2.0f;
+	float maxDownwardTraversal = nodeDiameter * 2.0f;
 	// grid size
 	int gridSize;
 };

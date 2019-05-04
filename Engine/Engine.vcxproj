@@ -151,6 +151,7 @@
     <ClInclude Include="DebugWorld.h" />
     <ClInclude Include="DefaultVertexShader.h" />
     <ClInclude Include="DXErr.h" />
+    <ClInclude Include="EnemyOne.h" />
     <ClInclude Include="EnemyParent.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="EntityHandler.h" />
@@ -288,6 +289,7 @@
     <Image Include="..\..\..\..\Downloads\test.bmp" />
     <Image Include="..\..\..\Memes\blackimage.bmp" />
     <Image Include="..\..\..\Memes\checkered.bmp" />
+    <Image Include="..\..\..\Memes\coastalHeightmap.bmp" />
     <Image Include="..\..\..\Memes\debuggingMenu1.bmp" />
     <Image Include="..\..\..\Memes\debuggingMenu2.bmp" />
     <Image Include="..\..\..\Memes\entitytextureone.bmp" />

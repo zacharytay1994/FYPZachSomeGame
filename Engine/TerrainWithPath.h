@@ -45,17 +45,20 @@ public:
 		pathfinding.DrawGridPath(viewMatrix, projectionMatrix);
 	}
 	// Finds the path
-	void FindPath(const Vecf3& startPos, const Vecf3& endPos) {
-		pathfinding.FindPath(startPos, endPos);
+	bool FindPath(const Vecf3& startPos, const Vecf3& endPos) {
+		return pathfinding.FindPath(startPos, endPos);
 	}
 
 	std::vector<Vecf3> GetPathInWorldCoordinates() {
 		return pathfinding.GetPointsOfPath();
 	}
 
-	std::vector<Vecf3> FindAndReturnPath(const Vecf3& startPos, const Vecf3& endPos) {
-		FindPath(startPos, endPos);
-		return GetPathInWorldCoordinates();
+	bool FindAndReturnPath(const Vecf3& startPos, const Vecf3& endPos, std::vector<Vecf3>& pathInOut) {
+		if (FindPath(startPos, endPos)) {
+			pathInOut = GetPathInWorldCoordinates();
+			return true;
+		}
+		return false;
 	}
 
 	std::shared_ptr<HeightMap>& GetHeightMap() {

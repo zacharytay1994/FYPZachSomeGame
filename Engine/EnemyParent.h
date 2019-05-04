@@ -21,7 +21,7 @@ public:
 	virtual void Draw() = 0;
 	virtual bool SetCurrentPath(const std::vector<Vecf3>& newPath) {
 		currentPath = newPath;
-		pathSize = currentPath.size();
+		pathSize = (int)currentPath.size();
 		InitStartPath();
 		return true;
 	}
@@ -40,7 +40,7 @@ public:
 		spawnLocationOffset = currentPath[pathStep];
 		velBetweenPoints = ApproximatePoints(currentPoint, nextPoint);
 	}
-	void ExecutePath(const float& stepCounterIn) {
+	void ExecutePath(const int& stepCounterIn) {
 		if (stepCounterIn < stepCounterMax) {
 			spawnLocationOffset += velBetweenPoints;
 			stepCounter++;
@@ -64,7 +64,7 @@ public:
 	Vecf3 targetDestination = {-9.8f, 0.1f, -8.0f};
 private:
 	std::vector<Vecf3> currentPath;
-	int pathSize = currentPath.size();
+	int pathSize = (int)currentPath.size();
 	float pathSpeed = 0.2f;
 	int stepCounter;
 	int stepCounterMax = (int)(1 / pathSpeed);

@@ -35,11 +35,11 @@ public:
 		//entityHandler.AddSolid(1.0f, { 55, 0, 45 });
 		// let entityHandler know about the heightmap to implicitly place some entities
 		entityHandler.SetHeightMap(terrainWithPath->GetHeightMap());
-		//entityHandler.PopulateRandomTurrets(10);
+		entityHandler.AddEnemy(1.0f, { 9.8f, 0.1f, 8.0f });
+		entityHandler.PopulateRandomTurrets(20);
 		//entityHandler.AddTurret(0.5f, { 25, 75 });
 		// make known to world terrain of solid obstacle entities
 		terrainWithPath->SyncWithWorldEntities(entityHandler.solidBuffer);
-		entityHandler.AddEnemy(1.0f, { 9.8f, 0.1f, 8.0f });
 	}
 	virtual void Update(Keyboard&kbd, Mouse& mouse, float dt) override {
 		// camera movement

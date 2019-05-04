@@ -30,16 +30,16 @@ public:
 		ProjectileTwo,
 		ProjectileThree
 	};
-	virtual void SpawnProjectile(const ProjectileType& type, const Vecf3& targetLoc) {
-		struct ProjectileData data = { static_cast<int>(type), targetLoc };
+	virtual void SpawnProjectile(const ProjectileType& type) {
+		struct ProjectileData data = { static_cast<int>(type), targetLocation };
 		ProjectileData.push_back(data);
 	}
-	virtual void FireAtRate(const ProjectileType& type, const Vecf3& targetLoc) {
+	virtual void FireAtRate(const ProjectileType& type) {
 		if (clock < timePerProjectile) {
 			clock += 1.0f / 60.0f;
 		}
 		else {
-			SpawnProjectile(type, targetLoc);
+			SpawnProjectile(type);
 			clock = 0.0f;
 		}
 	}
@@ -50,4 +50,6 @@ public:
 	int rateOfFire;
 	float clock = 0.0f;
 	float timePerProjectile = 1.0f / rateOfFire;
+	Vecf3 targetLocation = {0.0f, 0.0f, 0.0f};
+	bool hasTarget;
 };

@@ -6,6 +6,8 @@
 // types of turrets
 #include "TurretParent.h"
 #include "TurretOne.h"
+#include "TurretTwo.h"
+#include "TurretThree.h"
 
 // types of projectiles
 #include "ProjectileOne.h"
@@ -52,10 +54,17 @@ public:
 		std::vector<std::unique_ptr<TurretParent>>::iterator tEnd = turretBuffer.end();
 		for (std::vector<std::unique_ptr<TurretParent>>::iterator x = turretBuffer.begin(); x != tEnd; std::advance(x, 1)) {
 			(*x)->Update(kbd, mouse, dt);
+			(*x)->targetLocation = QueryEnemyLocation(*(enemyBuffer.begin()));
 		}
 		// update projectile entities buffer
 		std::vector<std::unique_ptr<ProjectileParent>>::iterator pEnd = projectileBuffer.end();
 		for (std::vector<std::unique_ptr<ProjectileParent>>::iterator x = projectileBuffer.begin(); x != pEnd; std::advance(x, 1)) {
+			/*if ((x != pEnd) && (*x)->toDestroy) {
+				QuickRemoveProjectile(projectileBuffer, x, pEnd);
+			}
+			if (x != pEnd) {
+				(*x)->Update(kbd, mouse, dt);
+			}*/
 			(*x)->Update(kbd, mouse, dt);
 		}
 		// update enemy entities buffer
@@ -155,6 +164,7 @@ public:
 		std::mt19937 rng(rand());
 		std::uniform_int_distribution<std::mt19937::result_type> gridDistribution(0, 99);
 		std::uniform_int_distribution<std::mt19937::result_type> rateOfFireDistribution(1, 5);
+		std::uniform_int_distribution<std::mt19937::result_type> typeOfTurrets(0, 2);
 		Veci2 gridLocation;
 		float height;
 		int rateOfFire;
@@ -162,8 +172,20 @@ public:
 			gridLocation = { (int)(gridDistribution(rng)), (int)(gridDistribution(rng)) };
 			rateOfFire = (int)(rateOfFireDistribution(rng));
 			height = heightmap->heightDisplacementGrid[gridLocation.y*heightmap->width + gridLocation.x];
-			turretBuffer.emplace_back(std::make_unique<TurretOne>(0.5f, gridLocation, height, worldSize, gridSize, rateOfFire));
-			(*(turretBuffer.end() - 1))->Calculate3DLocationOffset();
+			switch (typeOfTurrets(rng)) {
+				case 0:
+					turretBuffer.emplace_back(std::make_unique<TurretOne>(0.5f, gridLocation, height, worldSize, gridSize, rateOfFire));
+					(*(turretBuffer.end() - 1))->Calculate3DLocationOffset();
+					break;
+				case 1:
+					turretBuffer.emplace_back(std::make_unique<TurretTwo>(0.5f, gridLocation, height, worldSize, gridSize, rateOfFire));
+					(*(turretBuffer.end() - 1))->Calculate3DLocationOffset();
+					break;
+				case 2:
+					turretBuffer.emplace_back(std::make_unique<TurretThree>(0.5f, gridLocation, height, worldSize, gridSize, rateOfFire));
+					(*(turretBuffer.end() - 1))->Calculate3DLocationOffset();
+					break;
+			}
 		}
 	}
 	void GetProjectilesFromTurrets() {
@@ -194,6 +216,18 @@ public:
 			enemy->SetCurrentPath(holder);
 			enemy->needPath = false;
 		}
+	}
+	Vecf3 QueryEnemyLocation(std::unique_ptr<EnemyParent>& enemy) {
+		return enemy->GetSpawnLocationOffset();
+	}
+	void QuickRemoveProjectile(std::vector<std::unique_ptr<ProjectileParent>>& container, std::vector<std::unique_ptr<ProjectileParent>>::iterator& elementIterator,
+		std::vector<std::unique_ptr<ProjectileParent>>::iterator& updateEnd) {
+		std::vector<std::unique_ptr<ProjectileParent>>::iterator lastElement = container.end() - 1;
+		if (elementIterator != container.end()) {
+			elementIterator = std::move(lastElement);
+		}
+		container.pop_back();
+		updateEnd = container.end();
 	}
 public:
 	std::vector <std::unique_ptr<Entity>> solidBuffer;

@@ -57,14 +57,15 @@ public:
 			velocity = { speedX, projectileSpeed* sin(theta), speedZ };
 		}
 		else {
-			velocity = { 0.0f, 10.0f, 0.0f };
+			velocity = { 0.0f, 0.0f, 0.0f };
 			toDestroy = true;
 		}
 	}
+public:
+	bool toDestroy = false;
 protected:
 	Vecf3 velocity;
 	const Vecf3 targetLocation;
 	const float projectileSpeed;
-	bool toDestroy = false;
 	const Vecf3 gravitationalAcc = { 0.0f, -9.81f, 0.0f };
 };

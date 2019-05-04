@@ -288,6 +288,12 @@
     <ClInclude Include="EnemyOne.h">
       <Filter>Header Files\Entity\Enemies</Filter>
     </ClInclude>
+    <ClInclude Include="TurretTwo.h">
+      <Filter>Header Files\Entity\Turrets</Filter>
+    </ClInclude>
+    <ClInclude Include="TurretThree.h">
+      <Filter>Header Files\Entity\Turrets</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DXErr.cpp">

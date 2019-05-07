@@ -1,12 +1,14 @@
 #pragma once
 
 #include "Entity.h"
+#include "Physics.h"
+#include "ProjectileCatalogue.h"
 
 #include <vector>
 
 struct ProjectileData {
 	const int projectileType;
-	Vecf3 targetLocationInWorld;
+	Vecf3 velocity;
 };
 
 class TurretParent : public Entity {
@@ -31,8 +33,12 @@ public:
 		ProjectileThree
 	};
 	virtual void SpawnProjectile(const ProjectileType& type) {
-		struct ProjectileData data = { static_cast<int>(type), targetLocation };
-		ProjectileData.push_back(data);
+		Vecf3 velocityHolder;
+		if (CalculateVelocity(velocityHolder, type)) {
+			struct ProjectileData data = { static_cast<int>(type), velocityHolder };
+			ProjectileData.push_back(data);
+		}
+		
 	}
 	virtual void FireAtRate(const ProjectileType& type) {
 		if (clock < timePerProjectile) {
@@ -43,9 +49,37 @@ public:
 			clock = 0.0f;
 		}
 	}
+	virtual bool CalculateAngleOfProjection(float& theta, const ProjectileType& type, const float& projectileSpeed) {
+		if (Physics::GetProjectionAngleElevated(spawnLocationOffset, targetLocation, projectileSpeed, theta, ProjectileCatalogue::GetType(static_cast<int>(type)))) {
+			return true;
+		}
+		return false;
+	}
+	virtual bool CalculateVelocity(Vecf3& velocityHolder, const ProjectileType& type) {
+		float theta;
+		float projectileSpeed = ProjectileCatalogue::GetSpeed(static_cast<int>(type));
+		if (CalculateAngleOfProjection(theta, type, projectileSpeed)) {
+			float speedX;
+			float speedZ;
+			float diagonalDistance;
+			float xDisplacement = targetLocation.x - spawnLocationOffset.x;
+			float diagonalSpeed = projectileSpeed * cos(theta);
+			if (xDisplacement != 0) {
+				diagonalDistance = sqrt(sq(targetLocation.x - spawnLocationOffset.x) + sq(targetLocation.z - spawnLocationOffset.z));
+				speedX = ((targetLocation.x - spawnLocationOffset.x) * (diagonalSpeed)) / diagonalDistance;
+				speedZ = ((targetLocation.z - spawnLocationOffset.z) * (diagonalSpeed)) / diagonalDistance;
+			}
+			else {
+				speedX = 0.0f;
+				speedZ = diagonalSpeed;
+			}
+
+			velocityHolder = { speedX, projectileSpeed * sin(theta), speedZ };
+			return true;
+		}
+		return false;
+	}
 public:
-	std::vector<int> ProjectileHolder;
-	std::vector<Vecf3> VelocityHolder;
 	std::vector<ProjectileData> ProjectileData;
 	int rateOfFire;
 	float clock = 0.0f;

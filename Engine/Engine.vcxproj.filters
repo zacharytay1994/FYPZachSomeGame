@@ -294,6 +294,9 @@
     <ClInclude Include="TurretThree.h">
       <Filter>Header Files\Entity\Turrets</Filter>
     </ClInclude>
+    <ClInclude Include="ProjectileCatalogue.h">
+      <Filter>Header Files\Entity\Projectile</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DXErr.cpp">

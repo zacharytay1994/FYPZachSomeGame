@@ -4,10 +4,10 @@
 
 class ProjectileThree : public ProjectileParent {
 public:
-	ProjectileThree(const Vecf3& loc, const Vecf3& targetLocation)
+	ProjectileThree(const Vecf3& loc, const Vecf3& velocity)
 		:
 		// (projectileSize, projectileLocation, targetLocation, projectileSpeed, projectionType)
-		ProjectileParent(0.2f, loc, targetLocation, 8.0f, ProjectionType::low)
+		ProjectileParent(1.0f, loc, velocity)
 	{}
 	virtual void ChildUpdates(Keyboard&kbd, Mouse& mouse, float dt) override {}
 	virtual void Draw() override {}

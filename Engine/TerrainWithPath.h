@@ -23,6 +23,7 @@ public:
 	{
 		groundPipeline->effect.pixelShader.BindTexture(groundtexture);
 		SyncTerrainWithHeightmap();
+		surfaceNormalList = CalculateSurfaceNormalMap();
 	}
 	// updates pathfinding grid with height buffer generated from a height map from terrain
 	void SyncTerrainWithHeightmap() {
@@ -64,6 +65,33 @@ public:
 	std::shared_ptr<HeightMap>& GetHeightMap() {
 		return terrain.GetHeightMap();
 	}
+
+	std::vector<Vecf3> CalculateSurfaceNormalMap() {
+		std::vector<Vecf3> surfaceNormalHolder;
+		std::vector<size_t>::iterator end = terrain.terrainList.indices.end();
+		for (std::vector<size_t>::iterator start = terrain.terrainList.indices.begin(); start != end; std::advance(start, 6)) {
+			// calculating and emplacing back surfacenormal of left most triangle in square
+			/*size_t one = *(start);
+			size_t two = *(start + 1);
+			size_t three = *(start + 2);
+			size_t ione = terrain.terrainList.indices[*start];
+			size_t itwo = terrain.terrainList.indices[*(start + 1)];
+			size_t ithree = terrain.terrainList.indices[*(start + 2)];
+			Vecf3 vone = terrain.terrainList.vertices[*start].pos;
+			Vecf3 vtwo = terrain.terrainList.vertices[*(start + 1)].pos;
+			Vecf3 vthree = terrain.terrainList.vertices[*(start + 2)].pos;
+			Vecf3 val1 = (terrain.terrainList.vertices[*(start + 1)].pos - terrain.terrainList.vertices[*(start)].pos);
+			Vecf3 val2 = (terrain.terrainList.vertices[*(start + 2)].pos - terrain.terrainList.vertices[*(start)].pos);
+			Vecf3 normal = val1 % val2;
+			surfaceNormalHolder.push_back((normal.GetNormalized()));*/
+			surfaceNormalHolder.push_back(((terrain.terrainList.vertices[*(start + 1)].pos - terrain.terrainList.vertices[*(start)].pos) %
+				(terrain.terrainList.vertices[*(start + 2)].pos - terrain.terrainList.vertices[*(start)].pos)).GetNormalized());
+			// calculating and emplacing back surfacenormal of right most triangle in square
+			surfaceNormalHolder.push_back(((terrain.terrainList.vertices[*(start + 4)].pos - terrain.terrainList.vertices[*(start + 3)].pos) %
+				(terrain.terrainList.vertices[*(start + 5)].pos - terrain.terrainList.vertices[*(start + 3)].pos)).GetNormalized());
+		}
+		return surfaceNormalHolder;
+	}
 public:
 	const int gridSize;
 private:
@@ -71,5 +99,6 @@ private:
 	Terrain terrain;
 	// rendering stuffs
 	std::unique_ptr<Pipeline<SurfaceDirectionalLighting>> groundPipeline;
+	std::vector<Vecf3> surfaceNormalList;
 	const float worldSize;
 };

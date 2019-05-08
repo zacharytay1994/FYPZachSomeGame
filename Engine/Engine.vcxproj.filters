@@ -297,6 +297,9 @@
     <ClInclude Include="ProjectileCatalogue.h">
       <Filter>Header Files\Entity\Projectile</Filter>
     </ClInclude>
+    <ClInclude Include="Collision.h">
+      <Filter>Header Files\Physics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DXErr.cpp">

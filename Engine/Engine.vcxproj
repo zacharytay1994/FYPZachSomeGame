@@ -141,6 +141,7 @@
     <ClInclude Include="Board.h" />
     <ClInclude Include="ChiliException.h" />
     <ClInclude Include="ChiliWin.h" />
+    <ClInclude Include="Collision.h" />
     <ClInclude Include="ColorEffect.h" />
     <ClInclude Include="Colors.h" />
     <ClInclude Include="COMInitializer.h" />

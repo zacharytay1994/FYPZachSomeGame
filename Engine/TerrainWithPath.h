@@ -83,17 +83,14 @@ public:
 		return surfaceNormalHolder;
 	}
 
-	bool QueryQuadCollision(const Vecf3& locationIn, float& heightRef) {
-		int gridX = int(std::trunc((worldSize / 2 + locationIn.x) / unitsPerCell));
-		int gridZ = gridSize - int(std::trunc((worldSize / 2 + locationIn.z) / unitsPerCell));
-		/*ss.clear();
-		ss << gridX << ',' << gridZ << std::endl;
-		OutputDebugString(ss.str().c_str());*/
-		/*ss.clear();
-		ss << terrain.terrainList.vertices[gridZ * (gridSize + 1) + gridX].pos.y << std::endl;
-		OutputDebugString(ss.str().c_str());*/
-		if (locationIn.y < terrain.terrainList.vertices[gridZ * (gridSize + 1) + gridX].pos.y) {
-			heightRef = terrain.terrainList.vertices[gridZ * (gridSize + 1) + gridX].pos.y;
+	bool QueryQuadCollisionEstimate(const Vecf3& locationIn, ProjectileParent* projectile) {
+		// get rounded cell location
+		int gridX = std::clamp(int(std::trunc((worldSize / 2 + locationIn.x) / unitsPerCell)), 0, 99);
+		int gridZ = std::clamp(gridSize - int(std::trunc((worldSize / 2 + locationIn.z) / unitsPerCell)), 0, 99);
+		float terrainHeight = terrain.terrainList.vertices[gridZ * (gridSize + 1) + gridX].pos.y;
+		if (locationIn.y < terrainHeight) {
+			projectile->SetSpawnLocationOffsetY(terrainHeight);
+			projectile->ApplyExternalForce(surfaceNormalList[gridZ * gridSize + gridX]);
 			return true;
 		}
 		return false;

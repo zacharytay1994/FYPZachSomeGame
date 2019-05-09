@@ -66,14 +66,7 @@ public:
 				(*x)->Update(kbd, mouse, dt);
 			}*/
 			(*x)->Update(kbd, mouse, dt);
-			float tempHeightHolder;
-			if (terrainWithPath->QueryQuadCollision((*x)->GetSpawnLocationOffset(), tempHeightHolder) && !((*x)->stop)) {
-				(*x)->SetSpawnLocationOffsetY(tempHeightHolder);
-				(*x)->stop = true;
-				/*ss.clear();
-				ss << tempHeightHolder << std::endl;
-				OutputDebugString(ss.str().c_str());*/
-			}
+			terrainWithPath->QueryQuadCollisionEstimate((*x)->GetSpawnLocationOffset(), (*x).get());
 		}
 		// update enemy entities buffer
 		std::vector<std::unique_ptr<EnemyParent>>::iterator eEnd = enemyBuffer.end();

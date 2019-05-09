@@ -9,6 +9,8 @@
 #include "Vec3.h"
 
 #include <string>
+#include <cmath>
+#include <sstream>
 
 // mainly just a wrapper to wrap both Terrain.h and Pathfinding.h neatly together
 class TerrainWithPath {
@@ -19,7 +21,8 @@ public:
 		terrain(heightmap, worldSize, gridSize, minHeight, maxHeight),
 		groundPipeline(std::make_unique<Pipeline<SurfaceDirectionalLighting>>(gfx, zBuffer)),
 		worldSize(worldSize),
-		gridSize(gridSize)
+		gridSize(gridSize),
+		unitsPerCell(worldSize/gridSize)
 	{
 		groundPipeline->effect.pixelShader.BindTexture(groundtexture);
 		SyncTerrainWithHeightmap();
@@ -71,19 +74,6 @@ public:
 		std::vector<size_t>::iterator end = terrain.terrainList.indices.end();
 		for (std::vector<size_t>::iterator start = terrain.terrainList.indices.begin(); start != end; std::advance(start, 6)) {
 			// calculating and emplacing back surfacenormal of left most triangle in square
-			/*size_t one = *(start);
-			size_t two = *(start + 1);
-			size_t three = *(start + 2);
-			size_t ione = terrain.terrainList.indices[*start];
-			size_t itwo = terrain.terrainList.indices[*(start + 1)];
-			size_t ithree = terrain.terrainList.indices[*(start + 2)];
-			Vecf3 vone = terrain.terrainList.vertices[*start].pos;
-			Vecf3 vtwo = terrain.terrainList.vertices[*(start + 1)].pos;
-			Vecf3 vthree = terrain.terrainList.vertices[*(start + 2)].pos;
-			Vecf3 val1 = (terrain.terrainList.vertices[*(start + 1)].pos - terrain.terrainList.vertices[*(start)].pos);
-			Vecf3 val2 = (terrain.terrainList.vertices[*(start + 2)].pos - terrain.terrainList.vertices[*(start)].pos);
-			Vecf3 normal = val1 % val2;
-			surfaceNormalHolder.push_back((normal.GetNormalized()));*/
 			surfaceNormalHolder.push_back(((terrain.terrainList.vertices[*(start + 1)].pos - terrain.terrainList.vertices[*(start)].pos) %
 				(terrain.terrainList.vertices[*(start + 2)].pos - terrain.terrainList.vertices[*(start)].pos)).GetNormalized());
 			// calculating and emplacing back surfacenormal of right most triangle in square
@@ -91,6 +81,22 @@ public:
 				(terrain.terrainList.vertices[*(start + 5)].pos - terrain.terrainList.vertices[*(start + 3)].pos)).GetNormalized());
 		}
 		return surfaceNormalHolder;
+	}
+
+	bool QueryQuadCollision(const Vecf3& locationIn, float& heightRef) {
+		int gridX = int(std::trunc((worldSize / 2 + locationIn.x) / unitsPerCell));
+		int gridZ = gridSize - int(std::trunc((worldSize / 2 + locationIn.z) / unitsPerCell));
+		/*ss.clear();
+		ss << gridX << ',' << gridZ << std::endl;
+		OutputDebugString(ss.str().c_str());*/
+		/*ss.clear();
+		ss << terrain.terrainList.vertices[gridZ * (gridSize + 1) + gridX].pos.y << std::endl;
+		OutputDebugString(ss.str().c_str());*/
+		if (locationIn.y < terrain.terrainList.vertices[gridZ * (gridSize + 1) + gridX].pos.y) {
+			heightRef = terrain.terrainList.vertices[gridZ * (gridSize + 1) + gridX].pos.y;
+			return true;
+		}
+		return false;
 	}
 public:
 	const int gridSize;
@@ -101,4 +107,6 @@ private:
 	std::unique_ptr<Pipeline<SurfaceDirectionalLighting>> groundPipeline;
 	std::vector<Vecf3> surfaceNormalList;
 	const float worldSize;
+	const float unitsPerCell;
+	std::wstringstream ss;
 };

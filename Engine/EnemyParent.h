@@ -3,13 +3,16 @@
 #include "Entity.h"
 
 #include <assert.h>
+#include <sstream>
+#include <string>
 
 class EnemyParent : public Entity {
 public:
 	EnemyParent(const float& size, const Vecf3& loc) 
 		:
 		Entity(size, loc)
-	{}
+	{
+	}
 	virtual void Update(Keyboard&kbd, Mouse& mouse, float dt) 
 	{
 		if (!needPath) {
@@ -61,7 +64,7 @@ public:
 	void SetPathSpeed() {}
 public:
 	bool needPath = true;
-	Vecf3 targetDestination = {-9.8f, 0.1f, -8.0f};
+	Vecf3 targetDestination = {-8.0f, 0.1f, -8.0f};
 private:
 	std::vector<Vecf3> currentPath;
 	int pathSize = (int)currentPath.size();
@@ -72,4 +75,6 @@ private:
 	Vecf3 nextPoint;
 	Vecf3 velBetweenPoints;
 	int pathStep;
+
+	std::wstringstream ss;
 };

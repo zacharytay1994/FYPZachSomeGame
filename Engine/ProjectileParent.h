@@ -11,11 +11,12 @@ public:
 		velocity(velocity)
 	{}
 	virtual void Update(Keyboard&kbd, Mouse& mouse, float dt) {
-		// Update location with velocity
-		spawnLocationOffset += velocity * dt;
-		// change velocity due to gravitational acceleration
-		velocity += gravitationalAcc * dt;
-
+		if (!stop) {
+			// Update location with velocity
+			spawnLocationOffset += velocity * dt;
+			// change velocity due to gravitational acceleration
+			velocity += gravitationalAcc * dt;
+		}
 		// extra updates specified by the child
 		ChildUpdates(kbd, mouse, dt);
 	}
@@ -23,6 +24,7 @@ public:
 	virtual void Draw() = 0;
 public:
 	bool toDestroy = false;
+	bool stop = false;
 protected:
 	Vecf3 velocity;
 	const Vecf3 gravitationalAcc = { 0.0f, -9.81f, 0.0f };

@@ -10,6 +10,7 @@
 #include "Keyboard.h"
 #include "Mouse.h"
 
+#include <cmath>
 
 class Entity {
 public:
@@ -65,6 +66,15 @@ public:
 	virtual Vecf3 GetSpawnLocationOffset() {
 		return spawnLocationOffset;
 	}
+	virtual void SetSpawnLocationOffsetY(const float& posIn) {
+		spawnLocationOffset.y = posIn;
+	}
+	virtual void SetSpawnLocationOffset(const Vecf3& posIn) {
+		spawnLocationOffset = posIn;
+	}
+	virtual float GetSize() {
+		return size;
+	}
 	virtual void CalculateBoundaries() {
 		leftBound = spawnLocationOffset.x - size / 2;
 		rightBound = spawnLocationOffset.x + size / 2;
@@ -99,6 +109,7 @@ protected:
 	float bottomBound = 0.0f;
 	// world coordinates
 	Vecf3 spawnLocationOffset;
+	Veci2 gridCellLocation;
 	// movement vector
 	Vecf3 velocity = { 0.0f, 0.0f, 0.0f };
 	// triangleList

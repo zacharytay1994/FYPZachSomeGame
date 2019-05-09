@@ -66,6 +66,14 @@ public:
 				(*x)->Update(kbd, mouse, dt);
 			}*/
 			(*x)->Update(kbd, mouse, dt);
+			float tempHeightHolder;
+			if (terrainWithPath->QueryQuadCollision((*x)->GetSpawnLocationOffset(), tempHeightHolder) && !((*x)->stop)) {
+				(*x)->SetSpawnLocationOffsetY(tempHeightHolder);
+				(*x)->stop = true;
+				/*ss.clear();
+				ss << tempHeightHolder << std::endl;
+				OutputDebugString(ss.str().c_str());*/
+			}
 		}
 		// update enemy entities buffer
 		std::vector<std::unique_ptr<EnemyParent>>::iterator eEnd = enemyBuffer.end();
@@ -75,6 +83,11 @@ public:
 			if ((*x)->needPath) {
 				QueryPathfinder((*x));
 			}
+			/*float tempHeightHolder;
+			terrainWithPath->QueryQuadCollision((*x)->GetSpawnLocationOffset(), tempHeightHolder);*/
+			/*ss.clear();
+			ss << (*x)->GetSpawnLocationOffset().y << std::endl;
+			OutputDebugString(ss.str().c_str());*/
 		}
 		// entity handler functions
 		GetProjectilesFromTurrets();
@@ -102,14 +115,14 @@ public:
 			entityPipeline->Draw((*x)->GetCubeList());
 		}
 		// loop through and render projectile buffer
-		int counttest = 0;
+		//int counttest = 0;
 		std::vector<std::unique_ptr<ProjectileParent>>::iterator pEnd = projectileBuffer.end();
 		for (std::vector<std::unique_ptr<ProjectileParent>>::iterator x = projectileBuffer.begin(); x != pEnd; std::advance(x, 1)) {
 			translateVector = (*x)->GetSpawnLocationOffset();
 			worldTransform = Matf4::RotationZ(0.0f) * Matf4::RotationX(0.0f) * Matf4::RotationY(0.0f) * Matf4::Translation(translateVector);
 			entityPipeline->effect.vertexShader.BindWorld(worldTransform);
 			entityPipeline->Draw((*x)->GetCubeList());
-			counttest++;
+			//counttest++;
 		}
 		// loop through and render enemy entities
 		std::vector<std::unique_ptr<EnemyParent>>::iterator eEnd = enemyBuffer.end();
@@ -128,7 +141,7 @@ public:
 			entityPipeline->effect.vertexShader.BindWorld(worldTransform);
 			entityPipeline->Draw((*x)->GetCubeList());
 		}
-		ss << counttest << std::endl;
+		//ss << counttest << std::endl;
 		//OutputDebugString(ss.str().c_str());
 	}
 	void SetHeightMap(std::shared_ptr<HeightMap>& heightmapIn) {

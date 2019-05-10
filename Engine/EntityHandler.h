@@ -177,7 +177,7 @@ public:
 		for (int i = 0; i < amount; i++) {
 			gridLocation = { (int)(gridDistribution(rng)), (int)(gridDistribution(rng)) };
 			rateOfFire = (int)(rateOfFireDistribution(rng));
-			height = heightmap->heightDisplacementGrid[gridLocation.y*heightmap->width + gridLocation.x];
+			height = heightmap->heightDisplacementGrid[gridLocation.y*heightmap->width + gridLocation.x] + 0.1f;
 			switch (typeOfTurrets(rng)) {
 				case 0:
 					turretBuffer.emplace_back(std::make_unique<TurretOne>(0.5f, gridLocation, height, worldSize, gridSize, rateOfFire));

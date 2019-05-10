@@ -22,22 +22,22 @@ public:
 	// size of the world in world space coordinates (worldSize by worldSize large)
 	const float worldSize = 20.0f;
 	// size of the world in terms of a grid (gridSize by gridSize large)
-	const int gridSize = 100;
+	const int gridSize = 200;
 	// hence, worldSize/gridSize = density of vertices in world space
 public:
 	DebugWorld(Graphics& gfx)
 		:
 		Scene("Debug world"),
 		sceneZBuffer(std::make_shared<ZBuffer>(gfx.ScreenWidth, gfx.ScreenHeight)),
-		terrainWithPath(std::make_shared<TerrainWithPath>(gfx, sceneZBuffer, "coastalheightmap.bmp", "whiteimage.bmp", worldSize, gridSize, 0.0f, 8.0f)), // TerrainWithPath(graphics, zbuffer, heightmap, surface texture, world size, grid size, min world height, max world height)
+		terrainWithPath(std::make_shared<TerrainWithPath>(gfx, sceneZBuffer, "heightmap2.bmp", "whiteimage.bmp", worldSize, gridSize, 0.0f, 8.0f)), // TerrainWithPath(graphics, zbuffer, heightmap, surface texture, world size, grid size, min world height, max world height)
 		entityHandler(gfx, sceneZBuffer, worldSize, gridSize, terrainWithPath)
 	{
 		//entityHandler.AddSolid(1.0f, { 55, 0, 45 });
 		// let entityHandler know about the heightmap to implicitly place some entities
 		entityHandler.SetHeightMap(terrainWithPath->GetHeightMap());
 		entityHandler.AddEnemy(1.0f, { 8.0f, 0.1f, 8.0f });
-		entityHandler.PopulateRandomTurrets(20);
-		entityHandler.AddTurret(0.5f, { 25, 25 });
+		entityHandler.PopulateRandomTurrets(15);
+		//entityHandler.AddTurret(0.5f, { 5, 5 });
 		// make known to world terrain of solid obstacle entities
 		terrainWithPath->SyncWithWorldEntities(entityHandler.solidBuffer);
 	}

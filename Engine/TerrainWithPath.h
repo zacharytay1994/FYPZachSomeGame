@@ -85,12 +85,46 @@ public:
 
 	bool QueryQuadCollisionEstimate(const Vecf3& locationIn, ProjectileParent* projectile) {
 		// get rounded cell location
-		int gridX = std::clamp(int(std::trunc((worldSize / 2 + locationIn.x) / unitsPerCell)), 0, 99);
-		int gridZ = std::clamp(gridSize - int(std::trunc((worldSize / 2 + locationIn.z) / unitsPerCell)), 0, 99);
+		int gridX = std::clamp(int(std::trunc((worldSize / 2 + locationIn.x) / unitsPerCell)), 0, gridSize - 1);
+		int gridZ = std::clamp(gridSize - int(std::trunc((worldSize / 2 + locationIn.z) / unitsPerCell)), 0, gridSize - 1);
 		float terrainHeight = terrain.terrainList.vertices[gridZ * (gridSize + 1) + gridX].pos.y;
+		// calculating which triangle in a square it is
+		float excessX = locationIn.x - gridX * unitsPerCell;
+		float excessY = locationIn.z - gridZ * unitsPerCell;
+		float sideDeterminant = excessX + excessY;
+		//Vecf3 v1;
+		//Vecf3 v2;
+		//Vecf3 v3;
+		//// calculating interpolated height
+		//if (sideDeterminant < unitsPerCell) {
+		//	// top left vertex position
+		//	v1 = terrain.terrainList.vertices[gridZ * (gridSize + 1) + gridX].pos;
+		//	// top right vertex position
+		//	v2 = terrain.terrainList.vertices[gridZ * (gridSize + 1) + gridX + 1].pos;
+		//	//float leftSideHeightDiff = 
+		//}
 		if (locationIn.y < terrainHeight) {
-			projectile->SetSpawnLocationOffsetY(terrainHeight);
-			projectile->ApplyExternalForce(surfaceNormalList[gridZ * gridSize + gridX]);
+			projectile->SetSpawnLocationOffsetY(terrainHeight + 0.1f);
+			// calculate external force
+			Vecf3 surfaceNormal;
+			// right triangle
+			if (sideDeterminant > unitsPerCell) {
+				surfaceNormal = surfaceNormalList[gridZ * (gridSize*2) + gridX * 2 + 1];
+			}
+			else {
+				surfaceNormal = surfaceNormalList[gridZ * (gridSize*2) + gridX * 2];
+			}
+			Vecf3 normalForce = surfaceNormal * (-projectile->GetVelocity() * surfaceNormal);
+			projectile->ApplyExternalForce(normalForce * 2);
+			// applying dampening and frictional force
+			Vecf3 frictionalForce = -((projectile->GetVelocity() + normalForce) * 0.1f);
+			if (abs(projectile->GetVelocity().x) > 0.1f && abs(projectile->GetVelocity().z) > 0.1f && abs(projectile->GetVelocity().y) > 0.1f) {
+				projectile->ApplyExternalForce(frictionalForce);
+				projectile->ApplyExternalForce(-projectile->GetVelocity() * 0.2f);
+			}
+			else {
+				projectile->stop = true;
+			}
 			return true;
 		}
 		return false;

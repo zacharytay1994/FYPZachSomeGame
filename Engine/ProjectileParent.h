@@ -25,6 +25,9 @@ public:
 	virtual void ApplyExternalForce(const Vecf3& force) {
 		velocity += force;
 	}
+	virtual Vecf3 GetVelocity() {
+		return velocity;
+	}
 public:
 	bool toDestroy = false;
 	bool stop = false;

@@ -20,7 +20,7 @@ public:
 			position.y < (rectCenter.y + height / 2) &&
 			position.y >(rectCenter.y - height / 2);
 	}
-private:
+public:
 	Vecf2 rectCenter;
 	float width;
 	float height;

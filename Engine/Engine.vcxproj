@@ -185,6 +185,7 @@
     <ClInclude Include="ProjectileParent.h" />
     <ClInclude Include="ProjectileThree.h" />
     <ClInclude Include="ProjectileTwo.h" />
+    <ClInclude Include="Quadtree.h" />
     <ClInclude Include="Rect.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="Scene.h" />

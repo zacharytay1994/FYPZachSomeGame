@@ -22,6 +22,7 @@
 #include "Graphics.h"
 #include "MatTemplate.h"
 #include "TerrainWithPath.h"
+#include "Quadtree.h"
 
 #include <vector>
 #include <memory>
@@ -39,7 +40,9 @@ public:
 		entityPipeline(std::make_shared<Pipeline<SurfaceDirectionalLighting>>(gfx, entityZBuffer)),
 		worldSize(worldSize),
 		gridSize(gridSize),
-		terrainWithPath(terrainWithPath)
+		terrainWithPath(terrainWithPath),
+		projectileQt(worldSize),
+		gfx(gfx)
 	{
 		entityPipeline->effect.pixelShader.BindTexture("greenimage.bmp");
 	}
@@ -57,6 +60,7 @@ public:
 			(*x)->targetLocation = QueryEnemyLocation(*(enemyBuffer.begin()));
 		}
 		// update projectile entities buffer
+		projectileQt.Reset();
 		std::vector<std::unique_ptr<ProjectileParent>>::iterator pEnd = projectileBuffer.end();
 		for (std::vector<std::unique_ptr<ProjectileParent>>::iterator x = projectileBuffer.begin(); x != pEnd; std::advance(x, 1)) {
 			/*if ((x != pEnd) && (*x)->toDestroy) {
@@ -67,6 +71,9 @@ public:
 			}*/
 			(*x)->Update(kbd, mouse, dt);
 			terrainWithPath->QueryQuadCollisionEstimate((*x)->GetSpawnLocationOffset(), (*x).get());
+
+			// add projectiles to Qt
+			projectileQt.InsertElement((*x).get());
 		}
 		// update enemy entities buffer
 		std::vector<std::unique_ptr<EnemyParent>>::iterator eEnd = enemyBuffer.end();
@@ -136,6 +143,9 @@ public:
 		}
 		//ss << counttest << std::endl;
 		//OutputDebugString(ss.str().c_str());
+	}
+	void DrawDebugDisplay() {
+		projectileQt.DrawNodeDebuggingDisplay(gfx.ScreenWidth/2, gfx);
 	}
 	void SetHeightMap(std::shared_ptr<HeightMap>& heightmapIn) {
 		heightmap = heightmapIn;
@@ -258,6 +268,9 @@ private:
 	const float worldSize;
 	const int gridSize;
 	std::shared_ptr<TerrainWithPath>& terrainWithPath;
+
+	Graphics& gfx;
+	Quadtree<ProjectileParent> projectileQt;
 
 	std::wstringstream ss;
 };

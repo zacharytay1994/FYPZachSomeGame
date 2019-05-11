@@ -61,6 +61,6 @@ void Game::ComposeFrame()
 
 	// draw top menu scene
 	if (!menuScenes.empty()) {
-		menuScenes.top()->Draw();
+		//menuScenes.top()->Draw();
 	}
 }

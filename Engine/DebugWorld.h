@@ -22,14 +22,14 @@ public:
 	// size of the world in world space coordinates (worldSize by worldSize large)
 	const float worldSize = 20.0f;
 	// size of the world in terms of a grid (gridSize by gridSize large)
-	const int gridSize = 200;
+	const int gridSize = 100;
 	// hence, worldSize/gridSize = density of vertices in world space
 public:
 	DebugWorld(Graphics& gfx)
 		:
 		Scene("Debug world"),
 		sceneZBuffer(std::make_shared<ZBuffer>(gfx.ScreenWidth, gfx.ScreenHeight)),
-		terrainWithPath(std::make_shared<TerrainWithPath>(gfx, sceneZBuffer, "heightmap2.bmp", "whiteimage.bmp", worldSize, gridSize, 0.0f, 8.0f)), // TerrainWithPath(graphics, zbuffer, heightmap, surface texture, world size, grid size, min world height, max world height)
+		terrainWithPath(std::make_shared<TerrainWithPath>(gfx, sceneZBuffer, "heightmap2.bmp", "whiteimage.bmp", worldSize, gridSize, 0.0f, 5.0f)), // TerrainWithPath(graphics, zbuffer, heightmap, surface texture, world size, grid size, min world height, max world height)
 		entityHandler(gfx, sceneZBuffer, worldSize, gridSize, terrainWithPath)
 	{
 		//entityHandler.AddSolid(1.0f, { 55, 0, 45 });
@@ -88,6 +88,7 @@ public:
 		entityHandler.Draw(viewMatrix, projectionMatrix);
 		// draws world terrain and path found TerrainWithPath::FindPath()
 		terrainWithPath->Draw(worldTransform, viewMatrix, projectionMatrix);
+		entityHandler.DrawDebugDisplay();
 		//terrainWithPath.DrawPath(viewMatrix, projectionMatrix);
 	}
 private:

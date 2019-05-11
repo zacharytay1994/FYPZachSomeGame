@@ -79,6 +79,9 @@
     <Filter Include="Header Files\Entity\Enemies">
       <UniqueIdentifier>{831f2777-22b8-4fe1-a7b2-441743d84b7d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Structures">
+      <UniqueIdentifier>{7419871f-3a2e-4e54-9800-452440857fe1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ChiliWin.h">
@@ -299,6 +302,9 @@
     </ClInclude>
     <ClInclude Include="Collision.h">
       <Filter>Header Files\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Quadtree.h">
+      <Filter>Header Files\Structures</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

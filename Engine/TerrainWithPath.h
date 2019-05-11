@@ -120,7 +120,7 @@ public:
 			Vecf3 frictionalForce = -((projectile->GetVelocity() + normalForce) * 0.1f);
 			if (abs(projectile->GetVelocity().x) > 0.1f && abs(projectile->GetVelocity().z) > 0.1f && abs(projectile->GetVelocity().y) > 0.1f) {
 				projectile->ApplyExternalForce(frictionalForce);
-				projectile->ApplyExternalForce(-projectile->GetVelocity() * 0.2f);
+				projectile->ApplyExternalForce(-projectile->GetVelocity() * 0.1f);
 			}
 			else {
 				projectile->stop = true;

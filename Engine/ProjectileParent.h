@@ -31,6 +31,7 @@ public:
 public:
 	bool toDestroy = false;
 	bool stop = false;
+	bool isColliding = false;
 protected:
 	Vecf3 velocity;
 	const Vecf3 gravitationalAcc = { 0.0f, -9.81f, 0.0f };

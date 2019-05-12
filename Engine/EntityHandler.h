@@ -73,6 +73,7 @@ public:
 			terrainWithPath->QueryQuadCollisionEstimate((*x)->GetSpawnLocationOffset(), (*x).get());
 
 			// add projectiles to Qt
+			(*x)->isColliding = false;
 			projectileQt.InsertElement((*x).get());
 		}
 		// update enemy entities buffer
@@ -91,6 +92,10 @@ public:
 		}
 		// entity handler functions
 		GetProjectilesFromTurrets();
+		if (enemyBuffer.size() > 0) {
+			projectileQt.QueryQt(Rect(Vecf2(enemyBuffer[0]->GetSpawnLocationOffset().x, enemyBuffer[0]->GetSpawnLocationOffset().z), 4.0f, 4.0f));
+			projectileQt.SetQueryRange(Rect(Vecf2(enemyBuffer[0]->GetSpawnLocationOffset().x, enemyBuffer[0]->GetSpawnLocationOffset().z), 4.0f, 4.0f));
+		}
 	}
 
 	void Draw(const Matf4& viewMatrix, const Matf4& projectionMatrix) {

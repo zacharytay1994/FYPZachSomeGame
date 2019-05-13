@@ -29,7 +29,7 @@ Game::Game( MainWindow& wnd )
 	gfx( wnd ),
 	fontList(std::make_shared<FontList>())
 {
-	scenes.push_back(std::make_unique<DebugWorld>(gfx));
+	scenes.push_back(std::make_unique<DebugWorld>(gfx, fontList));
 	curScene = scenes.begin();
 
 	// push in start menu

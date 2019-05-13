@@ -10,6 +10,7 @@
 #include "Pathfinding.h"
 #include "Terrain.h"
 #include "TerrainWithPath.h"
+#include "ConsoleBox.h"
 
 #include <string>
 #include <sstream>
@@ -25,12 +26,13 @@ public:
 	const int gridSize = 100;
 	// hence, worldSize/gridSize = density of vertices in world space
 public:
-	DebugWorld(Graphics& gfx)
+	DebugWorld(Graphics& gfx, const std::shared_ptr<FontList> fontList)
 		:
 		Scene("Debug world"),
 		sceneZBuffer(std::make_shared<ZBuffer>(gfx.ScreenWidth, gfx.ScreenHeight)),
-		terrainWithPath(std::make_shared<TerrainWithPath>(gfx, sceneZBuffer, "heightmap2.bmp", "whiteimage.bmp", worldSize, gridSize, 0.0f, 8.0f)), // TerrainWithPath(graphics, zbuffer, heightmap, surface texture, world size, grid size, min world height, max world height)
-		entityHandler(gfx, sceneZBuffer, worldSize, gridSize, terrainWithPath)
+		terrainWithPath(std::make_shared<TerrainWithPath>(gfx, sceneZBuffer, "blackimage.bmp", "whiteimage.bmp", worldSize, gridSize, 0.0f, 8.0f)), // TerrainWithPath(graphics, zbuffer, heightmap, surface texture, world size, grid size, min world height, max world height)
+		entityHandler(gfx, sceneZBuffer, worldSize, gridSize, terrainWithPath),
+		consoleBox(gfx, sceneZBuffer, fontList)
 	{
 		//entityHandler.AddSolid(1.0f, { 55, 0, 45 });
 		// let entityHandler know about the heightmap to implicitly place some entities
@@ -72,12 +74,13 @@ public:
 		// updating world terrain, shifting worldEndPos per frame FindPath(worldStartPos, worldEndPos)
 		testingval = (testingval >= (worldSize - 0.5f))?0.0f:testingval + 1.0f * dt;
 		//terrainWithPath.FindPath({ 0.0f, (worldSize/gridSize)/2.0f, (worldSize/2.0f - 0.2f) }, { -(worldSize/2.0f) + testingval, (worldSize / gridSize) / 2.0f, -(worldSize / 2.0f - 0.2f) });
+		consoleBox.ChildUpdates(kbd, mouse, dt);
 	}
 	virtual void Draw() override {
 		// clearing shared zbuffer between all pipelines per frame
 		sceneZBuffer->Clear();
 		// scene world and camera transformation matrices
-		const Matf4 projectionMatrix = Matf4::Projection(4.0f, 3.0f, 1.0f, 20.0f);
+		const Matf4 projectionMatrix = Matf4::Projection(4.0f, 3.0f, 1.0f, 50.0f);
 		camRotInverse = Matf4::Identity() * Matf4::RotationY(camY) * Matf4::RotationX(-0.8f);
 		const Matf4 viewMatrix = Matf4::Translation(-cameraPosition) * camRotInverse;
 		const Vecf3 translate = { 0.0f, 0.0f, 0.0f };
@@ -88,8 +91,9 @@ public:
 		entityHandler.Draw(viewMatrix, projectionMatrix);
 		// draws world terrain and path found TerrainWithPath::FindPath()
 		terrainWithPath->Draw(worldTransform, viewMatrix, projectionMatrix);
-		entityHandler.DrawDebugDisplay();
+		//entityHandler.DrawDebugDisplay();
 		//terrainWithPath.DrawPath(viewMatrix, projectionMatrix);
+		consoleBox.Draw(viewMatrix, projectionMatrix);
 	}
 private:
 	// shared zbuffer of scene
@@ -112,4 +116,7 @@ private:
 	// other testing variables
 	float testingval = 0.0f;
 	// world variables
+
+	// environment object
+	ConsoleBox consoleBox;
 };

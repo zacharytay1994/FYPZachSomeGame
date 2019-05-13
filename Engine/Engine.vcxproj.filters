@@ -82,6 +82,9 @@
     <Filter Include="Header Files\Structures">
       <UniqueIdentifier>{7419871f-3a2e-4e54-9800-452440857fe1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Skyboxes">
+      <UniqueIdentifier>{44eb5dbe-104e-4abe-aea5-a6095b6d1eb5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ChiliWin.h">
@@ -305,6 +308,12 @@
     </ClInclude>
     <ClInclude Include="Quadtree.h">
       <Filter>Header Files\Structures</Filter>
+    </ClInclude>
+    <ClInclude Include="ConsoleBox.h">
+      <Filter>Header Files\Skyboxes</Filter>
+    </ClInclude>
+    <ClInclude Include="SkyBox.h">
+      <Filter>Header Files\Skyboxes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

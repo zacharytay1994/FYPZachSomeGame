@@ -146,6 +146,7 @@
     <ClInclude Include="Colors.h" />
     <ClInclude Include="COMInitializer.h" />
     <ClInclude Include="Console.h" />
+    <ClInclude Include="ConsoleBox.h" />
     <ClInclude Include="ConsoleScene.h" />
     <ClInclude Include="Cube.h" />
     <ClInclude Include="DebuggingMenu.h" />
@@ -189,6 +190,7 @@
     <ClInclude Include="Rect.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="Scene.h" />
+    <ClInclude Include="SkyBox.h" />
     <ClInclude Include="Sound.h" />
     <ClInclude Include="SoundEffect.h" />
     <ClInclude Include="StartMenuScene.h" />

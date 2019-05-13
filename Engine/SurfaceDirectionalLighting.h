@@ -196,12 +196,16 @@ public:
 			directionalLight = directionalLightIn;
 		}
 
+		void BindAmbientLight(const float& ambientLightIn) {
+			ambientLight = ambientLightIn;
+		}
+
 		Vecf3 GetSurfaceNormal() {
 			return surfaceNormal;
 		}
 	private:
 		Vecf3 surfaceNormal;
-		Vecf3 directionalLight = { -0.5f, 0.5f, -0.5f };
+		Vecf3 directionalLight = { 0.0f, 0.9f, 0.0f };
 		float diffuseLight = 1.0f;
 		float ambientLight = 0.2f;
 	};

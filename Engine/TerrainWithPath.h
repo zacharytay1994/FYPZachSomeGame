@@ -52,11 +52,11 @@ public:
 	bool FindPath(const Vecf3& startPos, const Vecf3& endPos) {
 		return pathfinding.FindPath(startPos, endPos);
 	}
-
+	// converts path in node position to world coordinates
 	std::vector<Vecf3> GetPathInWorldCoordinates() {
 		return pathfinding.GetPointsOfPath();
 	}
-
+	// queries a path and if found, return the path as a container of world coordinates (waypoints)
 	bool FindAndReturnPath(const Vecf3& startPos, const Vecf3& endPos, std::vector<Vecf3>& pathInOut) {
 		if (FindPath(startPos, endPos)) {
 			pathInOut = GetPathInWorldCoordinates();
@@ -64,11 +64,12 @@ public:
 		}
 		return false;
 	}
-
+	// get the terrain heightmap
 	std::shared_ptr<HeightMap>& GetHeightMap() {
 		return terrain.GetHeightMap();
 	}
-
+	// calculate and returns a container of the surface normal of triangular quads that make up the surface
+	// returns a grid of size [y*gridSize*2 + x] because a grid cell composes of 2 triangles, hence doubling the horizontal size
 	std::vector<Vecf3> CalculateSurfaceNormalMap() {
 		std::vector<Vecf3> surfaceNormalHolder;
 		std::vector<size_t>::iterator end = terrain.terrainList.indices.end();
@@ -82,46 +83,44 @@ public:
 		}
 		return surfaceNormalHolder;
 	}
-
+	// queries a coordinate in world space to see if it falls below the surface, if so applies a rebounding force
+	// together with other relevant forces to simulate collision with the surface, if not returns false
 	bool QueryQuadCollisionEstimate(const Vecf3& locationIn, ProjectileParent* projectile) {
 		// get rounded cell location
 		int gridX = std::clamp(int(std::trunc((worldSize / 2 + locationIn.x) / unitsPerCell)), 0, gridSize - 1);
 		int gridZ = std::clamp(gridSize - int(std::trunc((worldSize / 2 + locationIn.z) / unitsPerCell)), 0, gridSize - 1);
+		// gets the terrain height with rounded cell location, i.e. height of the closest estimated vertex
 		float terrainHeight = terrain.terrainList.vertices[gridZ * (gridSize + 1) + gridX].pos.y;
 		// calculating which triangle in a square it is
 		float excessX = locationIn.x - gridX * unitsPerCell;
 		float excessY = locationIn.z - gridZ * unitsPerCell;
+		// value used to determine if triangle falls on the right of left side of a square
 		float sideDeterminant = excessX + excessY;
-		//Vecf3 v1;
-		//Vecf3 v2;
-		//Vecf3 v3;
-		//// calculating interpolated height
-		//if (sideDeterminant < unitsPerCell) {
-		//	// top left vertex position
-		//	v1 = terrain.terrainList.vertices[gridZ * (gridSize + 1) + gridX].pos;
-		//	// top right vertex position
-		//	v2 = terrain.terrainList.vertices[gridZ * (gridSize + 1) + gridX + 1].pos;
-		//	//float leftSideHeightDiff = 
-		//}
 		if (locationIn.y < terrainHeight) {
 			projectile->SetSpawnLocationOffsetY(terrainHeight + 0.1f);
 			// calculate external force
 			Vecf3 surfaceNormal;
-			// right triangle
+			// right triangle in square
 			if (sideDeterminant > unitsPerCell) {
+				// get surface normal from surface normal list
 				surfaceNormal = surfaceNormalList[gridZ * (gridSize*2) + gridX * 2 + 1];
 			}
+			// left triangle in square
 			else {
 				surfaceNormal = surfaceNormalList[gridZ * (gridSize*2) + gridX * 2];
 			}
 			Vecf3 normalForce = surfaceNormal * (-projectile->GetVelocity() * surfaceNormal);
+			// applying the normal force, i.e. the normalalized surface perpendicular vector * perpendicular magnitude of incoming object
+			// multiplied by 2 to achieve an elastic rebound
 			projectile->ApplyExternalForce(normalForce * 2);
 			// applying dampening and frictional force
 			Vecf3 frictionalForce = -((projectile->GetVelocity() + normalForce) * 0.1f);
+			// if entity velocity is above a set threshold, apply force
 			if (abs(projectile->GetVelocity().x) > 0.1f && abs(projectile->GetVelocity().z) > 0.1f && abs(projectile->GetVelocity().y) > 0.1f) {
 				projectile->ApplyExternalForce(frictionalForce);
 				projectile->ApplyExternalForce(-projectile->GetVelocity() * 0.1f);
 			}
+			// else set its velocity to rest
 			else {
 				projectile->stop = true;
 			}
@@ -130,14 +129,23 @@ public:
 		return false;
 	}
 public:
+	// size of the grid, i.e. number of square tiles (2 triangular quads) making up the world
 	const int gridSize;
 private:
+	// object that executes the A* seach algorithm
 	Pathfinding pathfinding;
+	// object that holds the relevant details of the world terrain
 	Terrain terrain;
+	// list holding the calculate surface normals of individual quads that make up the terrain
+	std::vector<Vecf3> surfaceNormalList;
+	// the world size in terms of model space units
+	const float worldSize;
+	// the ratio of gridSize : worldSize
+	const float unitsPerCell;
+
 	// rendering stuffs
 	std::unique_ptr<Pipeline<SurfaceDirectionalLighting>> groundPipeline;
-	std::vector<Vecf3> surfaceNormalList;
-	const float worldSize;
-	const float unitsPerCell;
+
+	// string stream for debugging purposes
 	std::wstringstream ss;
 };

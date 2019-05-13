@@ -62,6 +62,15 @@ public:
 		PutPixel( x,y,{ unsigned char( r ),unsigned char( g ),unsigned char( b ) } );
 	}
 	void PutPixel( int x,int y,Color c );
+	void PutLargePixel(int x, int y, Color c, const int& size) {
+		int startingPosX = x - size / 2;
+		int startingPosY = y - size / 2;
+		for (int i = startingPosX; i < x+size/2; i++) {
+			for (int j = startingPosY; j < y+size/2; j++) {
+				PutPixel(i, j, c);
+			}
+		}
+	}
 	void DrawSprite(int x, int y, Surface surf);
 	void DrawLine(Vecf2 point1, Vecf2 point2, Color c) {
 		float m;

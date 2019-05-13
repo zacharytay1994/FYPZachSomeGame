@@ -70,10 +70,12 @@ public:
 				(*x)->Update(kbd, mouse, dt);
 			}*/
 			(*x)->Update(kbd, mouse, dt);
+			// check if projectile collides with the terrain surface
 			terrainWithPath->QueryQuadCollisionEstimate((*x)->GetSpawnLocationOffset(), (*x).get());
 
-			// add projectiles to Qt
+			// reset colliding flag of projectile
 			(*x)->isColliding = false;
+			// add projectile into the projectile quadtree
 			projectileQt.InsertElement((*x).get());
 		}
 		// update enemy entities buffer
@@ -84,16 +86,13 @@ public:
 			if ((*x)->needPath) {
 				QueryPathfinder((*x));
 			}
-			/*float tempHeightHolder;
-			terrainWithPath->QueryQuadCollision((*x)->GetSpawnLocationOffset(), tempHeightHolder);*/
-			/*ss.clear();
-			ss << (*x)->GetSpawnLocationOffset().y << std::endl;
-			OutputDebugString(ss.str().c_str());*/
 		}
 		// entity handler functions
 		GetProjectilesFromTurrets();
 		if (enemyBuffer.size() > 0) {
+			// queries the quadtree with temporary aabb of enemy entities
 			projectileQt.QueryQt(Rect(Vecf2(enemyBuffer[0]->GetSpawnLocationOffset().x, enemyBuffer[0]->GetSpawnLocationOffset().z), 4.0f, 4.0f));
+			// set query range variable of quadtree object for debugging purposes
 			projectileQt.SetQueryRange(Rect(Vecf2(enemyBuffer[0]->GetSpawnLocationOffset().x, enemyBuffer[0]->GetSpawnLocationOffset().z), 4.0f, 4.0f));
 		}
 	}
@@ -120,14 +119,12 @@ public:
 			entityPipeline->Draw((*x)->GetCubeList());
 		}
 		// loop through and render projectile buffer
-		//int counttest = 0;
 		std::vector<std::unique_ptr<ProjectileParent>>::iterator pEnd = projectileBuffer.end();
 		for (std::vector<std::unique_ptr<ProjectileParent>>::iterator x = projectileBuffer.begin(); x != pEnd; std::advance(x, 1)) {
 			translateVector = (*x)->GetSpawnLocationOffset();
 			worldTransform = Matf4::RotationZ(0.0f) * Matf4::RotationX(0.0f) * Matf4::RotationY(0.0f) * Matf4::Translation(translateVector);
 			entityPipeline->effect.vertexShader.BindWorld(worldTransform);
 			entityPipeline->Draw((*x)->GetCubeList());
-			//counttest++;
 		}
 		// loop through and render enemy entities
 		std::vector<std::unique_ptr<EnemyParent>>::iterator eEnd = enemyBuffer.end();
@@ -146,7 +143,6 @@ public:
 			entityPipeline->effect.vertexShader.BindWorld(worldTransform);
 			entityPipeline->Draw((*x)->GetCubeList());
 		}
-		//ss << counttest << std::endl;
 		//OutputDebugString(ss.str().c_str());
 	}
 	void DrawDebugDisplay() {
@@ -155,7 +151,7 @@ public:
 	void SetHeightMap(std::shared_ptr<HeightMap>& heightmapIn) {
 		heightmap = heightmapIn;
 	}
-	// add entity (size, location)
+	// functions to add entities into the world (size, location) { -----
 	void AddEntity(const float& size, const Veci2& loc) {
 		entityBuffer.emplace_back(std::make_unique<EntityOne>(size, loc, worldSize, gridSize));
 	}
@@ -209,6 +205,9 @@ public:
 			}
 		}
 	}
+	// ----- }
+
+	// gets projectiles stored in projectile buffers, waiting to be spawned, of turrets, and spawns it
 	void GetProjectilesFromTurrets() {
 		// loop through all turrets
 		std::vector<std::unique_ptr<TurretParent>>::iterator end = turretBuffer.end();
@@ -217,20 +216,26 @@ public:
 			projectileDataEnd = (*x)->ProjectileData.end();
 			for (std::vector<ProjectileData>::iterator start = (*x)->ProjectileData.begin(); start != projectileDataEnd; std::advance(start, 1)) {
 				switch ((*start).projectileType) {
+					// spawn projectile one
 				case 0:
 					projectileBuffer.emplace_back(std::make_unique<ProjectileOne>((*x)->GetSpawnLocationOffset(), (*start).velocity));
 					break;
+					// spawn projectile two
 				case 1:
 					projectileBuffer.emplace_back(std::make_unique<ProjectileTwo>((*x)->GetSpawnLocationOffset(), (*start).velocity));
 					break;
+					// spawn projectile three
 				case 2:
 					projectileBuffer.emplace_back(std::make_unique<ProjectileThree>((*x)->GetSpawnLocationOffset(), (*start).velocity));
 					break;
 				}
 			}
+			// clears projectile buffer held by the turret, i.e. turret has no more projectiles waiting to be spawned
 			(*x)->ProjectileData.clear();
 		}
 	}
+	// finds a path for an enemy entity to get from its current location to its target destination
+	// if path found, set its temporary needPath state to false, true if otherwise
 	void QueryPathfinder(std::unique_ptr<EnemyParent>& enemy) {
 		std::vector<Vecf3> holder;
 		if (terrainWithPath->FindAndReturnPath(enemy->GetSpawnLocationOffset(), enemy->targetDestination, holder)) {
@@ -238,9 +243,12 @@ public:
 			enemy->needPath = false;
 		}
 	}
+	// get the location in world coordinates of an enemy entity in the world
 	Vecf3 QueryEnemyLocation(std::unique_ptr<EnemyParent>& enemy) {
 		return enemy->GetSpawnLocationOffset();
 	}
+	// incomplete and unused at the moment,
+	// quick removal of elements from a vector container without requiring it to reallocate memory
 	void QuickRemoveProjectile(std::vector<std::unique_ptr<ProjectileParent>>& container, std::vector<std::unique_ptr<ProjectileParent>>::iterator& elementIterator,
 		std::vector<std::unique_ptr<ProjectileParent>>::iterator& updateEnd) {
 		std::vector<std::unique_ptr<ProjectileParent>>::iterator lastElement = container.end() - 1;
@@ -251,21 +259,20 @@ public:
 		updateEnd = container.end();
 	}
 public:
+	// buffer that holds all solid inanimate entities in the world
 	std::vector <std::unique_ptr<Entity>> solidBuffer;
 private:
+	// outdated buffer used to hold generic any entities in the world
 	std::vector<std::unique_ptr<Entity>> entityBuffer;
+	// buffer that holds all turrets in the world
 	std::vector<std::unique_ptr<TurretParent>> turretBuffer;
+	// buffer that holds all projectiles in the world
 	std::vector<std::unique_ptr<ProjectileParent>> projectileBuffer;
 	// enemy buffers
+	// buffer that holds all enemies in the world that are executing a path
 	std::vector<std::unique_ptr<EnemyParent>> enemyBuffer;
+	// buffer that holds all enemies in the world that are waiting for a path
 	std::vector<std::unique_ptr<EnemyParent>> enemiesAwaitingPath;
-	
-	Vecf3 translateVector;
-	Matf4 worldTransform;
-
-	// pipeline stuff 
-	std::shared_ptr<ZBuffer> entityZBuffer;
-	std::shared_ptr<Pipeline<SurfaceDirectionalLighting>> entityPipeline;
 	
 	// reference to height displacement map of the world
 	std::shared_ptr<HeightMap> heightmap;
@@ -273,9 +280,18 @@ private:
 	const float worldSize;
 	const int gridSize;
 	std::shared_ptr<TerrainWithPath>& terrainWithPath;
-
+	 
+	// graphics reference used for debugging overlay of quadtree
 	Graphics& gfx;
+	// quadtree data structure used to store projectiles for positional queries
 	Quadtree<ProjectileParent> projectileQt;
 
+	// rendering pipeline stuff 
+	std::shared_ptr<ZBuffer> entityZBuffer;
+	std::shared_ptr<Pipeline<SurfaceDirectionalLighting>> entityPipeline;
+	Vecf3 translateVector;
+	Matf4 worldTransform;
+
+	// string stream for debugging purposes
 	std::wstringstream ss;
 };

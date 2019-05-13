@@ -24,6 +24,7 @@ public:
 			position.y < upperBound &&
 			position.y > lowerBound;
 	}
+	// checks to see if rect is overlapping another rect
 	bool IsOverlapRect(const Rect& rectIn) {
 		return !(rightBound < rectIn.leftBound ||
 			leftBound > rectIn.rightBound ||
@@ -34,6 +35,7 @@ public:
 	Vecf2 rectCenter;
 	float width;
 	float height;
+	// aabb of rectangle
 	float leftBound = rectCenter.x - width / 2.0f;
 	float rightBound = rectCenter.x + width / 2.0f;
 	float upperBound = rectCenter.y + height / 2.0f;

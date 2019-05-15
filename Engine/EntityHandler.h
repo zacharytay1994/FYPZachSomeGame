@@ -23,6 +23,7 @@
 #include "MatTemplate.h"
 #include "TerrainWithPath.h"
 #include "Quadtree.h"
+#include "ConsoleBox.h"
 
 #include <vector>
 #include <memory>
@@ -34,7 +35,7 @@
 class EntityHandler {
 public:
 	EntityHandler(Graphics& gfx, std::shared_ptr<ZBuffer>& zbuffer, const float& worldSize, const int& gridSize,
-		std::shared_ptr<TerrainWithPath>& terrainWithPath) 
+		std::shared_ptr<TerrainWithPath>& terrainWithPath, std::shared_ptr<ConsoleBox>& consoleBox) 
 		:
 		entityZBuffer(zbuffer),
 		entityPipeline(std::make_shared<Pipeline<SurfaceDirectionalLighting>>(gfx, entityZBuffer)),
@@ -42,7 +43,8 @@ public:
 		gridSize(gridSize),
 		terrainWithPath(terrainWithPath),
 		projectileQt(worldSize),
-		gfx(gfx)
+		gfx(gfx),
+		consoleBox(consoleBox)
 	{
 		entityPipeline->effect.pixelShader.BindTexture("greenimage.bmp");
 	}
@@ -70,6 +72,7 @@ public:
 				(*x)->Update(kbd, mouse, dt);
 			}*/
 			(*x)->Update(kbd, mouse, dt);
+			ReadDebugQueue((*x)->debugQueue);
 			// check if projectile collides with the terrain surface
 			terrainWithPath->QueryQuadCollisionEstimate((*x)->GetSpawnLocationOffset(), (*x).get());
 
@@ -82,6 +85,8 @@ public:
 		std::vector<std::unique_ptr<EnemyParent>>::iterator eEnd = enemyBuffer.end();
 		for (std::vector<std::unique_ptr<EnemyParent>>::iterator x = enemyBuffer.begin(); x != eEnd; std::advance(x, 1)) {
 			(*x)->Update(kbd, mouse, dt);
+			ReadDebugQueue((*x)->debugQueue);
+			//ReadDebugQueue((*x)->debugQueue);
 			// check if enemy needs new path, find it a new path
 			if ((*x)->needPath) {
 				QueryPathfinder((*x));
@@ -95,6 +100,8 @@ public:
 			// set query range variable of quadtree object for debugging purposes
 			projectileQt.SetQueryRange(Rect(Vecf2(enemyBuffer[0]->GetSpawnLocationOffset().x, enemyBuffer[0]->GetSpawnLocationOffset().z), 4.0f, 4.0f));
 		}
+		// Write entity debug messages to console
+		WriteEDMToConsole();
 	}
 
 	void Draw(const Matf4& viewMatrix, const Matf4& projectionMatrix) {
@@ -258,6 +265,18 @@ public:
 		container.pop_back();
 		updateEnd = container.end();
 	}
+	void ReadDebugQueue(std::queue<Entity::DebugMessage>& debugQueue) {
+		while (debugQueue.size() != 0) {
+			debugMessagePQ.push(debugQueue.front());
+			debugQueue.pop();
+		}
+	}
+	void WriteEDMToConsole() {
+		while (debugMessagePQ.size() != 0) {
+			consoleBox->Write(debugMessagePQ.top().message + " /g@t:" + std::to_string((float)debugMessagePQ.top().timeElapsed / 1000.0f) + "s");
+			debugMessagePQ.pop();
+		}
+	}
 public:
 	// buffer that holds all solid inanimate entities in the world
 	std::vector <std::unique_ptr<Entity>> solidBuffer;
@@ -280,6 +299,10 @@ private:
 	const float worldSize;
 	const int gridSize;
 	std::shared_ptr<TerrainWithPath>& terrainWithPath;
+	// console box
+	std::shared_ptr<ConsoleBox>& consoleBox;
+	// reverse priority queue with smallest time elapsed at the top (typealloc, container, comparatoroperator)
+	std::priority_queue<Entity::DebugMessage, std::vector<Entity::DebugMessage>, Entity::DebugMessage> debugMessagePQ;
 	 
 	// graphics reference used for debugging overlay of quadtree
 	Graphics& gfx;

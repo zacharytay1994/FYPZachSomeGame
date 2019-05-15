@@ -31,13 +31,14 @@ public:
 		Scene("Debug world"),
 		sceneZBuffer(std::make_shared<ZBuffer>(gfx.ScreenWidth, gfx.ScreenHeight)),
 		terrainWithPath(std::make_shared<TerrainWithPath>(gfx, sceneZBuffer, "heightmap2.bmp", "parchmentpaper.bmp", worldSize, gridSize, 0.0f, 8.0f)), // TerrainWithPath(graphics, zbuffer, heightmap, surface texture, world size, grid size, min world height, max world height)
-		entityHandler(gfx, sceneZBuffer, worldSize, gridSize, terrainWithPath),
-		consoleBox(gfx, sceneZBuffer, fontList)
+		entityHandler(gfx, sceneZBuffer, worldSize, gridSize, terrainWithPath, consoleBox),
+		consoleBox(std::make_shared<ConsoleBox>(gfx, sceneZBuffer, fontList))
 	{
 		//entityHandler.AddSolid(1.0f, { 55, 0, 45 });
 		// let entityHandler know about the heightmap to implicitly place some entities
 		entityHandler.SetHeightMap(terrainWithPath->GetHeightMap());
 		entityHandler.AddEnemy(1.0f, { 8.0f, 0.1f, 8.0f });
+		entityHandler.AddEnemy(1.0f, { -8.0f, 0.1f, 8.0f });
 		entityHandler.PopulateRandomTurrets(15);
 		//entityHandler.AddTurret(0.5f, { 5, 5 });
 		// make known to world terrain of solid obstacle entities
@@ -74,7 +75,7 @@ public:
 		// updating world terrain, shifting worldEndPos per frame FindPath(worldStartPos, worldEndPos)
 		testingval = (testingval >= (worldSize - 0.5f))?0.0f:testingval + 1.0f * dt;
 		//terrainWithPath.FindPath({ 0.0f, (worldSize/gridSize)/2.0f, (worldSize/2.0f - 0.2f) }, { -(worldSize/2.0f) + testingval, (worldSize / gridSize) / 2.0f, -(worldSize / 2.0f - 0.2f) });
-		consoleBox.ChildUpdates(kbd, mouse, dt);
+		consoleBox->ChildUpdates(kbd, mouse, dt);
 	}
 	virtual void Draw() override {
 		// clearing shared zbuffer between all pipelines per frame
@@ -93,7 +94,7 @@ public:
 		terrainWithPath->Draw(worldTransform, viewMatrix, projectionMatrix);
 		//entityHandler.DrawDebugDisplay();
 		//terrainWithPath.DrawPath(viewMatrix, projectionMatrix);
-		consoleBox.Draw(viewMatrix, projectionMatrix);
+		consoleBox->Draw(viewMatrix, projectionMatrix);
 	}
 private:
 	// shared zbuffer of scene
@@ -118,5 +119,5 @@ private:
 	// world variables
 
 	// environment object
-	ConsoleBox consoleBox;
+	std::shared_ptr<ConsoleBox> consoleBox;
 };

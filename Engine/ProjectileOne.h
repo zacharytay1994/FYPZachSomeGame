@@ -8,7 +8,9 @@ public:
 		:
 		// (projectileSize, projectileLocation, targetLocation, projectileSpeed, projectionType)
 		ProjectileParent(0.1f, loc, velocity) 
-	{}
+	{
+		InsertDebugString("projectileone /y" + std::to_string(entityUniqueID) + " has been created.");
+	}
 	virtual void ChildUpdates(Keyboard&kbd, Mouse& mouse, float dt) override {}
 	virtual void Draw() override {}
 private:

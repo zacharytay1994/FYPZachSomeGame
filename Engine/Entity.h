@@ -9,11 +9,27 @@
 
 #include "Keyboard.h"
 #include "Mouse.h"
+#include "Clock.h"
 
 #include <cmath>
+#include <queue>
+#include <ctime>
 
 class Entity {
 public:
+	struct DebugMessage {
+		bool operator()(const DebugMessage& lhs, const DebugMessage& rhs) const {
+			return lhs > rhs;
+		}
+		bool operator>(const DebugMessage& rhs) const {
+			return timeElapsed > rhs.timeElapsed;
+		}
+		bool operator<(const DebugMessage& rhs) const {
+			return timeElapsed < rhs.timeElapsed;
+		}
+		std::string message;
+		double timeElapsed;
+	};
 	Entity(const float& size, const Vecf3& loc, const float& worldSize, const int& gridSize)
 		:
 		size(size),
@@ -22,7 +38,9 @@ public:
 		worldSize(worldSize),
 		gridSize(gridSize),
 		cubeList(TexCube::GetPlain<Pipeline<SurfaceDirectionalLighting>::Vertex>(size))
-	{}
+	{
+		SetUniqueID();
+	}
 	Entity(const float& size, const Veci2& loc, const float& worldSize, const int& gridSize)
 		:
 		Entity(size, { (float)loc.x, 0.0f, (float)loc.y }, worldSize, gridSize)
@@ -38,7 +56,9 @@ public:
 		size(size),
 		cubeList(TexCube::GetPlain<Pipeline<SurfaceDirectionalLighting>::Vertex>(size)),
 		spawnLocationOffset(loc)
-	{}
+	{
+		SetUniqueID();
+	}
 	virtual void Update(Keyboard&kbd, Mouse& mouse, float dt) = 0;
 	virtual void Draw() = 0;
 	virtual Veci2 Get2DLocation() {
@@ -91,6 +111,17 @@ public:
 		}
 		return false;
 	}
+	void SetUniqueID() {
+		entityUniqueID = nextValidID;
+		nextValidID++;
+	}
+	void InsertDebugString(const std::string& string) {
+		std::clock_t now = clock();
+		double timeElapsed = now - Clock::begin;
+		debugQueue.push({ string, timeElapsed });
+	}
+public:
+	std::queue<DebugMessage> debugQueue;
 protected:
 	// 2d location based on board range (x, z) (0-99, 0-99), y coordinate is always world coordinate not (0-99)
 	Veci2 locationOnBoard2D; 
@@ -114,4 +145,8 @@ protected:
 	Vecf3 velocity = { 0.0f, 0.0f, 0.0f };
 	// triangleList
 	IndexedTriangleList<Pipeline<SurfaceDirectionalLighting>::Vertex> cubeList;
+
+	// finite state machine variables
+	int entityUniqueID;
+	static int nextValidID;
 };

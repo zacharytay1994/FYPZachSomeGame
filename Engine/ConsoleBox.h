@@ -20,6 +20,11 @@ public:
 			console.Write("/renemy of id /r1 has changed state.");
 		}
 	}
+	void Write(const std::string& string) {
+		if (string.size() != 0) {
+			console.Write(string);
+		}
+	}
 private:
 	// font writing variables
 	Surface surface; // surface to alter

@@ -25,6 +25,7 @@ public:
 	virtual bool SetCurrentPath(const std::vector<Vecf3>& newPath) {
 		currentPath = newPath;
 		pathSize = (int)currentPath.size();
+		InsertDebugString("/renemy /y" + std::to_string(entityUniqueID) + " path /bfound.");
 		InitStartPath();
 		return true;
 	}
@@ -42,6 +43,7 @@ public:
 		nextPoint = currentPath[pathStep + 1];
 		spawnLocationOffset = currentPath[pathStep];
 		velBetweenPoints = ApproximatePoints(currentPoint, nextPoint);
+		InsertDebugString("/renemy /y" + std::to_string(entityUniqueID) + " path /binitialized.");
 	}
 	void ExecutePath(const int& stepCounterIn) {
 		if (stepCounterIn < stepCounterMax) {
@@ -55,9 +57,11 @@ public:
 			velBetweenPoints = ApproximatePoints(currentPoint, nextPoint);
 			spawnLocationOffset = currentPoint;
 			stepCounter = 0;
+			InsertDebugString("/renemy /y" + std::to_string(entityUniqueID) + " /bexecuting path step /y" + std::to_string(pathStep) + ".");
 		}
 		else {
 			std::reverse(currentPath.begin(), currentPath.end());
+			InsertDebugString("/renemy /y" + std::to_string(entityUniqueID) + " path /breversed.");
 			InitStartPath();
 		}
 	}
@@ -68,7 +72,7 @@ public:
 private:
 	std::vector<Vecf3> currentPath;
 	int pathSize = (int)currentPath.size();
-	float pathSpeed = 0.2f;
+	float pathSpeed = 0.05f;
 	int stepCounter;
 	int stepCounterMax = (int)(1 / pathSpeed);
 	Vecf3 currentPoint;

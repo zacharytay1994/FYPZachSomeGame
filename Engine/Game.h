@@ -27,10 +27,12 @@
 #include "StartMenuScene.h"
 #include "DebuggingMenu.h"
 #include "FontList.h"
+#include "Clock.h"
 
 #include <vector>
 #include <stack>
 #include <memory>
+#include <ctime>
 
 class Game
 {
@@ -57,4 +59,5 @@ private:
 	std::stack<std::unique_ptr<MenuSceneParent>> menuScenes;
 	// font list
 	std::shared_ptr<FontList> fontList;
+	Clock clock;
 };

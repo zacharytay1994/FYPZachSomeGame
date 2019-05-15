@@ -98,6 +98,9 @@ public:
 					case 98:
 						color = Colors::Blue;
 						break;
+					case 103:
+						color = Colors::Gray;
+						break;
 					}
 					readColor = false;
 					continue;

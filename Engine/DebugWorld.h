@@ -21,7 +21,7 @@
 class DebugWorld : public Scene {
 public:
 	// size of the world in world space coordinates (worldSize by worldSize large)
-	const float worldSize = 20.0f;
+	const float worldSize = 50.0f;
 	// size of the world in terms of a grid (gridSize by gridSize large)
 	const int gridSize = 100;
 	// hence, worldSize/gridSize = density of vertices in world space
@@ -30,7 +30,7 @@ public:
 		:
 		Scene("Debug world"),
 		sceneZBuffer(std::make_shared<ZBuffer>(gfx.ScreenWidth, gfx.ScreenHeight)),
-		terrainWithPath(std::make_shared<TerrainWithPath>(gfx, sceneZBuffer, "blackimage.bmp", "whiteimage.bmp", worldSize, gridSize, 0.0f, 8.0f)), // TerrainWithPath(graphics, zbuffer, heightmap, surface texture, world size, grid size, min world height, max world height)
+		terrainWithPath(std::make_shared<TerrainWithPath>(gfx, sceneZBuffer, "heightmap2.bmp", "parchmentpaper.bmp", worldSize, gridSize, 0.0f, 8.0f)), // TerrainWithPath(graphics, zbuffer, heightmap, surface texture, world size, grid size, min world height, max world height)
 		entityHandler(gfx, sceneZBuffer, worldSize, gridSize, terrainWithPath),
 		consoleBox(gfx, sceneZBuffer, fontList)
 	{
@@ -80,7 +80,7 @@ public:
 		// clearing shared zbuffer between all pipelines per frame
 		sceneZBuffer->Clear();
 		// scene world and camera transformation matrices
-		const Matf4 projectionMatrix = Matf4::Projection(4.0f, 3.0f, 1.0f, 50.0f);
+		const Matf4 projectionMatrix = Matf4::Projection(4.0f, 3.0f, 1.0f, 100.0f);
 		camRotInverse = Matf4::Identity() * Matf4::RotationY(camY) * Matf4::RotationX(-0.8f);
 		const Matf4 viewMatrix = Matf4::Translation(-cameraPosition) * camRotInverse;
 		const Vecf3 translate = { 0.0f, 0.0f, 0.0f };

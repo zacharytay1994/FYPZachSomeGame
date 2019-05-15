@@ -15,7 +15,7 @@ public:
 		skyBoxPipeline(std::make_shared<Pipeline<SurfaceDirectionalLighting>>(gfx, zBuffer)),
 		skyCubeList(TexCube::GetSkyCube<Pipeline<SurfaceDirectionalLighting>::Vertex>(40.0f))
 	{
-		skyBoxPipeline->effect.pixelShader.BindTexture("test.bmp");
+		skyBoxPipeline->effect.pixelShader.BindTexture("blackimage.bmp");
 		skyBoxPipeline->effect.geomShader.BindAmbientLight(1.0f);
 	}
 	virtual void ChildUpdates(Keyboard&kbd, Mouse& mouse, float dt) = 0 {}

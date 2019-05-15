@@ -297,6 +297,7 @@
     <Image Include="..\..\..\Memes\blackimage.bmp" />
     <Image Include="..\..\..\Memes\checkered.bmp" />
     <Image Include="..\..\..\Memes\coastalHeightmap.bmp" />
+    <Image Include="..\..\..\Memes\consoleimage.bmp" />
     <Image Include="..\..\..\Memes\debuggingMenu1.bmp" />
     <Image Include="..\..\..\Memes\debuggingMenu2.bmp" />
     <Image Include="..\..\..\Memes\entitytextureone.bmp" />
@@ -305,6 +306,7 @@
     <Image Include="..\..\..\Memes\fontsheet5.bmp" />
     <Image Include="..\..\..\Memes\fontsheet6.bmp" />
     <Image Include="..\..\..\Memes\fontsheet7.bmp" />
+    <Image Include="..\..\..\Memes\fontsheet8.bmp" />
     <Image Include="..\..\..\Memes\greenimage.bmp" />
     <Image Include="..\..\..\Memes\heightmap1.bmp" />
     <Image Include="..\..\..\Memes\heightmap2.bmp" />

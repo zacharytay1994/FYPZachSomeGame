@@ -116,6 +116,103 @@ public:
 			}
 		}
 	}
+	void PlaceFontColoured(Surface& surfaceToAlter, const char& c, int& rowCount, int& columnCount, Color color) const {
+		// defined params needed
+		const int xStart = rowCount * fontWidth + (paddingX * fontWidth);
+		const int yStart = columnCount * fontHeight + (paddingY * fontHeight);
+		const int xEnd = xStart + fontWidth;
+		const int yEnd = yStart + fontHeight;
+		int fontStartX;
+		int fontStartY;
+		// surface coords
+		int x;
+		int y;
+		// fontsheet coords
+		int i;
+		int j;
+
+		// ASCII conversion
+		const int cVal = (int)c;
+		// if c is a-z
+		if (cVal >= 97 && cVal <= 122) {
+			fontStartX = (cVal - 97) * fontWidth;
+			fontStartY = ((int)(cVal - 97) / 10) * fontHeight;
+
+			// loop in font pixels
+			for (x = xStart, i = fontStartX; x < xEnd; x++, i++) {
+				for (y = yStart, j = fontStartY; y < yEnd; y++, j++) {
+					Color check = fontSheet.GetPixel(i, j);
+					if ((Vecf3)check != Vecf3(255, 255, 255)) {
+						surfaceToAlter.PutPixel(x, y, color);
+					}
+				}
+			}
+			rowCount = ((rowCount + 1) % charPerRow);
+			if (rowCount == 0) {
+				columnCount++;
+			}
+		}
+		// if c is 0-9
+		else if (cVal >= 48 && cVal <= 57) {
+			const int yoffset = 3;
+			fontStartX = (cVal - 48) * fontWidth;
+			fontStartY = ((int)(cVal - 48) / 10) + yoffset * fontHeight;
+
+			// loop in font pixels
+			for (x = xStart, i = fontStartX; x < xEnd; x++, i++) {
+				for (y = yStart, j = fontStartY; y < yEnd; y++, j++) {
+					Color check = fontSheet.GetPixel(i, j);
+					if ((Vecf3)check != Vecf3(255, 255, 255)) {
+						surfaceToAlter.PutPixel(x, y, color);
+					}
+				}
+			}
+			rowCount = ((rowCount + 1) % charPerRow);
+			if (rowCount == 0) {
+				columnCount++;
+			}
+		}
+		// if c is range of punctuation 33-47
+		else if (cVal >= 33 && cVal <= 47) {
+			const int yoffset = 4;
+			fontStartX = (cVal - 33) * fontWidth;
+			fontStartY = (((int)(cVal - 33) / 10) + yoffset) * fontHeight;
+
+			// loop in font pixels
+			for (x = xStart, i = fontStartX; x < xEnd; x++, i++) {
+				for (y = yStart, j = fontStartY; y < yEnd; y++, j++) {
+					Color check = fontSheet.GetPixel(i, j);
+					if ((Vecf3)check != Vecf3(255, 255, 255)) {
+						surfaceToAlter.PutPixel(x, y, color);
+					}
+				}
+			}
+			rowCount = ((rowCount + 1) % charPerRow);
+			if (rowCount == 0) {
+				columnCount++;
+			}
+		}
+		// if c is range of punctuation 33-47
+		else if (cVal >= 58 && cVal <= 64) {
+			const int yoffset = 6;
+			fontStartX = (cVal - 58) * fontWidth;
+			fontStartY = (((int)(cVal - 58) / 10) + yoffset) * fontHeight;
+
+			// loop in font pixels
+			for (x = xStart, i = fontStartX; x < xEnd; x++, i++) {
+				for (y = yStart, j = fontStartY; y < yEnd; y++, j++) {
+					Color check = fontSheet.GetPixel(i, j);
+					if ((Vecf3)check != Vecf3(255, 255, 255)) {
+						surfaceToAlter.PutPixel(x, y, color);
+					}
+				}
+			}
+			rowCount = ((rowCount + 1) % charPerRow);
+			if (rowCount == 0) {
+				columnCount++;
+			}
+		}
+	}
 public:
 	const int fontWidth;
 	const int fontHeight;

@@ -34,8 +34,5 @@ public:
 			velocity.z *= -1;
 		}
 	}
-	virtual void Draw() override {
-
-	}
 private:
 };

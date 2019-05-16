@@ -10,6 +10,5 @@ public:
 		ProjectileParent(0.2f, loc, velocity)
 	{}
 	virtual void ChildUpdates(Keyboard&kbd, Mouse& mouse, float dt) override {}
-	virtual void Draw() override {}
 private:
 };

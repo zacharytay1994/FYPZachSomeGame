@@ -46,7 +46,8 @@ public:
 		gfx(gfx),
 		consoleBox(consoleBox)
 	{
-		entityPipeline->effect.pixelShader.BindTexture("greenimage.bmp");
+		entityPipeline->effect.pixelShader.SetStaticTexture(false);
+		entityPipeline->effect.pixelShader.AddTexture("redimage.bmp");
 	}
 
 	void Update(Keyboard&kbd, Mouse& mouse, float dt) {
@@ -116,8 +117,10 @@ public:
 			worldTransform = Matf4::RotationZ(0.0f) * Matf4::RotationX(0.0f) * Matf4::RotationY(0.0f) * Matf4::Translation(translateVector);
 			entityPipeline->effect.vertexShader.BindWorld(worldTransform);
 			entityPipeline->Draw((*x)->GetCubeList());
+			//(*x)->Draw(viewMatrix, projectionMatrix);
 		}
 		// loop through and render turret buffer
+		//entityPipeline->effect.pixelShader.BindTexture("silverimage.bmp");
 		std::vector<std::unique_ptr<TurretParent>>::iterator tEnd = turretBuffer.end();
 		for (std::vector<std::unique_ptr<TurretParent>>::iterator x = turretBuffer.begin(); x != tEnd; std::advance(x, 1)) {
 			translateVector = (*x)->GetSpawnLocationOffset();
@@ -134,6 +137,7 @@ public:
 			entityPipeline->Draw((*x)->GetCubeList());
 		}
 		// loop through and render enemy entities
+		//entityPipeline->effect.pixelShader.BindTexture("redimage.bmp");
 		std::vector<std::unique_ptr<EnemyParent>>::iterator eEnd = enemyBuffer.end();
 		for (std::vector<std::unique_ptr<EnemyParent>>::iterator x = enemyBuffer.begin(); x != eEnd; std::advance(x, 1)) {
 			translateVector = (*x)->GetSpawnLocationOffset();
@@ -182,6 +186,11 @@ public:
 	}
 	void AddEnemy(const float& size, const Vecf3& loc) {
 		enemyBuffer.emplace_back(std::make_unique<EnemyOne>(size, loc));
+	}
+	void AddEnemy(const float& size, const Veci2& loc) {
+		float temp = heightmap->heightDisplacementGrid[loc.y*heightmap->width + loc.x];
+		enemyBuffer.emplace_back(std::make_unique<EnemyOne>(size, loc, temp, worldSize, gridSize));
+		(*(enemyBuffer.end() - 1))->Calculate3DLocationOffset();
 	}
 	void PopulateRandomTurrets(const int& amount) {
 		std::random_device rand;
@@ -280,6 +289,9 @@ public:
 public:
 	// buffer that holds all solid inanimate entities in the world
 	std::vector <std::unique_ptr<Entity>> solidBuffer;
+	// world variables
+	const float worldSize;
+	const int gridSize;
 private:
 	// outdated buffer used to hold generic any entities in the world
 	std::vector<std::unique_ptr<Entity>> entityBuffer;
@@ -295,9 +307,6 @@ private:
 	
 	// reference to height displacement map of the world
 	std::shared_ptr<HeightMap> heightmap;
-	// world variables
-	const float worldSize;
-	const int gridSize;
 	std::shared_ptr<TerrainWithPath>& terrainWithPath;
 	// console box
 	std::shared_ptr<ConsoleBox>& consoleBox;

@@ -85,6 +85,12 @@
     <Filter Include="Header Files\Skyboxes">
       <UniqueIdentifier>{44eb5dbe-104e-4abe-aea5-a6095b6d1eb5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\WorldInteractivity">
+      <UniqueIdentifier>{a8f8203c-1b9d-4d3c-8800-aea76434ef62}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\ColorImages">
+      <UniqueIdentifier>{2341c2a1-1f4d-4a6c-9070-ffe3567e448e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ChiliWin.h">
@@ -318,6 +324,9 @@
     <ClInclude Include="Clock.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="MouseInteract.h">
+      <Filter>Header Files\WorldInteractivity</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DXErr.cpp">
@@ -383,22 +392,10 @@
     <Image Include="..\..\..\Memes\waterimage.bmp">
       <Filter>Resource Files</Filter>
     </Image>
-    <Image Include="..\..\..\Memes\blackimage.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="..\..\..\Memes\greenimage.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="..\..\..\Memes\whiteimage.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
     <Image Include="..\..\..\Memes\sandimage.bmp">
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="..\..\..\Memes\checkered.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="..\..\..\Memes\silverimage.bmp">
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="..\..\..\Memes\postgrassblock.bmp">
@@ -481,6 +478,21 @@
     </Image>
     <Image Include="..\..\..\Memes\consoleimage.bmp">
       <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\..\Memes\blackimage.bmp">
+      <Filter>Resource Files\ColorImages</Filter>
+    </Image>
+    <Image Include="..\..\..\Memes\greenimage.bmp">
+      <Filter>Resource Files\ColorImages</Filter>
+    </Image>
+    <Image Include="..\..\..\Memes\silverimage.bmp">
+      <Filter>Resource Files\ColorImages</Filter>
+    </Image>
+    <Image Include="..\..\..\Memes\whiteimage.bmp">
+      <Filter>Resource Files\ColorImages</Filter>
+    </Image>
+    <Image Include="..\..\..\Memes\redimage.bmp">
+      <Filter>Resource Files\ColorImages</Filter>
     </Image>
   </ItemGroup>
 </Project>

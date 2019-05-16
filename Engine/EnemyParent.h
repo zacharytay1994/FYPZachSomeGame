@@ -8,11 +8,15 @@
 
 class EnemyParent : public Entity {
 public:
-	EnemyParent(const float& size, const Vecf3& loc) 
+	EnemyParent(const float& size, const Vecf3& loc)
 		:
 		Entity(size, loc)
 	{
 	}
+	EnemyParent(const float& size, const Veci2& loc, const float& heightDisplaced, const float& worldSize, const int& gridSize)
+		:
+		Entity(size, loc, heightDisplaced + size/4.0f, worldSize, gridSize)
+	{}
 	virtual void Update(Keyboard&kbd, Mouse& mouse, float dt) 
 	{
 		if (!needPath) {
@@ -21,7 +25,6 @@ public:
 		ChildUpdates(kbd, mouse, dt);
 	}
 	virtual void ChildUpdates(Keyboard&kbd, Mouse& mouse, float dt) = 0;
-	virtual void Draw() = 0;
 	virtual bool SetCurrentPath(const std::vector<Vecf3>& newPath) {
 		currentPath = newPath;
 		pathSize = (int)currentPath.size();
@@ -57,7 +60,7 @@ public:
 			velBetweenPoints = ApproximatePoints(currentPoint, nextPoint);
 			spawnLocationOffset = currentPoint;
 			stepCounter = 0;
-			InsertDebugString("/renemy /y" + std::to_string(entityUniqueID) + " /bexecuting path step /y" + std::to_string(pathStep) + ".");
+			//InsertDebugString("/renemy /y" + std::to_string(entityUniqueID) + " /bexecuting path step /y" + std::to_string(pathStep) + ".");
 		}
 		else {
 			std::reverse(currentPath.begin(), currentPath.end());

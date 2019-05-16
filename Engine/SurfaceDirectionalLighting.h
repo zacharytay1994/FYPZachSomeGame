@@ -212,12 +212,33 @@ public:
 
 	class PixelShader {
 	public:
+		struct Texture {
+			std::unique_ptr<Surface> texture;
+			const float tex_width;
+			const float tex_height;
+			const float width_clamp;
+			const float height_clamp;
+		};
+		enum class EntityType {
+			Enemy,
+			Turret,
+			Projectile
+		};
+	public:
 		template<class Input>
 		Color operator()(const Input& input) const {
-			Vecf3 colorReturn = (Vecf3)texture->GetPixel(
-				(int)std::min(input.texpos.x * tex_width, width_clamp),
-				(int)std::min(input.texpos.y * tex_height, height_clamp));
-			return (Color)(colorReturn * input.intensity);
+			if (staticTexture) {
+				Vecf3 colorReturn = (Vecf3)texture->GetPixel(
+					(int)std::min(input.texpos.x * tex_width, width_clamp),
+					(int)std::min(input.texpos.y * tex_height, height_clamp));
+				return (Color)(colorReturn * input.intensity);
+			}
+			else {
+				Vecf3 colorReturn = (Vecf3)textureList[entityType].texture->GetPixel(
+					(int)std::min(input.texpos.x * textureList[entityType].tex_width, textureList[entityType].width_clamp),
+					(int)std::min(input.texpos.y * textureList[entityType].tex_height, textureList[entityType].height_clamp));
+				return (Color)(colorReturn * input.intensity);
+			}
 		}
 		void BindTexture(const std::string& filename) {
 			texture = std::make_unique<Surface>(Surface(filename));
@@ -233,13 +254,26 @@ public:
 			width_clamp = tex_width - 1.0f;
 			height_clamp = tex_height - 1.0f;
 		}
+		void AddTexture(const std::string& filename) {
+			BindTexture(filename);
+			textureList.push_back({ std::make_unique<Surface>(Surface(filename)), tex_width, tex_height, width_clamp, height_clamp });
+		}
+		int SetTextureType(EntityType& type) {
+			entityType = static_cast<int>(type);
+		}
+		void SetStaticTexture(const bool& boolIn) {
+			staticTexture = boolIn;
+		}
 	private:
 		// texture attributes
+		std::vector<Texture> textureList;
 		std::unique_ptr<Surface> texture;
 		float tex_width;
 		float tex_height;
 		float width_clamp;
 		float height_clamp;
+		int entityType = 0;
+		bool staticTexture = true;
 	};
 public:
 	PixelShader pixelShader;

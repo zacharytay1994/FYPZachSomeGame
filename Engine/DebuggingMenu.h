@@ -47,6 +47,7 @@ public:
 		}
 	}
 private:
+	// supplementary surface container
 	const Surface supSurfaces[2] = { Surface("debuggingMenu1.bmp"), Surface("debuggingMenu2.bmp") };
 	Vecf2 mousePosition;
 	ConsoleScene consoleScene = ConsoleScene(gfx, fontList);

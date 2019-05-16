@@ -12,8 +12,5 @@ public:
 	virtual void Update(Keyboard&kbd, Mouse& mouse, float dt) override {
 		FireAtRate(ProjectileType::ProjectileOne);
 	}
-	virtual void Draw() override {
-
-	}
 private:
 };

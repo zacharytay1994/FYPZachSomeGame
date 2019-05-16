@@ -21,7 +21,6 @@ public:
 		ChildUpdates(kbd, mouse, dt);
 	}
 	virtual void ChildUpdates(Keyboard&kbd, Mouse& mouse, float dt) = 0;
-	virtual void Draw() = 0;
 	virtual void ApplyExternalForce(const Vecf3& force) {
 		velocity += force;
 	}

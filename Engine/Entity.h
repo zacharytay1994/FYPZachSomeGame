@@ -6,6 +6,8 @@
 #include "Pipeline.h"
 #include "TexCube.h"
 #include "SurfaceDirectionalLighting.h"
+#include "ZBuffer.h"
+#include "Graphics.h"
 
 #include "Keyboard.h"
 #include "Mouse.h"
@@ -60,7 +62,12 @@ public:
 		SetUniqueID();
 	}
 	virtual void Update(Keyboard&kbd, Mouse& mouse, float dt) = 0;
-	virtual void Draw() = 0;
+	virtual void Draw(const Matf4& viewMatrix, const Matf4& projectionMatrix) {
+		/*entityPipeline->effect.vertexShader.BindWorld(Matf4::RotationZ(0.0f) * Matf4::RotationX(0.0f) * Matf4::RotationY(0.0f) * Matf4::Translation(spawnLocationOffset));
+		entityPipeline->effect.vertexShader.BindView(viewMatrix);
+		entityPipeline->effect.vertexShader.BindProjection(projectionMatrix);
+		entityPipeline->Draw(cubeList);*/
+	}
 	virtual Veci2 Get2DLocation() {
 		return locationOnBoard2D;
 	}
@@ -139,7 +146,7 @@ protected:
 	float upBound = 0.0f;
 	float bottomBound = 0.0f;
 	// world coordinates
-	Vecf3 spawnLocationOffset;
+	Vecf3 spawnLocationOffset = {0.0f, 0.0f, 0.0f};
 	Veci2 gridCellLocation;
 	// movement vector
 	Vecf3 velocity = { 0.0f, 0.0f, 0.0f };

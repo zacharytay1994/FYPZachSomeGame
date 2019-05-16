@@ -176,6 +176,7 @@
     <ClInclude Include="MenuNaviTestScene.h" />
     <ClInclude Include="MenuSceneParent.h" />
     <ClInclude Include="Mouse.h" />
+    <ClInclude Include="MouseInteract.h" />
     <ClInclude Include="NDCTransformer.h" />
     <ClInclude Include="NodeAStar.h" />
     <ClInclude Include="Pathfinding.h" />
@@ -320,6 +321,7 @@
     <Image Include="..\..\..\Memes\parchmentpaper.bmp" />
     <Image Include="..\..\..\Memes\pikachumeme.bmp" />
     <Image Include="..\..\..\Memes\postgrassblock.bmp" />
+    <Image Include="..\..\..\Memes\redimage.bmp" />
     <Image Include="..\..\..\Memes\sandimage.bmp" />
     <Image Include="..\..\..\Memes\sandimage2.bmp" />
     <Image Include="..\..\..\Memes\silverimage.bmp" />

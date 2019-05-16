@@ -6,16 +6,17 @@
 #include "Rect.h"
 #include "Surface.h"
 #include "FontList.h"
+#include "Scene.h"
 
 #include <string>
 #include <stack>
 #include <vector>
+#include <memory>
 
 class MenuSceneParent {
 public:
 	MenuSceneParent(const std::string& name, const std::string& filename, Graphics& gfx,
-		std::stack<std::unique_ptr<MenuSceneParent>>& menuScenes, const Vecf3& chroma,
-		const std::shared_ptr<FontList>& fontList)
+		std::stack<std::unique_ptr<MenuSceneParent>>& menuScenes, std::vector<std::unique_ptr<Scene>>& scenes, const Vecf3& chroma, const std::shared_ptr<FontList>& fontList)
 		:
 		name(name),
 		surface(Surface(filename)),
@@ -27,6 +28,7 @@ public:
 		screenAlphaW(float(surfaceWidth) / float(screenWidth)),
 		screenAlphaH(float(surfaceHeight) / float(screenHeight)),
 		menuScenes(menuScenes),
+		scenes(scenes),
 		chroma(chroma),
 		fontList(fontList)
 	{}
@@ -59,6 +61,7 @@ public:
 protected:
 	std::vector<Rect> clickableRects;
 	std::stack<std::unique_ptr<MenuSceneParent>>& menuScenes;
+	std::vector<std::unique_ptr<Scene>>& scenes;
 	// draw screen variables
 	Graphics& gfx;
 	Surface surface;

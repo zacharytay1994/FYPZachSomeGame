@@ -13,8 +13,8 @@ class TestScene : public Scene {
 public:
 	TestScene(Graphics& gfx) 
 		:
-		Scene("Test Scene"),
 		zBuffer(std::make_shared<ZBuffer>(gfx.ScreenWidth, gfx.ScreenHeight)),
+		Scene("Test Scene", zBuffer, gfx),
 		pipelinePerPixel(std::make_shared<Pipeline<SurfaceDirectionalLighting>>(gfx, zBuffer)),
 		testList(TexCube::GetWrapIndependent<Pipeline<SurfaceDirectionalLighting>::Vertex>(1.0f))
 	{

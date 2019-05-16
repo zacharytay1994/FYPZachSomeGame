@@ -17,8 +17,8 @@ class ConsoleScene : public Scene {
 public:
 	ConsoleScene(Graphics& gfx, const std::shared_ptr<FontList> fontList)
 		:
-		Scene("Console Scene"),
 		zBuffer(std::make_shared<ZBuffer>(gfx.ScreenWidth, gfx.ScreenHeight)),
+		Scene("Console Scene", zBuffer, gfx),
 		consolePipeline(std::make_shared<Pipeline<SurfaceDirectionalLighting>>(gfx, zBuffer)),
 		planeList(PlaneVertex::GetPlane<Pipeline<SurfaceDirectionalLighting>::Vertex>(3.0f)),
 		surface(Surface("parchmentpaper.bmp")),

@@ -15,7 +15,7 @@ public:
 		:
 		EnemyParent(size, loc, heightDisplaced, worldSize, gridSize)
 	{
-		InsertDebugString("/renemyone has been created.");
+		InsertDebugString("/renemyone /y" + std::to_string(entityUniqueID) + " has been /ccreated.");
 	}
 	virtual void ChildUpdates(Keyboard&kbd, Mouse& mouse, float dt) override {}
 private:

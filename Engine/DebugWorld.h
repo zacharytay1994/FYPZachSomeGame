@@ -29,20 +29,19 @@ public:
 public:
 	DebugWorld(Graphics& gfx, const std::shared_ptr<FontList> fontList)
 		:
-		Scene("Debug world"),
 		sceneZBuffer(std::make_shared<ZBuffer>(gfx.ScreenWidth, gfx.ScreenHeight)),
+		Scene("Debug world", sceneZBuffer, gfx),
 		terrainWithPath(std::make_shared<TerrainWithPath>(gfx, sceneZBuffer, "heightmap2.bmp", "parchmentpaper.bmp", worldSize, gridSize, 0.0f, 8.0f)), // TerrainWithPath(graphics, zbuffer, heightmap, surface texture, world size, grid size, min world height, max world height)
 		entityHandler(gfx, sceneZBuffer, worldSize, gridSize, terrainWithPath, consoleBox),
-		consoleBox(std::make_shared<ConsoleBox>(gfx, sceneZBuffer, fontList)),
-		mouseInteract(sceneZBuffer, gfx)
+		consoleBox(std::make_shared<ConsoleBox>(gfx, sceneZBuffer, fontList))
 	{
 		//entityHandler.AddSolid(1.0f, { 55, 0, 45 });
 		// let entityHandler know about the heightmap to implicitly place some entities
 		entityHandler.SetHeightMap(terrainWithPath->GetHeightMap());
-		/*entityHandler.AddEnemy(1.0f, { 8.0f, 0.1f, 8.0f });
-		entityHandler.AddEnemy(1.0f, { -8.0f, 0.1f, 8.0f });
-		entityHandler.PopulateRandomTurrets(15);*/
-		//entityHandler.AddTurret(0.5f, { 5, 5 });
+		//entityHandler.AddEnemy(1.0f, { 8.0f, 0.1f, 8.0f });
+		//entityHandler.AddEnemy(1.0f, { -8.0f, 0.1f, 8.0f });
+		//entityHandler.PopulateRandomTurrets(15);
+		//entityHandler.AddTurret(2.5f, { 50, 50 });
 		// make known to world terrain of solid obstacle entities
 		terrainWithPath->SyncWithWorldEntities(entityHandler.solidBuffer);
 	}
@@ -79,8 +78,12 @@ public:
 		//terrainWithPath.FindPath({ 0.0f, (worldSize/gridSize)/2.0f, (worldSize/2.0f - 0.2f) }, { -(worldSize/2.0f) + testingval, (worldSize / gridSize) / 2.0f, -(worldSize / 2.0f - 0.2f) });
 		consoleBox->ChildUpdates(kbd, mouse, dt);
 		// testing mouse interactivity
-		if (mouse.LeftIsPressed()) {
+		if (kbd.KeyIsPressed('R')) {
+			mouseAct = true;
+		}
+		if (mouse.LeftIsPressed() && mouseAct) {
 			mouseInteract.SpawnEnemy(entityHandler, mouse);
+			mouseAct = false;
 		}
 		//ss << test.x << "," << test.y << std::endl;
 		OutputDebugString(ss.str().c_str());
@@ -104,6 +107,10 @@ public:
 		//terrainWithPath.DrawPath(viewMatrix, projectionMatrix);
 		consoleBox->Draw(viewMatrix, projectionMatrix);
 	}
+//public:
+//	// mouse interactivity
+//	MouseInteract mouseInteract;
+
 private:
 	// shared zbuffer of scene
 	std::shared_ptr<ZBuffer> sceneZBuffer;
@@ -129,9 +136,7 @@ private:
 	// environment object
 	std::shared_ptr<ConsoleBox> consoleBox;
 
-	// mouse interactivity
-	MouseInteract mouseInteract;
-
 	// debugging stuff
 	std::wstringstream ss;
+	bool mouseAct = false;
 };

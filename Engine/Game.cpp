@@ -33,7 +33,7 @@ Game::Game( MainWindow& wnd )
 	curScene = scenes.begin();
 
 	// push in start menu
-	menuScenes.push(std::make_unique<DebuggingMenu>(gfx, menuScenes, fontList));
+	menuScenes.push(std::make_unique<DebuggingMenu>(gfx, menuScenes, scenes, fontList));
 }
 
 void Game::Go()

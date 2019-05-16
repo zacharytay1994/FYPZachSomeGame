@@ -4,9 +4,10 @@
 
 class MenuNaviTestScene : public MenuSceneParent {
 public:
-	MenuNaviTestScene(Graphics& gfx, std::stack<std::unique_ptr<MenuSceneParent>>& stackIn, const std::shared_ptr<FontList>& fontList)
+	MenuNaviTestScene(Graphics& gfx, std::stack<std::unique_ptr<MenuSceneParent>>& stackIn, std::vector<std::unique_ptr<Scene>>& scenes,
+		const std::shared_ptr<FontList>& fontList)
 		:
-		MenuSceneParent("Navi Test", "menunavi1.bmp", gfx, stackIn, Vecf3(255.0f, 255.0f, 255.0f), fontList)
+		MenuSceneParent("Navi Test", "menunavi1.bmp", gfx, stackIn, scenes, Vecf3(255.0f, 255.0f, 255.0f), fontList)
 	{
 		clickableRects.emplace_back(Rect(Vecf2(50.0f * perX, 50.0f * perY), 30.0f * perX, 20.0f * perY));
 	}

@@ -4,11 +4,17 @@
 #include "ConsoleScene.h"
 #include "FontList.h"
 
+//child menus
+#include "EntitySelectScreen.h"
+#include "DebugWorld.h"
+
 class DebuggingMenu : public MenuSceneParent {
 public:
-	DebuggingMenu(Graphics& gfx, std::stack<std::unique_ptr<MenuSceneParent>>& stackIn, const std::shared_ptr<FontList>& fontList)
+	DebuggingMenu(Graphics& gfx, std::stack<std::unique_ptr<MenuSceneParent>>& stackIn, std::vector<std::unique_ptr<Scene>>& scenes,
+		const std::shared_ptr<FontList>& fontList)
 		:
-		MenuSceneParent("Debugging Menu", "debuggingMenu1.bmp", gfx, stackIn, Vecf3(255.0f, 255.0f, 255.0f), fontList)
+		MenuSceneParent("Debugging Menu", "debuggingMenu1.bmp", gfx, stackIn, scenes, Vecf3(255.0f, 255.0f, 255.0f), fontList)
+		//scene(scene)
 	{
 		clickableRects.emplace_back(Rect(Vecf2(12.5f * perX, 85.0f * perY), 18.5f * perX, 10.0f * perY));
 	}
@@ -30,12 +36,14 @@ public:
 			// on click event
 			if (OnClick(e)) {
 				if (eventID == 1) {
-					if (consoleOut) {
+					/*if (consoleOut) {
 						consoleOut = false;
 					}
 					else {
 						consoleOut = true;
-					}
+					}*/
+					//surface = supSurfaces[1];
+					menuScenes.push(std::make_unique<EntitySelectScreen>(gfx, menuScenes, scenes, fontList));
 				}
 			}
 		}
@@ -52,4 +60,6 @@ private:
 	Vecf2 mousePosition;
 	ConsoleScene consoleScene = ConsoleScene(gfx, fontList);
 	bool consoleOut = false;
+	// scene reference to be passed to entity select screen menu
+	//DebugWorld* scene;
 };

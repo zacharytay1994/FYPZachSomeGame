@@ -33,6 +33,7 @@
 #include <string>
 
 class EntityHandler {
+	typedef typename SurfaceDirectionalLighting::PixelShader::EntityType TextureEntityType;
 public:
 	EntityHandler(Graphics& gfx, std::shared_ptr<ZBuffer>& zbuffer, const float& worldSize, const int& gridSize,
 		std::shared_ptr<TerrainWithPath>& terrainWithPath, std::shared_ptr<ConsoleBox>& consoleBox) 
@@ -46,8 +47,11 @@ public:
 		gfx(gfx),
 		consoleBox(consoleBox)
 	{
+		// initialized the effect used by the pipeline, non static textures, red for enemy, green for turret, and blue for buildings
 		entityPipeline->effect.pixelShader.SetStaticTexture(false);
 		entityPipeline->effect.pixelShader.AddTexture("redimage.bmp");
+		entityPipeline->effect.pixelShader.AddTexture("greenimage.bmp");
+		entityPipeline->effect.pixelShader.AddTexture("blueimage.bmp");
 	}
 
 	void Update(Keyboard&kbd, Mouse& mouse, float dt) {
@@ -60,7 +64,10 @@ public:
 		std::vector<std::unique_ptr<TurretParent>>::iterator tEnd = turretBuffer.end();
 		for (std::vector<std::unique_ptr<TurretParent>>::iterator x = turretBuffer.begin(); x != tEnd; std::advance(x, 1)) {
 			(*x)->Update(kbd, mouse, dt);
-			(*x)->targetLocation = QueryEnemyLocation(*(enemyBuffer.begin()));
+			ReadDebugQueue((*x)->debugQueue);
+			if (enemyBuffer.size() > 0) {
+				(*x)->targetLocation = QueryEnemyLocation(*(enemyBuffer.begin()));
+			}
 		}
 		// update projectile entities buffer
 		projectileQt.Reset();
@@ -120,7 +127,7 @@ public:
 			//(*x)->Draw(viewMatrix, projectionMatrix);
 		}
 		// loop through and render turret buffer
-		//entityPipeline->effect.pixelShader.BindTexture("silverimage.bmp");
+		entityPipeline->effect.pixelShader.SetTextureType(TextureEntityType::Turret);
 		std::vector<std::unique_ptr<TurretParent>>::iterator tEnd = turretBuffer.end();
 		for (std::vector<std::unique_ptr<TurretParent>>::iterator x = turretBuffer.begin(); x != tEnd; std::advance(x, 1)) {
 			translateVector = (*x)->GetSpawnLocationOffset();
@@ -137,7 +144,7 @@ public:
 			entityPipeline->Draw((*x)->GetCubeList());
 		}
 		// loop through and render enemy entities
-		//entityPipeline->effect.pixelShader.BindTexture("redimage.bmp");
+		entityPipeline->effect.pixelShader.SetTextureType(TextureEntityType::Enemy);
 		std::vector<std::unique_ptr<EnemyParent>>::iterator eEnd = enemyBuffer.end();
 		for (std::vector<std::unique_ptr<EnemyParent>>::iterator x = enemyBuffer.begin(); x != eEnd; std::advance(x, 1)) {
 			translateVector = (*x)->GetSpawnLocationOffset();

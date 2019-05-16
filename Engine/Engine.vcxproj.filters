@@ -91,6 +91,9 @@
     <Filter Include="Resource Files\ColorImages">
       <UniqueIdentifier>{2341c2a1-1f4d-4a6c-9070-ffe3567e448e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\MenuImages\EntitySelectMenu">
+      <UniqueIdentifier>{08643aef-e2ce-4634-8433-aa728e9ed84b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ChiliWin.h">
@@ -327,6 +330,9 @@
     <ClInclude Include="MouseInteract.h">
       <Filter>Header Files\WorldInteractivity</Filter>
     </ClInclude>
+    <ClInclude Include="EntitySelectScreen.h">
+      <Filter>Header Files\Scenes\MenuScenes</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DXErr.cpp">
@@ -493,6 +499,21 @@
     </Image>
     <Image Include="..\..\..\Memes\redimage.bmp">
       <Filter>Resource Files\ColorImages</Filter>
+    </Image>
+    <Image Include="..\..\..\Memes\blueimage.bmp">
+      <Filter>Resource Files\ColorImages</Filter>
+    </Image>
+    <Image Include="..\..\..\Memes\entityselectscreen.bmp">
+      <Filter>Resource Files\MenuImages\EntitySelectMenu</Filter>
+    </Image>
+    <Image Include="..\..\..\Memes\entityselectscreen4.bmp">
+      <Filter>Resource Files\MenuImages\EntitySelectMenu</Filter>
+    </Image>
+    <Image Include="..\..\..\Memes\entityselectscreen2.bmp">
+      <Filter>Resource Files\MenuImages\EntitySelectMenu</Filter>
+    </Image>
+    <Image Include="..\..\..\Memes\entityselectscreen3.bmp">
+      <Filter>Resource Files\MenuImages\EntitySelectMenu</Filter>
     </Image>
   </ItemGroup>
 </Project>

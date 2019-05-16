@@ -258,7 +258,7 @@ public:
 			BindTexture(filename);
 			textureList.push_back({ std::make_unique<Surface>(Surface(filename)), tex_width, tex_height, width_clamp, height_clamp });
 		}
-		int SetTextureType(EntityType& type) {
+		void SetTextureType(const EntityType& type) {
 			entityType = static_cast<int>(type);
 		}
 		void SetStaticTexture(const bool& boolIn) {

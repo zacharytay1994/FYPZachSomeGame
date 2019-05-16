@@ -101,6 +101,12 @@ public:
 					case 103:
 						color = Colors::Gray;
 						break;
+					case 99:
+						color = Colors::Cyan;
+						break;
+					case 116:
+						color = Color({29, 150, 65});
+						break;
 					}
 					readColor = false;
 					continue;

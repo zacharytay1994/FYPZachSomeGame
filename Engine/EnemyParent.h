@@ -11,14 +11,17 @@ public:
 	EnemyParent(const float& size, const Vecf3& loc)
 		:
 		Entity(size, loc)
-	{
-	}
+	{}
 	EnemyParent(const float& size, const Veci2& loc, const float& heightDisplaced, const float& worldSize, const int& gridSize)
 		:
 		Entity(size, loc, heightDisplaced + size/4.0f, worldSize, gridSize)
 	{}
 	virtual void Update(Keyboard&kbd, Mouse& mouse, float dt) 
 	{
+		// execute current state
+		/*if (currentState) {
+			currentState->Execute(this);
+		}*/
 		if (!needPath) {
 			ExecutePath(stepCounter);
 		}
@@ -83,5 +86,8 @@ private:
 	Vecf3 velBetweenPoints;
 	int pathStep;
 
+	// fsm variables
+
 	std::wstringstream ss;
+
 };

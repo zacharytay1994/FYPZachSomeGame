@@ -94,6 +94,18 @@
     <Filter Include="Resource Files\MenuImages\EntitySelectMenu">
       <UniqueIdentifier>{08643aef-e2ce-4634-8433-aa728e9ed84b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\AI">
+      <UniqueIdentifier>{eae62cbe-c8da-402b-955f-96cf7ca20048}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\AI\EnemyStates">
+      <UniqueIdentifier>{cbb49714-d260-483b-9b02-86a0f28bf737}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\AI Source Files">
+      <UniqueIdentifier>{d662a868-bda4-4762-8cdf-bcbf00c69842}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\AI Source Files\EnemyStates">
+      <UniqueIdentifier>{1747122a-b5cd-4fe7-95bf-87a86b82bedb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ChiliWin.h">
@@ -333,6 +345,15 @@
     <ClInclude Include="EntitySelectScreen.h">
       <Filter>Header Files\Scenes\MenuScenes</Filter>
     </ClInclude>
+    <ClInclude Include="State.h">
+      <Filter>Header Files\AI</Filter>
+    </ClInclude>
+    <ClInclude Include="StateMachine.h">
+      <Filter>Header Files\AI</Filter>
+    </ClInclude>
+    <ClInclude Include="EnemyIdle.h">
+      <Filter>Header Files\AI\EnemyStates</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DXErr.cpp">
@@ -370,6 +391,9 @@
     </ClCompile>
     <ClCompile Include="Clock.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="EnemyIdle.cpp">
+      <Filter>Source Files\AI Source Files\EnemyStates</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

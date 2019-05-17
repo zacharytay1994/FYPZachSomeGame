@@ -96,9 +96,9 @@ public:
 			ReadDebugQueue((*x)->debugQueue);
 			//ReadDebugQueue((*x)->debugQueue);
 			// check if enemy needs new path, find it a new path
-			if ((*x)->needPath) {
+			/*if ((*x)->needPath) {
 				QueryPathfinder((*x));
-			}
+			}*/
 		}
 		// entity handler functions
 		GetProjectilesFromTurrets();

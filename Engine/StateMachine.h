@@ -1,7 +1,6 @@
 #pragma once
 
 #include "State.h"
-//#include "EnemyIdle.h"
 
 #include <assert.h>
 #include <memory>
@@ -18,6 +17,7 @@ public:
 	{}
 	void SetCurrentState(std::shared_ptr<State<EntityType>> state) {
 		currentState = state;
+		currentState->Enter(entityOwner);
 	}
 	void SetPreviousState(std::shared_ptr<State<EntityType>> state) {
 		previousState = state;

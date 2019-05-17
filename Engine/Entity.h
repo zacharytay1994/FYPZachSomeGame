@@ -21,13 +21,19 @@ class Entity {
 public:
 	struct DebugMessage {
 		bool operator()(const DebugMessage& lhs, const DebugMessage& rhs) const {
-			return lhs > rhs;
+			return lhs >= rhs;
 		}
 		bool operator>(const DebugMessage& rhs) const {
 			return timeElapsed > rhs.timeElapsed;
 		}
 		bool operator<(const DebugMessage& rhs) const {
 			return timeElapsed < rhs.timeElapsed;
+		}
+		bool operator==(const DebugMessage& rhs) const {
+			return timeElapsed == rhs.timeElapsed;
+		}
+		bool operator>=(const DebugMessage& rhs) const {
+			return timeElapsed >= rhs.timeElapsed;
 		}
 		std::string message;
 		double timeElapsed;
@@ -121,6 +127,9 @@ public:
 	void SetUniqueID() {
 		entityUniqueID = nextValidID;
 		nextValidID++;
+	}
+	int GetUniqueID() {
+		return entityUniqueID;
 	}
 	void InsertDebugString(const std::string& string) {
 		std::clock_t now = clock();

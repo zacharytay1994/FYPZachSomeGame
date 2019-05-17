@@ -100,11 +100,11 @@
     <Filter Include="Header Files\AI\EnemyStates">
       <UniqueIdentifier>{cbb49714-d260-483b-9b02-86a0f28bf737}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\AI Source Files">
-      <UniqueIdentifier>{d662a868-bda4-4762-8cdf-bcbf00c69842}</UniqueIdentifier>
+    <Filter Include="Header Files\AI\EnemyStates\HeaderFiles">
+      <UniqueIdentifier>{73a2d8ff-0027-4590-ac72-023e197b6c0d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\AI Source Files\EnemyStates">
-      <UniqueIdentifier>{1747122a-b5cd-4fe7-95bf-87a86b82bedb}</UniqueIdentifier>
+    <Filter Include="Header Files\AI\EnemyStates\SourceFiles">
+      <UniqueIdentifier>{1ce6f70a-a302-4a36-8e1d-8ce99af3edfb}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -352,7 +352,10 @@
       <Filter>Header Files\AI</Filter>
     </ClInclude>
     <ClInclude Include="EnemyIdle.h">
-      <Filter>Header Files\AI\EnemyStates</Filter>
+      <Filter>Header Files\AI\EnemyStates\HeaderFiles</Filter>
+    </ClInclude>
+    <ClInclude Include="EnemyAwaitPath.h">
+      <Filter>Header Files\AI\EnemyStates\HeaderFiles</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -393,7 +396,10 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="EnemyIdle.cpp">
-      <Filter>Source Files\AI Source Files\EnemyStates</Filter>
+      <Filter>Header Files\AI\EnemyStates\SourceFiles</Filter>
+    </ClCompile>
+    <ClCompile Include="EnemyAwaitPath.cpp">
+      <Filter>Header Files\AI\EnemyStates\SourceFiles</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

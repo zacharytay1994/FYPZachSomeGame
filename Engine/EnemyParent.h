@@ -87,7 +87,6 @@ private:
 	int pathStep;
 
 	// fsm variables
-
 	std::wstringstream ss;
 
 };

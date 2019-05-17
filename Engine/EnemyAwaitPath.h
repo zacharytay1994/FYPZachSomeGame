@@ -3,15 +3,16 @@
 #include "State.h"
 
 class EnemyOne;
-class EnemyIdle : public State<EnemyOne> {
+
+class EnemyAwaitPath : public State<EnemyOne> {
 public:
-	EnemyIdle()
+	EnemyAwaitPath()
 		:
 		State()
 	{}
 public:
 	// singleton reference
-	static std::shared_ptr<EnemyIdle> Instance();
+	static std::shared_ptr<EnemyAwaitPath> Instance();
 	virtual void Enter(EnemyOne*& entity) override;
 	virtual void Execute(EnemyOne*& entity) override;
 	virtual void Exit(EnemyOne*& entity) override;

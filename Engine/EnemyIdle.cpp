@@ -21,7 +21,6 @@ void EnemyIdle::Execute(EnemyOne *& entity)
 	if (entity->entityQueryHandler->QueryNearestBuilding(entity->GetSpawnLocationOffset(), target)) {
 		entity->targetDestination = target;
 		entity->InsertDebugString("/renemyone id: /y" + std::to_string(entity->GetUniqueID()) + " target found.");
-		entity->needPath = true;
 		entity->stateMachine->ChangeState(EnemyAwaitPath::Instance());
 	}
 }

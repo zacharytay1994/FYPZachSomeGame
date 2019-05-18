@@ -13,6 +13,7 @@
 #include <utility>
 
 // mainly a*search pathfinding algorithm, and other basic functions
+class Entity;
 class Pathfinding {
 public:
 	Pathfinding(Graphics& gfx, std::shared_ptr<ZBuffer>& zBuffer, const float& worldSize, const int& gridSize, const float& gridCellRadius)
@@ -135,7 +136,7 @@ public:
 
 	// update grid with obstacle entities from solidBuffer in entityHandler, 
 	// CALLS: GridAStar.h, CALLEDBY: TerrainWithPath::SyncWithWorldEntities
-	void UpdateGridObstacles(std::vector<std::unique_ptr<Entity>>& solidBuffer) {
+	void Pathfinding::UpdateGridObstacles(std::vector<std::unique_ptr<Entity>>& solidBuffer) {
 		grid->UpdateWalkable(solidBuffer);
 	}
 
@@ -150,7 +151,7 @@ public:
 		grid->DrawPath(viewMatrix, projectionMatrix, currentPath);
 	}
 	// redefine node grid, no longer used at the moment
-	void RedefineGrid(const float& radius, std::vector<std::unique_ptr<Entity>>& solidBuffer) {
+	void Pathfinding::RedefineGrid(const float & radius, std::vector<std::unique_ptr<Entity>>& solidBuffer) {
 		grid->RedefineGrid(radius, solidBuffer);
 	}
 	// sets the height value of nodes in the world grid to their respective heights based on the heightmap used for terrain generation,

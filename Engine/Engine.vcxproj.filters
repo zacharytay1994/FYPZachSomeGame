@@ -369,6 +369,9 @@
     <ClInclude Include="EntityQueryHandler.h">
       <Filter>Header Files\Entity</Filter>
     </ClInclude>
+    <ClInclude Include="EnemyMove.h">
+      <Filter>Header Files\AI\EnemyStates\HeaderFiles</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DXErr.cpp">
@@ -411,6 +414,9 @@
       <Filter>Header Files\AI\EnemyStates\SourceFiles</Filter>
     </ClCompile>
     <ClCompile Include="EnemyAwaitPath.cpp">
+      <Filter>Header Files\AI\EnemyStates\SourceFiles</Filter>
+    </ClCompile>
+    <ClCompile Include="EnemyMove.cpp">
       <Filter>Header Files\AI\EnemyStates\SourceFiles</Filter>
     </ClCompile>
   </ItemGroup>

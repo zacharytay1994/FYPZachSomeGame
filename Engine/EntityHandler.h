@@ -213,12 +213,12 @@ public:
 		(*(turretBuffer.end() - 1))->Calculate3DLocationOffset();
 	}
 	void AddEnemy(const float& size, const Vecf3& loc) {
-		enemyBuffer.emplace_back(std::make_unique<EnemyOne>(size, loc, entityQueryHandler));
+		enemyBuffer.emplace_back(std::make_unique<EnemyOne>(size, loc, entityQueryHandler, terrainWithPath));
 	}
 	void AddEnemy(const float& size, const Veci2& loc) {
 		float temp = heightmap->heightDisplacementGrid[loc.y*heightmap->width + loc.x];
-		enemyBuffer.emplace_back(std::make_unique<EnemyOne>(size, loc, temp, worldSize, gridSize, entityQueryHandler));
-		(*(enemyBuffer.end() - 1))->Calculate3DLocationOffset();
+		enemyBuffer.emplace_back(std::make_unique<EnemyOne>(size, loc, temp, worldSize, gridSize, entityQueryHandler, terrainWithPath));
+		(*(enemyBuffer.end() - 1))->originalSpawnLocation = (*(enemyBuffer.end() - 1))->Calculate3DLocationOffset();
 	}
 	void AddBuilding(const float& size, const Veci2& loc) {
 		float temp = heightmap->heightDisplacementGrid[loc.y*heightmap->width + loc.x];
@@ -307,11 +307,15 @@ public:
 		container.pop_back();
 		updateEnd = container.end();
 	}
-	void ReadDebugQueue(std::queue<Entity::DebugMessage>& debugQueue) {
-		while (debugQueue.size() != 0) {
+	void ReadDebugQueue(std::vector<Entity::DebugMessage>& debugQueue) {
+		/*while (debugQueue.size() != 0) {
 			debugMessagePQ.push(debugQueue.front());
 			debugQueue.pop();
+		}*/
+		for (Entity::DebugMessage m : debugQueue) {
+			debugMessagePQ.push(m);
 		}
+		debugQueue.clear();
 	}
 	void WriteEDMToConsole() {
 		while (debugMessagePQ.size() != 0) {

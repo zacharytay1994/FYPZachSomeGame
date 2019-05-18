@@ -9,6 +9,7 @@
 #include "TexCube.h"
 #include "Vec2.h"
 #include "ZBuffer.h"
+#include "Entity.h"
 
 #include <vector>
 #include <memory>

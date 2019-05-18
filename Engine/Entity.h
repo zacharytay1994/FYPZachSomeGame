@@ -22,7 +22,10 @@ class Entity {
 public:
 	struct DebugMessage {
 		bool operator()(const DebugMessage& lhs, const DebugMessage& rhs) const {
-			return lhs >= rhs;
+			if (lhs == rhs) {
+				return false;
+			}
+			return lhs > rhs;
 		}
 		bool operator>(const DebugMessage& rhs) const {
 			return timeElapsed > rhs.timeElapsed;
@@ -35,6 +38,9 @@ public:
 		}
 		bool operator>=(const DebugMessage& rhs) const {
 			return timeElapsed >= rhs.timeElapsed;
+		}
+		bool operator<=(const DebugMessage& rhs) const {
+			return timeElapsed <= rhs.timeElapsed;
 		}
 		std::string message;
 		double timeElapsed;
@@ -137,10 +143,10 @@ public:
 	void InsertDebugString(const std::string& string) {
 		std::clock_t now = clock();
 		double timeElapsed = now - Clock::begin;
-		debugQueue.push({ string, timeElapsed });
+		debugQueue.push_back({ string, timeElapsed });
 	}
 public:
-	std::queue<DebugMessage> debugQueue;
+	std::vector<DebugMessage> debugQueue;
 
 	// handles the query of other entities in the world
 	std::shared_ptr<EntityQueryHandler> entityQueryHandler;

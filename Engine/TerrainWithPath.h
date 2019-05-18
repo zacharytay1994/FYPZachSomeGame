@@ -59,7 +59,12 @@ public:
 	// queries a path and if found, return the path as a container of world coordinates (waypoints)
 	bool FindAndReturnPath(const Vecf3& startPos, const Vecf3& endPos, std::vector<Vecf3>& pathInOut) {
 		if (FindPath(startPos, endPos)) {
-			pathInOut = GetPathInWorldCoordinates();
+			pathInOut.push_back(startPos);
+			std::vector<Vecf3> temp = GetPathInWorldCoordinates();
+			for (Vecf3 v : temp) {
+				pathInOut.push_back(v);
+			}
+			pathInOut.push_back(endPos);
 			return true;
 		}
 		return false;

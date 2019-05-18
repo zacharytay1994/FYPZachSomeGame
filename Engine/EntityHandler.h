@@ -18,12 +18,16 @@
 #include "EnemyParent.h"
 #include "EnemyOne.h"
 
+// types of buildings
+#include "BuildingOne.h"
+
 #include "HeightMap.h"
 #include "Graphics.h"
 #include "MatTemplate.h"
 #include "TerrainWithPath.h"
 #include "Quadtree.h"
 #include "ConsoleBox.h"
+#include "EntityQueryHandler.h"
 
 #include <vector>
 #include <memory>
@@ -47,6 +51,8 @@ public:
 		gfx(gfx),
 		consoleBox(consoleBox)
 	{
+		// initialize entity query handler
+		entityQueryHandler = std::make_shared<EntityQueryHandler>(turretBuffer, enemyBuffer, buildingBuffer, projectileBuffer);
 		// initialized the effect used by the pipeline, non static textures, red for enemy, green for turret, and blue for buildings
 		entityPipeline->effect.pixelShader.SetStaticTexture(false);
 		entityPipeline->effect.pixelShader.AddTexture("redimage.bmp");
@@ -100,6 +106,12 @@ public:
 				QueryPathfinder((*x));
 			}*/
 		}
+		// update building entities buffer
+		std::vector<std::unique_ptr<BuildingParent>>::iterator bEnd = buildingBuffer.end();
+		for (std::vector<std::unique_ptr<BuildingParent>>::iterator x = buildingBuffer.begin(); x != bEnd; std::advance(x, 1)) {
+			(*x)->Update(kbd, mouse, dt);
+			ReadDebugQueue((*x)->debugQueue);
+		}
 		// entity handler functions
 		GetProjectilesFromTurrets();
 		if (enemyBuffer.size() > 0) {
@@ -152,6 +164,15 @@ public:
 			entityPipeline->effect.vertexShader.BindWorld(worldTransform);
 			entityPipeline->Draw((*x)->GetCubeList());
 		}
+		// loop through and render building entities
+		entityPipeline->effect.pixelShader.SetTextureType(TextureEntityType::Building);
+		std::vector<std::unique_ptr<BuildingParent>>::iterator bEnd = buildingBuffer.end();
+		for (std::vector<std::unique_ptr<BuildingParent>>::iterator x = buildingBuffer.begin(); x != bEnd; std::advance(x, 1)) {
+			translateVector = (*x)->GetSpawnLocationOffset();
+			worldTransform = Matf4::RotationZ(0.0f) * Matf4::RotationX(0.0f) * Matf4::RotationY(0.0f) * Matf4::Translation(translateVector);
+			entityPipeline->effect.vertexShader.BindWorld(worldTransform);
+			entityPipeline->Draw((*x)->GetCubeList());
+		}
 		// loop through and render solid entities
 		end = solidBuffer.end();
 		for (std::vector<std::unique_ptr<Entity>>::iterator x = solidBuffer.begin(); x != end; std::advance(x, 1)) {
@@ -171,33 +192,38 @@ public:
 	}
 	// functions to add entities into the world (size, location) { -----
 	void AddEntity(const float& size, const Veci2& loc) {
-		entityBuffer.emplace_back(std::make_unique<EntityOne>(size, loc, worldSize, gridSize));
+		entityBuffer.emplace_back(std::make_unique<EntityOne>(size, loc, worldSize, gridSize, entityQueryHandler));
 	}
 	void AddEntity(const float& size, const Veci3& loc) {
-		entityBuffer.emplace_back(std::make_unique<EntityOne>(size, loc, worldSize, gridSize));
+		entityBuffer.emplace_back(std::make_unique<EntityOne>(size, loc, worldSize, gridSize, entityQueryHandler));
 	}
 	void AddSolid(const float& size, const Veci2& loc) {
-		solidBuffer.emplace_back(std::make_unique<EntityOne>(size, loc, worldSize, gridSize));
+		solidBuffer.emplace_back(std::make_unique<EntityOne>(size, loc, worldSize, gridSize, entityQueryHandler));
 		(*(solidBuffer.end() - 1))->Calculate3DLocationOffset();
 		(*(solidBuffer.end() - 1))->CalculateBoundaries();
 	}
 	void AddSolid(const float& size, const Veci3& loc) {
-		solidBuffer.emplace_back(std::make_unique<EntityOne>(size, loc, worldSize, gridSize));
+		solidBuffer.emplace_back(std::make_unique<EntityOne>(size, loc, worldSize, gridSize, entityQueryHandler));
 		(*(solidBuffer.end() - 1))->Calculate3DLocationOffset();
 		(*(solidBuffer.end() - 1))->CalculateBoundaries();
 	}
 	void AddTurret(const float& size, const Veci2& loc) {
 		float temp = heightmap->heightDisplacementGrid[loc.y*heightmap->width + loc.x];
-		turretBuffer.emplace_back(std::make_unique<TurretOne>(size, loc, temp, worldSize, gridSize, 1));
+		turretBuffer.emplace_back(std::make_unique<TurretOne>(size, loc, temp, worldSize, gridSize, 1, entityQueryHandler));
 		(*(turretBuffer.end() - 1))->Calculate3DLocationOffset();
 	}
 	void AddEnemy(const float& size, const Vecf3& loc) {
-		enemyBuffer.emplace_back(std::make_unique<EnemyOne>(size, loc));
+		enemyBuffer.emplace_back(std::make_unique<EnemyOne>(size, loc, entityQueryHandler));
 	}
 	void AddEnemy(const float& size, const Veci2& loc) {
 		float temp = heightmap->heightDisplacementGrid[loc.y*heightmap->width + loc.x];
-		enemyBuffer.emplace_back(std::make_unique<EnemyOne>(size, loc, temp, worldSize, gridSize));
+		enemyBuffer.emplace_back(std::make_unique<EnemyOne>(size, loc, temp, worldSize, gridSize, entityQueryHandler));
 		(*(enemyBuffer.end() - 1))->Calculate3DLocationOffset();
+	}
+	void AddBuilding(const float& size, const Veci2& loc) {
+		float temp = heightmap->heightDisplacementGrid[loc.y*heightmap->width + loc.x];
+		buildingBuffer.emplace_back(std::make_unique<BuildingOne>(size, loc, temp, worldSize, gridSize, entityQueryHandler));
+		(*(buildingBuffer.end() - 1))->Calculate3DLocationOffset();
 	}
 	void PopulateRandomTurrets(const int& amount) {
 		std::random_device rand;
@@ -214,15 +240,15 @@ public:
 			height = heightmap->heightDisplacementGrid[gridLocation.y*heightmap->width + gridLocation.x] + 0.1f;
 			switch (typeOfTurrets(rng)) {
 				case 0:
-					turretBuffer.emplace_back(std::make_unique<TurretOne>(0.5f, gridLocation, height, worldSize, gridSize, rateOfFire));
+					turretBuffer.emplace_back(std::make_unique<TurretOne>(0.5f, gridLocation, height, worldSize, gridSize, rateOfFire, entityQueryHandler));
 					(*(turretBuffer.end() - 1))->Calculate3DLocationOffset();
 					break;
 				case 1:
-					turretBuffer.emplace_back(std::make_unique<TurretTwo>(0.5f, gridLocation, height, worldSize, gridSize, rateOfFire));
+					turretBuffer.emplace_back(std::make_unique<TurretTwo>(0.5f, gridLocation, height, worldSize, gridSize, rateOfFire, entityQueryHandler));
 					(*(turretBuffer.end() - 1))->Calculate3DLocationOffset();
 					break;
 				case 2:
-					turretBuffer.emplace_back(std::make_unique<TurretThree>(0.5f, gridLocation, height, worldSize, gridSize, rateOfFire));
+					turretBuffer.emplace_back(std::make_unique<TurretThree>(0.5f, gridLocation, height, worldSize, gridSize, rateOfFire, entityQueryHandler));
 					(*(turretBuffer.end() - 1))->Calculate3DLocationOffset();
 					break;
 			}
@@ -241,15 +267,15 @@ public:
 				switch ((*start).projectileType) {
 					// spawn projectile one
 				case 0:
-					projectileBuffer.emplace_back(std::make_unique<ProjectileOne>((*x)->GetSpawnLocationOffset(), (*start).velocity));
+					projectileBuffer.emplace_back(std::make_unique<ProjectileOne>((*x)->GetSpawnLocationOffset(), (*start).velocity, entityQueryHandler));
 					break;
 					// spawn projectile two
 				case 1:
-					projectileBuffer.emplace_back(std::make_unique<ProjectileTwo>((*x)->GetSpawnLocationOffset(), (*start).velocity));
+					projectileBuffer.emplace_back(std::make_unique<ProjectileTwo>((*x)->GetSpawnLocationOffset(), (*start).velocity, entityQueryHandler));
 					break;
 					// spawn projectile three
 				case 2:
-					projectileBuffer.emplace_back(std::make_unique<ProjectileThree>((*x)->GetSpawnLocationOffset(), (*start).velocity));
+					projectileBuffer.emplace_back(std::make_unique<ProjectileThree>((*x)->GetSpawnLocationOffset(), (*start).velocity, entityQueryHandler));
 					break;
 				}
 			}
@@ -311,6 +337,10 @@ private:
 	std::vector<std::unique_ptr<EnemyParent>> enemyBuffer;
 	// buffer that holds all enemies in the world that are waiting for a path
 	std::vector<std::unique_ptr<EnemyParent>> enemiesAwaitingPath;
+	// buffer that holds all buildings in the world
+	std::vector<std::unique_ptr<BuildingParent>> buildingBuffer;
+	// entity query handler
+	std::shared_ptr<EntityQueryHandler> entityQueryHandler;
 	
 	// reference to height displacement map of the world
 	std::shared_ptr<HeightMap> heightmap;

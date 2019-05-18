@@ -60,7 +60,7 @@ public:
 					break;
 				case 3:
 					surface = supSurfaces[3];
-					//debugWorld->mouseInteract.SetEntitySelected(static_cast<int>(EntitySelected::building));
+					(*scenes.begin())->mouseInteract.SetEntitySelected(static_cast<int>(EntitySelected::building));
 					break;
 				case 4:
 					menuScenes.pop();

@@ -3,13 +3,6 @@
 
 #include "EnemyAwaitPath.h"
 
-//template<class EnemyType>
-//std::shared_ptr<EnemyIdle<EnemyType>> EnemyIdle<EnemyType>::Instance()
-//{
-//	static std::shared_ptr<EnemyIdle<EnemyType>> instance = std::make_shared<EnemyIdle<EnemyType>>();
-//	return instance;
-//}
-
 std::shared_ptr<EnemyIdle> EnemyIdle::Instance()
 {
 	static std::shared_ptr<EnemyIdle> instance = std::make_shared<EnemyIdle>();
@@ -18,18 +11,22 @@ std::shared_ptr<EnemyIdle> EnemyIdle::Instance()
 
 void EnemyIdle::Enter(EnemyOne *& entity)
 {
-	entity->InsertDebugString("enemyone /y" + std::to_string(entity->GetUniqueID()) + " entered /cidle /cstate.");
+	entity->InsertDebugString("/renemyone id: /y" + std::to_string(entity->GetUniqueID()) + " entered /cidle /cstate.");
 }
 
 void EnemyIdle::Execute(EnemyOne *& entity)
 {
-	//entity->InsertDebugString("now executing /cidle /cstate.");
-	if (entity->needPath) {
+	// if target found(far)
+	Vecf3 target;
+	if (entity->entityQueryHandler->QueryNearestBuilding(entity->GetSpawnLocationOffset(), target)) {
+		entity->targetDestination = target;
+		entity->InsertDebugString("/renemyone id: /y" + std::to_string(entity->GetUniqueID()) + " target found.");
+		entity->needPath = true;
 		entity->stateMachine->ChangeState(EnemyAwaitPath::Instance());
 	}
 }
 
 void EnemyIdle::Exit(EnemyOne *& entity)
 {
-	entity->InsertDebugString("enemyone /y" + std::to_string(entity->GetUniqueID()) + " exited /cidle /cstate.");
+	entity->InsertDebugString("/renemyone id: /y" + std::to_string(entity->GetUniqueID()) + " exited /cidle /cstate.");
 }

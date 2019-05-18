@@ -5,9 +5,9 @@
 
 class ProjectileParent : public Entity {
 public:
-	ProjectileParent(const float& size, const Vecf3& loc, const Vecf3& velocity)
+	ProjectileParent(const float& size, const Vecf3& loc, const Vecf3& velocity, std::shared_ptr<EntityQueryHandler>& entityQueryHandler)
 		:
-		Entity(size, loc),
+		Entity(size, loc, entityQueryHandler),
 		velocity(velocity)
 	{}
 	virtual void Update(Keyboard&kbd, Mouse& mouse, float dt) {

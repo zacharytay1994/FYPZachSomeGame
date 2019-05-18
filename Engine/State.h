@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Entity.h"
+#include "EntityQueryHandler.h"
 
 #include <memory>
 

@@ -106,6 +106,9 @@
     <Filter Include="Header Files\AI\EnemyStates\SourceFiles">
       <UniqueIdentifier>{1ce6f70a-a302-4a36-8e1d-8ce99af3edfb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Entity\Buildings">
+      <UniqueIdentifier>{289e3ff4-c756-4470-a34d-538df49223ba}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ChiliWin.h">
@@ -356,6 +359,15 @@
     </ClInclude>
     <ClInclude Include="EnemyAwaitPath.h">
       <Filter>Header Files\AI\EnemyStates\HeaderFiles</Filter>
+    </ClInclude>
+    <ClInclude Include="BuildingParent.h">
+      <Filter>Header Files\Entity\Buildings</Filter>
+    </ClInclude>
+    <ClInclude Include="BuildingOne.h">
+      <Filter>Header Files\Entity\Buildings</Filter>
+    </ClInclude>
+    <ClInclude Include="EntityQueryHandler.h">
+      <Filter>Header Files\Entity</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

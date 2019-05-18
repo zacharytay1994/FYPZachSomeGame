@@ -14,15 +14,15 @@ struct ProjectileData {
 class TurretParent : public Entity {
 public:
 	// explicitly set height of turret
-	TurretParent(const float& size, const Veci3& loc, const float& worldSize, const int& gridSize, const int& rateOfFire)
+	TurretParent(const float& size, const Veci3& loc, const float& worldSize, const int& gridSize, const int& rateOfFire, std::shared_ptr<EntityQueryHandler>& entityQueryHandler)
 		:
-		Entity(size, loc, worldSize, gridSize),
+		Entity(size, loc, worldSize, gridSize, entityQueryHandler),
 		rateOfFire(rateOfFire)
 	{}
 	// implicitly set height of turret based on heightmap
-	TurretParent(const float& size, const Veci2& loc, const float& heightDisplaced, const float& worldSize, const int& gridSize, const int& rateOfFire)
+	TurretParent(const float& size, const Veci2& loc, const float& heightDisplaced, const float& worldSize, const int& gridSize, const int& rateOfFire, std::shared_ptr<EntityQueryHandler>& entityQueryHandler)
 		:
-		Entity(size, loc, heightDisplaced, worldSize, gridSize),
+		Entity(size, loc, heightDisplaced, worldSize, gridSize, entityQueryHandler),
 		rateOfFire(rateOfFire)
 	{}
 	virtual void Update(Keyboard&kbd, Mouse& mouse, float dt) = 0;

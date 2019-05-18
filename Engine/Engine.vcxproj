@@ -139,6 +139,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Board.h" />
+    <ClInclude Include="BuildingOne.h" />
+    <ClInclude Include="BuildingParent.h" />
     <ClInclude Include="ChiliException.h" />
     <ClInclude Include="ChiliWin.h" />
     <ClInclude Include="Clock.h" />
@@ -161,6 +163,7 @@
     <ClInclude Include="Entity.h" />
     <ClInclude Include="EntityHandler.h" />
     <ClInclude Include="EntityOne.h" />
+    <ClInclude Include="EntityQueryHandler.h" />
     <ClInclude Include="EntitySelectScreen.h" />
     <ClInclude Include="Font.h" />
     <ClInclude Include="FontList.h" />

@@ -17,6 +17,7 @@
 #include <queue>
 #include <ctime>
 
+class EntityQueryHandler;
 class Entity {
 public:
 	struct DebugMessage {
@@ -38,32 +39,34 @@ public:
 		std::string message;
 		double timeElapsed;
 	};
-	Entity(const float& size, const Vecf3& loc, const float& worldSize, const int& gridSize)
+	Entity(const float& size, const Vecf3& loc, const float& worldSize, const int& gridSize, std::shared_ptr<EntityQueryHandler>& entityQueryHandler)
 		:
 		size(size),
 		locationOnBoard2D({ (int)loc.x, (int)loc.z }),
 		locationOnBoard3D(loc),
 		worldSize(worldSize),
 		gridSize(gridSize),
-		cubeList(TexCube::GetPlain<Pipeline<SurfaceDirectionalLighting>::Vertex>(size))
+		cubeList(TexCube::GetPlain<Pipeline<SurfaceDirectionalLighting>::Vertex>(size)),
+		entityQueryHandler(entityQueryHandler)
 	{
 		SetUniqueID();
 	}
-	Entity(const float& size, const Veci2& loc, const float& worldSize, const int& gridSize)
+	Entity(const float& size, const Veci2& loc, const float& worldSize, const int& gridSize, std::shared_ptr<EntityQueryHandler>& entityQueryHandler)
 		:
-		Entity(size, { (float)loc.x, 0.0f, (float)loc.y }, worldSize, gridSize)
+		Entity(size, { (float)loc.x, 0.0f, (float)loc.y }, worldSize, gridSize, entityQueryHandler)
 	{}
 	// constructor mainly for turret entities who implicitly have their y coordinate set for them
-	Entity(const float& size, const Veci2& loc, const float& heightDisplaced, const float& worldSize, const int& gridSize)
+	Entity(const float& size, const Veci2& loc, const float& heightDisplaced, const float& worldSize, const int& gridSize, std::shared_ptr<EntityQueryHandler>& entityQueryHandler)
 		:
-		Entity(size, {(float)loc.x, heightDisplaced, (float)loc.y}, worldSize, gridSize)
+		Entity(size, {(float)loc.x, heightDisplaced, (float)loc.y}, worldSize, gridSize, entityQueryHandler)
 	{}
 	// constructor for basic projectiles
-	Entity(const float& size, const Vecf3& loc)
+	Entity(const float& size, const Vecf3& loc, std::shared_ptr<EntityQueryHandler>& entityQueryHandler)
 		:
 		size(size),
 		cubeList(TexCube::GetPlain<Pipeline<SurfaceDirectionalLighting>::Vertex>(size)),
-		spawnLocationOffset(loc)
+		spawnLocationOffset(loc),
+		entityQueryHandler(entityQueryHandler)
 	{
 		SetUniqueID();
 	}
@@ -138,6 +141,9 @@ public:
 	}
 public:
 	std::queue<DebugMessage> debugQueue;
+
+	// handles the query of other entities in the world
+	std::shared_ptr<EntityQueryHandler> entityQueryHandler;
 protected:
 	// 2d location based on board range (x, z) (0-99, 0-99), y coordinate is always world coordinate not (0-99)
 	Veci2 locationOnBoard2D; 

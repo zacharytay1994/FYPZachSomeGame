@@ -222,6 +222,7 @@ public:
 		enum class EntityType {
 			Enemy,
 			Turret,
+			Building,
 			Projectile
 		};
 	public:

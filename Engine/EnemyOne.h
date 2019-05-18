@@ -7,22 +7,21 @@
 
 class EnemyOne : public EnemyParent {
 public:
-	EnemyOne(const float& size, const Vecf3& loc)
+	EnemyOne(const float& size, const Vecf3& loc, std::shared_ptr<EntityQueryHandler>& entityQueryHandler)
 		:
-		EnemyParent(size, loc),
+		EnemyParent(size, loc, entityQueryHandler),
 		stateMachine(std::make_unique<StateMachine<EnemyOne>>(this))
 	{
 		//entityPipeline->effect.pixelShader.BindTexture("greenimage.bmp");
-		InsertDebugString("/renemyone has been created");
+		InsertDebugString("/renemyone id: /y" + std::to_string(entityUniqueID) + " has been /ccreated");
 	}
-	EnemyOne(const float& size, const Veci2& loc, const float& heightDisplaced, const float& worldSize, const int& gridSize)
+	EnemyOne(const float& size, const Veci2& loc, const float& heightDisplaced, const float& worldSize, const int& gridSize, std::shared_ptr<EntityQueryHandler>& entityQueryHandler)
 		:
-		EnemyParent(size, loc, heightDisplaced, worldSize, gridSize),
+		EnemyParent(size, loc, heightDisplaced, worldSize, gridSize, entityQueryHandler),
 		stateMachine(std::make_unique<StateMachine<EnemyOne>>(this))
 	{
-		InsertDebugString("/renemyone /y" + std::to_string(entityUniqueID) + " has been /ccreated.");
+		InsertDebugString("/renemyone id: /y" + std::to_string(entityUniqueID) + " has been /ccreated.");
 		stateMachine->SetCurrentState(EnemyIdle::Instance());
-		InsertDebugString("/renemy /y" + std::to_string(entityUniqueID) + " /cstate set.");
 	}
 	virtual void ChildUpdates(Keyboard&kbd, Mouse& mouse, float dt) override {
 		stateMachine->Update();

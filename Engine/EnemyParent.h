@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Entity.h"
+#include "BuildingParent.h"
 
 #include <assert.h>
 #include <sstream>
@@ -8,13 +9,13 @@
 
 class EnemyParent : public Entity {
 public:
-	EnemyParent(const float& size, const Vecf3& loc)
+	EnemyParent(const float& size, const Vecf3& loc, std::shared_ptr<EntityQueryHandler>& entityQueryHandler)
 		:
-		Entity(size, loc)
+		Entity(size, loc, entityQueryHandler)
 	{}
-	EnemyParent(const float& size, const Veci2& loc, const float& heightDisplaced, const float& worldSize, const int& gridSize)
+	EnemyParent(const float& size, const Veci2& loc, const float& heightDisplaced, const float& worldSize, const int& gridSize, std::shared_ptr<EntityQueryHandler>& entityQueryHandler)
 		:
-		Entity(size, loc, heightDisplaced + size/4.0f, worldSize, gridSize)
+		Entity(size, loc, heightDisplaced + size/4.0f, worldSize, gridSize, entityQueryHandler)
 	{}
 	virtual void Update(Keyboard&kbd, Mouse& mouse, float dt) 
 	{
@@ -22,7 +23,7 @@ public:
 		/*if (currentState) {
 			currentState->Execute(this);
 		}*/
-		if (!needPath) {
+		if (!needPath && currentPath.size() > 0) {
 			ExecutePath(stepCounter);
 		}
 		ChildUpdates(kbd, mouse, dt);
@@ -71,9 +72,8 @@ public:
 			InitStartPath();
 		}
 	}
-	void SetPathSpeed() {}
 public:
-	bool needPath = true;
+	bool needPath = false;
 	Vecf3 targetDestination = {-8.0f, 0.1f, -8.0f};
 private:
 	std::vector<Vecf3> currentPath;
@@ -86,7 +86,6 @@ private:
 	Vecf3 velBetweenPoints;
 	int pathStep;
 
-	// fsm variables
 	std::wstringstream ss;
 
 };

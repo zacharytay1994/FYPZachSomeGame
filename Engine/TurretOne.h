@@ -5,9 +5,9 @@
 
 class TurretOne : public TurretParent {
 public:
-	TurretOne(const float& size, const Veci2& loc, const float& heightDisplaced, const float& worldSize, const int& gridSize, const int& rateOfFire)
+	TurretOne(const float& size, const Veci2& loc, const float& heightDisplaced, const float& worldSize, const int& gridSize, const int& rateOfFire, std::shared_ptr<EntityQueryHandler>& entityQueryHandler)
 		:
-		TurretParent(size, loc, heightDisplaced, worldSize, gridSize, rateOfFire)
+		TurretParent(size, loc, heightDisplaced, worldSize, gridSize, rateOfFire, entityQueryHandler)
 	{
 		InsertDebugString("/tturretone /y" + std::to_string(entityUniqueID) + " has been /ccreated.");
 	}

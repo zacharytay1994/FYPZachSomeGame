@@ -31,9 +31,10 @@ public:
 			eh.AddTurret(1.0f, TexPosToGridPos(eh.gridSize, TexPosAtMouse(mouse)));
 			break;
 		case 2:
-			eh.AddEnemy(1.0f, TexPosToGridPos(eh.gridSize, TexPosAtMouse(mouse)));
+			eh.AddEnemy(0.5f, TexPosToGridPos(eh.gridSize, TexPosAtMouse(mouse)));
 			break;
 		case 3:
+			eh.AddBuilding(3.0f, TexPosToGridPos(eh.gridSize, TexPosAtMouse(mouse)));
 			break;
 		}
 	}

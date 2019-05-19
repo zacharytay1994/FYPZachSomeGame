@@ -8,6 +8,7 @@
 #include "SurfaceDirectionalLighting.h"
 #include "ZBuffer.h"
 #include "Graphics.h"
+#include "MessageDispatcher.h"
 
 #include "Keyboard.h"
 #include "Mouse.h"
@@ -145,6 +146,11 @@ public:
 		double timeElapsed = now - Clock::begin;
 		debugQueue.push_back({ string, timeElapsed });
 	}
+	bool HandleMessage(const MessageDispatcher::Telegram& msg) {
+		InsertDebugString("entity /y" + std::to_string(entityUniqueID) + " message received.");
+		receivedMessage = true;
+		return true;
+	}
 public:
 	std::vector<DebugMessage> debugQueue;
 
@@ -177,4 +183,6 @@ protected:
 	// finite state machine variables
 	int entityUniqueID;
 	static int nextValidID;
+	// testing bool
+	bool receivedMessage = false;
 };

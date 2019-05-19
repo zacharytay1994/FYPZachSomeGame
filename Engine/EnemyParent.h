@@ -73,7 +73,7 @@ public:
 			spawnLocationOffset += velBetweenPoints;
 			stepCounter++;
 		}
-		// increment edge count, total edge = total points - 1
+		// increment edge count, total edge = total points - 1, index = size - 1, hence pathSize - 2
 		else if (pathStep < pathSize - 2) {
 			pathStep++;
 			currentPoint = currentPath[pathStep];

@@ -32,6 +32,7 @@
 #include <vector>
 #include <memory>
 #include <random>
+#include <map>
 
 #include <sstream>
 #include <string>
@@ -52,7 +53,7 @@ public:
 		consoleBox(consoleBox)
 	{
 		// initialize entity query handler
-		entityQueryHandler = std::make_shared<EntityQueryHandler>(turretBuffer, enemyBuffer, buildingBuffer, projectileBuffer);
+		entityQueryHandler = std::make_shared<EntityQueryHandler>(turretBuffer, enemyBuffer, buildingBuffer, projectileBuffer, entityMap);
 		// initialized the effect used by the pipeline, non static textures, red for enemy, green for turret, and blue for buildings
 		entityPipeline->effect.pixelShader.SetStaticTexture(false);
 		entityPipeline->effect.pixelShader.AddTexture("redimage.bmp");
@@ -193,37 +194,45 @@ public:
 	// functions to add entities into the world (size, location) { -----
 	void AddEntity(const float& size, const Veci2& loc) {
 		entityBuffer.emplace_back(std::make_unique<EntityOne>(size, loc, worldSize, gridSize, entityQueryHandler));
+		entityMap[(*(entityBuffer.end() - 1))->GetUniqueID()] = (*(entityBuffer.end() - 1)).get();
 	}
 	void AddEntity(const float& size, const Veci3& loc) {
 		entityBuffer.emplace_back(std::make_unique<EntityOne>(size, loc, worldSize, gridSize, entityQueryHandler));
+		entityMap[(*(entityBuffer.end() - 1))->GetUniqueID()] = (*(entityBuffer.end() - 1)).get();
 	}
 	void AddSolid(const float& size, const Veci2& loc) {
 		solidBuffer.emplace_back(std::make_unique<EntityOne>(size, loc, worldSize, gridSize, entityQueryHandler));
 		(*(solidBuffer.end() - 1))->Calculate3DLocationOffset();
 		(*(solidBuffer.end() - 1))->CalculateBoundaries();
+		entityMap[(*(solidBuffer.end() - 1))->GetUniqueID()] = (*(solidBuffer.end() - 1)).get();
 	}
 	void AddSolid(const float& size, const Veci3& loc) {
 		solidBuffer.emplace_back(std::make_unique<EntityOne>(size, loc, worldSize, gridSize, entityQueryHandler));
 		(*(solidBuffer.end() - 1))->Calculate3DLocationOffset();
 		(*(solidBuffer.end() - 1))->CalculateBoundaries();
+		entityMap[(*(solidBuffer.end() - 1))->GetUniqueID()] = (*(solidBuffer.end() - 1)).get();
 	}
 	void AddTurret(const float& size, const Veci2& loc) {
 		float temp = heightmap->heightDisplacementGrid[loc.y*heightmap->width + loc.x];
 		turretBuffer.emplace_back(std::make_unique<TurretOne>(size, loc, temp, worldSize, gridSize, 1, entityQueryHandler));
 		(*(turretBuffer.end() - 1))->Calculate3DLocationOffset();
+		entityMap[(*(turretBuffer.end() - 1))->GetUniqueID()] = (*(turretBuffer.end() - 1)).get();
 	}
 	void AddEnemy(const float& size, const Vecf3& loc) {
 		enemyBuffer.emplace_back(std::make_unique<EnemyOne>(size, loc, entityQueryHandler, terrainWithPath));
+		entityMap[(*(enemyBuffer.end() - 1))->GetUniqueID()] = (*(enemyBuffer.end() - 1)).get();
 	}
 	void AddEnemy(const float& size, const Veci2& loc) {
 		float temp = heightmap->heightDisplacementGrid[loc.y*heightmap->width + loc.x];
 		enemyBuffer.emplace_back(std::make_unique<EnemyOne>(size, loc, temp, worldSize, gridSize, entityQueryHandler, terrainWithPath));
 		(*(enemyBuffer.end() - 1))->originalSpawnLocation = (*(enemyBuffer.end() - 1))->Calculate3DLocationOffset();
+		entityMap[(*(enemyBuffer.end() - 1))->GetUniqueID()] = (*(enemyBuffer.end() - 1)).get();
 	}
 	void AddBuilding(const float& size, const Veci2& loc) {
 		float temp = heightmap->heightDisplacementGrid[loc.y*heightmap->width + loc.x];
 		buildingBuffer.emplace_back(std::make_unique<BuildingOne>(size, loc, temp, worldSize, gridSize, entityQueryHandler));
 		(*(buildingBuffer.end() - 1))->Calculate3DLocationOffset();
+		entityMap[(*(buildingBuffer.end() - 1))->GetUniqueID()] = (*(buildingBuffer.end() - 1)).get();
 	}
 	void PopulateRandomTurrets(const int& amount) {
 		std::random_device rand;
@@ -343,6 +352,8 @@ private:
 	std::vector<std::unique_ptr<EnemyParent>> enemiesAwaitingPath;
 	// buffer that holds all buildings in the world
 	std::vector<std::unique_ptr<BuildingParent>> buildingBuffer;
+	// map storing all entities in the game
+	std::map<int, Entity*> entityMap;
 	// entity query handler
 	std::shared_ptr<EntityQueryHandler> entityQueryHandler;
 	

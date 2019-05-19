@@ -6,18 +6,21 @@
 #include "ProjectileParent.h"
 
 #include <memory>
+#include <map>
 
 class EntityQueryHandler {
 public:
 	EntityQueryHandler(std::vector <std::unique_ptr<TurretParent>>& turretBuffer,
 		std::vector <std::unique_ptr<EnemyParent>>& enemyBuffer,
 		std::vector <std::unique_ptr<BuildingParent>>& buildingBuffer,
-		std::vector <std::unique_ptr<ProjectileParent>>& projectileBuffer)
+		std::vector <std::unique_ptr<ProjectileParent>>& projectileBuffer,
+		std::map<int, Entity*>& entityMap)
 		:
 		TurretBuffer(turretBuffer),
 		EnemyBuffer(enemyBuffer),
 		BuildingBuffer(buildingBuffer),
-		ProjectileBuffer(projectileBuffer)
+		ProjectileBuffer(projectileBuffer),
+		entityMap(entityMap)
 	{}
 	float DistanceBetween(const Vecf3& p1, const Vecf3& p2) {
 		return (sq(p2.x - p1.x) + sq(p2.z - p1.z));
@@ -39,9 +42,14 @@ public:
 		}
 		return false;
 	}
+	Entity* GetEntityFromID(const int& entity) {
+		return entityMap[entity];
+	}
 private:
 	std::vector <std::unique_ptr<TurretParent>>& TurretBuffer;
 	std::vector <std::unique_ptr<EnemyParent>>& EnemyBuffer;
 	std::vector <std::unique_ptr<BuildingParent>>& BuildingBuffer;
 	std::vector <std::unique_ptr<ProjectileParent>>& ProjectileBuffer;
+
+	std::map<int, Entity*>& entityMap;
 };

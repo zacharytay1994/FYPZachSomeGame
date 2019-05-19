@@ -21,6 +21,7 @@ public:
 		stateMachine(std::make_unique<StateMachine<EnemyOne>>(this))
 	{
 		InsertDebugString("/renemyone id: /y" + std::to_string(entityUniqueID) + " has been /ccreated.");
+		MessageDispatcher::Instance()->DispatchMsg(0.0, this, 0, 1, nullptr);
 		stateMachine->SetCurrentState(EnemyIdle::Instance());
 	}
 	virtual void ChildUpdates(Keyboard&kbd, Mouse& mouse, float dt) override {

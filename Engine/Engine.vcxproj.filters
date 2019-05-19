@@ -109,6 +109,9 @@
     <Filter Include="Header Files\Entity\Buildings">
       <UniqueIdentifier>{289e3ff4-c756-4470-a34d-538df49223ba}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\AI\TelegramMessenger">
+      <UniqueIdentifier>{e71256dc-e184-42dc-8737-5f96544b62c1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ChiliWin.h">
@@ -372,6 +375,9 @@
     <ClInclude Include="EnemyMove.h">
       <Filter>Header Files\AI\EnemyStates\HeaderFiles</Filter>
     </ClInclude>
+    <ClInclude Include="MessageDispatcher.h">
+      <Filter>Header Files\AI\TelegramMessenger</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DXErr.cpp">
@@ -418,6 +424,9 @@
     </ClCompile>
     <ClCompile Include="EnemyMove.cpp">
       <Filter>Header Files\AI\EnemyStates\SourceFiles</Filter>
+    </ClCompile>
+    <ClCompile Include="MessageDispatcher.cpp">
+      <Filter>Header Files\AI\TelegramMessenger</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

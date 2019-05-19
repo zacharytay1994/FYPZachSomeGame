@@ -24,6 +24,7 @@ public:
 	}
 	void SetGlobalState(std::shared_ptr<State<EntityType>> state) {
 		globalState = state;
+		globalState->Enter(entityOwner);
 	}
 	std::shared_ptr<State<EntityType>> GetCurrentState() {
 		return currentState;
@@ -56,6 +57,15 @@ public:
 		currentState = newState;
 		// enter new state
 		currentState->Enter(entityOwner);
+	}
+	void ChangeGlobalState(std::shared_ptr<State<EntityType>> newState) {
+		assert(newState&&"trying to change to a null state");
+		// exit current global state
+		globalState->Exit(entityOwner);
+		// set global state to new state
+		globalState = newState;
+		// enter global state
+		globalState->Enter(entityOwner);
 	}
 	void RevertState() {
 		ChangeState(previousState);

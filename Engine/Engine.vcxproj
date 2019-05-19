@@ -139,6 +139,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Board.h" />
+    <ClInclude Include="BuildingAlive.h" />
+    <ClInclude Include="BuildingDead.h" />
     <ClInclude Include="BuildingOne.h" />
     <ClInclude Include="BuildingParent.h" />
     <ClInclude Include="ChiliException.h" />
@@ -156,7 +158,10 @@
     <ClInclude Include="DebugWorld.h" />
     <ClInclude Include="DefaultVertexShader.h" />
     <ClInclude Include="DXErr.h" />
+    <ClInclude Include="EnemyAlive.h" />
+    <ClInclude Include="EnemyAttack.h" />
     <ClInclude Include="EnemyAwaitPath.h" />
+    <ClInclude Include="EnemyDead.h" />
     <ClInclude Include="EnemyIdle.h" />
     <ClInclude Include="EnemyMove.h" />
     <ClInclude Include="EnemyOne.h" />
@@ -217,6 +222,8 @@
     <ClInclude Include="TextureEffectPerPixel.h" />
     <ClInclude Include="TextureVertex.h" />
     <ClInclude Include="Triangle.h" />
+    <ClInclude Include="TurretAttack.h" />
+    <ClInclude Include="TurretIdle.h" />
     <ClInclude Include="TurretOne.h" />
     <ClInclude Include="TurretParent.h" />
     <ClInclude Include="TurretThree.h" />
@@ -228,10 +235,15 @@
     <ClInclude Include="ZBuffer.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="BuildingAlive.cpp" />
+    <ClCompile Include="BuildingDead.cpp" />
     <ClCompile Include="Clock.cpp" />
     <ClCompile Include="COMInitializer.cpp" />
     <ClCompile Include="DXErr.cpp" />
+    <ClCompile Include="EnemyAlive.cpp" />
+    <ClCompile Include="EnemyAttack.cpp" />
     <ClCompile Include="EnemyAwaitPath.cpp" />
+    <ClCompile Include="EnemyDead.cpp" />
     <ClCompile Include="EnemyIdle.cpp" />
     <ClCompile Include="EnemyMove.cpp" />
     <ClCompile Include="Entity.cpp" />
@@ -244,6 +256,8 @@
     <ClCompile Include="Mouse.cpp" />
     <ClCompile Include="Sound.cpp" />
     <ClCompile Include="Surface.cpp" />
+    <ClCompile Include="TurretAttack.cpp" />
+    <ClCompile Include="TurretIdle.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="FramebufferPS.hlsl">

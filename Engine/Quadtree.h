@@ -133,22 +133,26 @@ public:
 		// query if range overlaps with node boundary,
 		// if node does overlap and is divided, recursively query inner nodes,
 		// if node does overlap and is not divided, check with all elements held by that node to see if elements fall within range
-		void QueryQt(Rect& range) {
+		void QueryQt(Rect& range, int& hits, const float& yHeight, const float& sizeRadius) {
 			if (range.IsOverlapRect(boundary)) {
 				// if not divided return points within boundary
 				if (!divided) {
 					for (T* e : nodeArray) {
-						if (range.IsOverlap(Vecf2(e->GetSpawnLocationOffset().x, e->GetSpawnLocationOffset().z))) {
-							e->isColliding = true;
+						if (!e->toDestroy) {
+							if (range.IsOverlap(Vecf2(e->GetSpawnLocationOffset().x, e->GetSpawnLocationOffset().z)) && (abs(e->GetSpawnLocationOffset().y - yHeight) < sizeRadius)) {
+								e->toDestroy = true;
+								hits++;
+								e->isColliding = true;
+							}
 						}
 					}
 				}
 				// if divided query inner nodes
 				else {
-					northWest->QueryQt(range);
-					northEast->QueryQt(range);
-					southWest->QueryQt(range);
-					southEast->QueryQt(range);
+					northWest->QueryQt(range, hits, yHeight, sizeRadius);
+					northEast->QueryQt(range, hits, yHeight, sizeRadius);
+					southWest->QueryQt(range, hits, yHeight, sizeRadius);
+					southEast->QueryQt(range, hits, yHeight, sizeRadius);
 				}
 			}
 		}
@@ -214,8 +218,8 @@ public:
 		//ss << "root reset" << std::endl;
 	}
 	// queries the quadtree recursively through the nodes, and does stuff to elements that falls within range
-	void QueryQt(Rect& queryRange) {
-		rootNode->QueryQt(queryRange);
+	void QueryQt(Rect& queryRange, int& hits, const float& yHeight, const float& sizeRadius) {
+		rootNode->QueryQt(queryRange, hits, yHeight, sizeRadius);
 	}
 	// sets query range mainly for debugging purposes
 	void SetQueryRange(Rect& queryRangeIn) {

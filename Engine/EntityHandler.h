@@ -53,7 +53,7 @@ public:
 		consoleBox(consoleBox)
 	{
 		// initialize entity query handler
-		entityQueryHandler = std::make_shared<EntityQueryHandler>(turretBuffer, enemyBuffer, buildingBuffer, projectileBuffer, entityMap);
+		entityQueryHandler = std::make_shared<EntityQueryHandler>(turretBuffer, enemyBuffer, buildingBuffer, projectileBuffer, entityMap, projectileQt);
 		// initialized the effect used by the pipeline, non static textures, red for enemy, green for turret, and blue for buildings
 		entityPipeline->effect.pixelShader.SetStaticTexture(false);
 		entityPipeline->effect.pixelShader.AddTexture("redimage.bmp");
@@ -72,35 +72,39 @@ public:
 		for (std::vector<std::unique_ptr<TurretParent>>::iterator x = turretBuffer.begin(); x != tEnd; std::advance(x, 1)) {
 			(*x)->Update(kbd, mouse, dt);
 			ReadDebugQueue((*x)->debugQueue);
-			if (enemyBuffer.size() > 0) {
+			/*if (enemyBuffer.size() > 0) {
 				(*x)->targetLocation = QueryEnemyLocation(*(enemyBuffer.begin()));
-			}
+			}*/
 		}
 		// update projectile entities buffer
 		projectileQt.Reset();
 		std::vector<std::unique_ptr<ProjectileParent>>::iterator pEnd = projectileBuffer.end();
 		for (std::vector<std::unique_ptr<ProjectileParent>>::iterator x = projectileBuffer.begin(); x != pEnd; std::advance(x, 1)) {
-			/*if ((x != pEnd) && (*x)->toDestroy) {
+			if (!(*x)->toDestroy) {
+				/*if ((x != pEnd) && (*x)->toDestroy) {
 				QuickRemoveProjectile(projectileBuffer, x, pEnd);
 			}
 			if (x != pEnd) {
 				(*x)->Update(kbd, mouse, dt);
 			}*/
-			(*x)->Update(kbd, mouse, dt);
-			ReadDebugQueue((*x)->debugQueue);
-			// check if projectile collides with the terrain surface
-			terrainWithPath->QueryQuadCollisionEstimate((*x)->GetSpawnLocationOffset(), (*x).get());
+				(*x)->Update(kbd, mouse, dt);
+				ReadDebugQueue((*x)->debugQueue);
+				// check if projectile collides with the terrain surface
+				terrainWithPath->QueryQuadCollisionEstimate((*x)->GetSpawnLocationOffset(), (*x).get());
 
-			// reset colliding flag of projectile
-			(*x)->isColliding = false;
-			// add projectile into the projectile quadtree
-			projectileQt.InsertElement((*x).get());
+				// reset colliding flag of projectile
+				(*x)->isColliding = false;
+				// add projectile into the projectile quadtree
+				projectileQt.InsertElement((*x).get());
+			}
 		}
 		// update enemy entities buffer
 		std::vector<std::unique_ptr<EnemyParent>>::iterator eEnd = enemyBuffer.end();
 		for (std::vector<std::unique_ptr<EnemyParent>>::iterator x = enemyBuffer.begin(); x != eEnd; std::advance(x, 1)) {
-			(*x)->Update(kbd, mouse, dt);
-			ReadDebugQueue((*x)->debugQueue);
+			if (!(*x)->isDead) {
+				(*x)->Update(kbd, mouse, dt);
+				ReadDebugQueue((*x)->debugQueue);
+			}
 			//ReadDebugQueue((*x)->debugQueue);
 			// check if enemy needs new path, find it a new path
 			/*if ((*x)->needPath) {
@@ -110,19 +114,21 @@ public:
 		// update building entities buffer
 		std::vector<std::unique_ptr<BuildingParent>>::iterator bEnd = buildingBuffer.end();
 		for (std::vector<std::unique_ptr<BuildingParent>>::iterator x = buildingBuffer.begin(); x != bEnd; std::advance(x, 1)) {
-			(*x)->Update(kbd, mouse, dt);
-			ReadDebugQueue((*x)->debugQueue);
+			if (!(*x)->IsDestroyed()) {
+				(*x)->Update(kbd, mouse, dt);
+				ReadDebugQueue((*x)->debugQueue);
+			}
 		}
 		// entity handler functions
 		GetProjectilesFromTurrets();
-		if (enemyBuffer.size() > 0) {
-			// queries the quadtree with temporary aabb of enemy entities
-			projectileQt.QueryQt(Rect(Vecf2(enemyBuffer[0]->GetSpawnLocationOffset().x, enemyBuffer[0]->GetSpawnLocationOffset().z), 4.0f, 4.0f));
-			// set query range variable of quadtree object for debugging purposes
-			projectileQt.SetQueryRange(Rect(Vecf2(enemyBuffer[0]->GetSpawnLocationOffset().x, enemyBuffer[0]->GetSpawnLocationOffset().z), 4.0f, 4.0f));
-		}
+		//if (enemyBuffer.size() > 0) {
+		//	// queries the quadtree with temporary aabb of enemy entities
+		//	//projectileQt.QueryQt(Rect(Vecf2(enemyBuffer[0]->GetSpawnLocationOffset().x, enemyBuffer[0]->GetSpawnLocationOffset().z), 4.0f, 4.0f));
+		//	// set query range variable of quadtree object for debugging purposes
+		//	projectileQt.SetQueryRange(Rect(Vecf2(enemyBuffer[0]->GetSpawnLocationOffset().x, enemyBuffer[0]->GetSpawnLocationOffset().z), 4.0f, 4.0f));
+		//}
 		// Write entity debug messages to console
-		WriteEDMToConsole();
+		//WriteEDMToConsole();
 	}
 
 	void Draw(const Matf4& viewMatrix, const Matf4& projectionMatrix) {
@@ -151,28 +157,34 @@ public:
 		// loop through and render projectile buffer
 		std::vector<std::unique_ptr<ProjectileParent>>::iterator pEnd = projectileBuffer.end();
 		for (std::vector<std::unique_ptr<ProjectileParent>>::iterator x = projectileBuffer.begin(); x != pEnd; std::advance(x, 1)) {
-			translateVector = (*x)->GetSpawnLocationOffset();
-			worldTransform = Matf4::RotationZ(0.0f) * Matf4::RotationX(0.0f) * Matf4::RotationY(0.0f) * Matf4::Translation(translateVector);
-			entityPipeline->effect.vertexShader.BindWorld(worldTransform);
-			entityPipeline->Draw((*x)->GetCubeList());
+			if (!(*x)->toDestroy) {
+				translateVector = (*x)->GetSpawnLocationOffset();
+				worldTransform = Matf4::RotationZ(0.0f) * Matf4::RotationX(0.0f) * Matf4::RotationY(0.0f) * Matf4::Translation(translateVector);
+				entityPipeline->effect.vertexShader.BindWorld(worldTransform);
+				entityPipeline->Draw((*x)->GetCubeList());
+			}
 		}
 		// loop through and render enemy entities
 		entityPipeline->effect.pixelShader.SetTextureType(TextureEntityType::Enemy);
 		std::vector<std::unique_ptr<EnemyParent>>::iterator eEnd = enemyBuffer.end();
 		for (std::vector<std::unique_ptr<EnemyParent>>::iterator x = enemyBuffer.begin(); x != eEnd; std::advance(x, 1)) {
-			translateVector = (*x)->GetSpawnLocationOffset();
-			worldTransform = Matf4::RotationZ(0.0f) * Matf4::RotationX(0.0f) * Matf4::RotationY(0.0f) * Matf4::Translation(translateVector);
-			entityPipeline->effect.vertexShader.BindWorld(worldTransform);
-			entityPipeline->Draw((*x)->GetCubeList());
+			if (!(*x)->isDead) {
+				translateVector = (*x)->GetSpawnLocationOffset();
+				worldTransform = Matf4::RotationZ(0.0f) * Matf4::RotationX(0.0f) * Matf4::RotationY(0.0f) * Matf4::Translation(translateVector);
+				entityPipeline->effect.vertexShader.BindWorld(worldTransform);
+				entityPipeline->Draw((*x)->GetCubeList());
+			}
 		}
 		// loop through and render building entities
 		entityPipeline->effect.pixelShader.SetTextureType(TextureEntityType::Building);
 		std::vector<std::unique_ptr<BuildingParent>>::iterator bEnd = buildingBuffer.end();
 		for (std::vector<std::unique_ptr<BuildingParent>>::iterator x = buildingBuffer.begin(); x != bEnd; std::advance(x, 1)) {
-			translateVector = (*x)->GetSpawnLocationOffset();
-			worldTransform = Matf4::RotationZ(0.0f) * Matf4::RotationX(0.0f) * Matf4::RotationY(0.0f) * Matf4::Translation(translateVector);
-			entityPipeline->effect.vertexShader.BindWorld(worldTransform);
-			entityPipeline->Draw((*x)->GetCubeList());
+			if (!(*x)->IsDestroyed()) {
+				translateVector = (*x)->GetSpawnLocationOffset();
+				worldTransform = Matf4::RotationZ(0.0f) * Matf4::RotationX(0.0f) * Matf4::RotationY(0.0f) * Matf4::Translation(translateVector);
+				entityPipeline->effect.vertexShader.BindWorld(worldTransform);
+				entityPipeline->Draw((*x)->GetCubeList());
+			}
 		}
 		// loop through and render solid entities
 		end = solidBuffer.end();
@@ -225,7 +237,7 @@ public:
 	void AddEnemy(const float& size, const Veci2& loc) {
 		float temp = heightmap->heightDisplacementGrid[loc.y*heightmap->width + loc.x];
 		enemyBuffer.emplace_back(std::make_unique<EnemyOne>(size, loc, temp, worldSize, gridSize, entityQueryHandler, terrainWithPath));
-		(*(enemyBuffer.end() - 1))->originalSpawnLocation = (*(enemyBuffer.end() - 1))->Calculate3DLocationOffset();
+		(*(enemyBuffer.end() - 1))->Calculate3DLocationOffset();
 		entityMap[(*(enemyBuffer.end() - 1))->GetUniqueID()] = (*(enemyBuffer.end() - 1)).get();
 	}
 	void AddBuilding(const float& size, const Veci2& loc) {

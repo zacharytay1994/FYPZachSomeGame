@@ -13,5 +13,26 @@ public:
 		ChildUpdates(kbd, mouse, dt);
 	}
 	virtual void ChildUpdates(Keyboard&kbd, Mouse& mouse, float dt) = 0;
+
+	virtual void ChildMessage(const MessageDispatcher::Telegram& msg) {
+		switch (msg.enumMessage) {
+			// MessageDispatcher::Messages::AttackFor1Damage
+			case 0:
+				health -= 1;
+				InsertDebugString("/bbuildingone id: /y" + std::to_string(entityUniqueID) + " has lost /y1 health.");
+				if (health <= 0) {
+					isDestroyed = true;
+					unableToReceiveMessage = true;
+				}
+				break;
+		}
+	}
+
+	bool IsDestroyed() {
+		return isDestroyed;
+	}
+public:
+	int health = 3;
 private:
+	bool isDestroyed = false;
 };

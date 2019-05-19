@@ -21,6 +21,7 @@ public:
 		ChildUpdates(kbd, mouse, dt);
 	}
 	virtual void ChildUpdates(Keyboard&kbd, Mouse& mouse, float dt) = 0;
+	virtual void ChildMessage(const MessageDispatcher::Telegram& msg) override {}
 	virtual void ApplyExternalForce(const Vecf3& force) {
 		velocity += force;
 	}

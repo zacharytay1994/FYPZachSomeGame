@@ -26,6 +26,7 @@ public:
 		rateOfFire(rateOfFire)
 	{}
 	virtual void Update(Keyboard&kbd, Mouse& mouse, float dt) = 0;
+	virtual void ChildMessage(const MessageDispatcher::Telegram& msg) override {}
 	enum class ProjectileType {
 		ProjectileOne,
 		ProjectileTwo,
@@ -85,4 +86,9 @@ public:
 	float timePerProjectile = 1.0f / rateOfFire;
 	Vecf3 targetLocation = {0.0f, 0.0f, 0.0f};
 	bool hasTarget;
+	float maxRange = 12.0f;
+
+	// enemy target lock
+	bool targetFound = false;
+	Entity* target;
 };

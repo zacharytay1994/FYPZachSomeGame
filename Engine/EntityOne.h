@@ -34,5 +34,6 @@ public:
 			velocity.z *= -1;
 		}
 	}
+	virtual void ChildMessage(const MessageDispatcher::Telegram& msg) override {}
 private:
 };

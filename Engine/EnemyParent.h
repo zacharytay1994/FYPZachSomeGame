@@ -10,15 +10,21 @@
 class TerrainWithPath;
 class EnemyParent : public Entity {
 public:
-	EnemyParent(const float& size, const Vecf3& loc, std::shared_ptr<EntityQueryHandler>& entityQueryHandler, std::shared_ptr<TerrainWithPath>& terrainWithPath)
+	EnemyParent(const float& size, const Vecf3& loc, std::shared_ptr<EntityQueryHandler>& entityQueryHandler, std::shared_ptr<TerrainWithPath>& terrainWithPath,
+		const float& attackRange, const int& attackSpeed)
 		:
 		Entity(size, loc, entityQueryHandler),
-		terrainWithPath(terrainWithPath)
+		terrainWithPath(terrainWithPath),
+		attackRange(attackRange),
+		attackSpeed(attackSpeed)
 	{}
-	EnemyParent(const float& size, const Veci2& loc, const float& heightDisplaced, const float& worldSize, const int& gridSize, std::shared_ptr<EntityQueryHandler>& entityQueryHandler, std::shared_ptr<TerrainWithPath>& terrainWithPath)
+	EnemyParent(const float& size, const Veci2& loc, const float& heightDisplaced, const float& worldSize, const int& gridSize, std::shared_ptr<EntityQueryHandler>& entityQueryHandler, std::shared_ptr<TerrainWithPath>& terrainWithPath,
+		const float& attackRange, const int& attackSpeed)
 		:
 		Entity(size, loc, heightDisplaced + size/4.0f, worldSize, gridSize, entityQueryHandler),
-		terrainWithPath(terrainWithPath)
+		terrainWithPath(terrainWithPath),
+		attackRange(attackRange),
+		attackSpeed(attackSpeed)
 	{}
 	virtual void Update(Keyboard&kbd, Mouse& mouse, float dt) 
 	{
@@ -36,8 +42,10 @@ public:
 		}*/
 	}
 	virtual void ChildUpdates(Keyboard&kbd, Mouse& mouse, float dt) = 0;
+	virtual void ChildMessage(const MessageDispatcher::Telegram& msg) override {}
 	virtual bool SetCurrentPath(const std::vector<Vecf3>& newPath) {
 		currentPath = newPath;
+		TrimPath(currentPath);
 		pathSize = (int)currentPath.size();
 		//InsertDebugString("/renemy /y" + std::to_string(entityUniqueID) + " path /cfound.");
 		InitStartPath();
@@ -83,26 +91,55 @@ public:
 			stepCounter = 0;
 			//InsertDebugString("/renemy /y" + std::to_string(entityUniqueID) + " /bexecuting path step /y" + std::to_string(pathStep) + ".");
 		}
-		else if (notreversed) {
+		/*else if (notreversed) {
 			std::reverse(currentPath.begin(), currentPath.end());
 			InsertDebugString("/renemy /y" + std::to_string(entityUniqueID) + " path /creversed.");
 			InitStartPath();
 			notreversed = false;
-		}
+		}*/
 		else {
 			reachedDestination = true;
 		}
 	}
+	void TrimPath(std::vector<Vecf3>& currentPathIn) {
+		float trimVal = 0.0f;
+		std::vector<Vecf3>::iterator front = currentPathIn.begin();
+		for (std::vector<Vecf3>::iterator back = (currentPathIn.end() - 1); (back != front) && (trimVal < (attackRange - cellDiameter)); std::advance(back, -1)) {
+			trimVal += DistanceBetween(*back, *(back - 1));
+			currentPathIn.pop_back();
+		}
+	}
 	int GetStepCounter() {
 		return stepCounter;
+	}
+	virtual bool AttackAtSpeed() {
+		if (clock < timePerAttack) {
+			clock += 1.0f / 60.0f;
+			return true;
+		}
+		else {
+			MessageDispatcher::Instance()->DispatchMsg(0.0, this, targetID, static_cast<int>(MessageDispatcher::Messages::AttackFor1Damage), nullptr);
+			InsertDebugString("/renemyone id: /y" + std::to_string(entityUniqueID) + " attacked /bbuildingone id: /y" + std::to_string(targetID));
+			clock = 0.0f;
+			return true;
+		}
+	}
+	bool IsDead() {
+		return isDead;
 	}
 public:
 	bool needPath = false;
 	Vecf3 targetDestination = {-8.0f, 0.1f, -8.0f};
 	bool reachedDestination = false;
 	bool notreversed = true;
-
-	Vecf3 originalSpawnLocation;
+	// attack variables
+	int targetID;
+	float attackRange;
+	int attackSpeed; 
+	float clock = 0.0f;
+	float timePerAttack = 1.0f / attackSpeed;
+	int health = 3;
+	bool isDead = false;
 
 	// reference to query path
 	std::shared_ptr<TerrainWithPath> terrainWithPath;

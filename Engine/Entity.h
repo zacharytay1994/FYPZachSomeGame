@@ -23,13 +23,10 @@ class Entity {
 public:
 	struct DebugMessage {
 		bool operator()(const DebugMessage& lhs, const DebugMessage& rhs) const {
-			if (lhs == rhs) {
-				return false;
-			}
 			return lhs > rhs;
 		}
 		bool operator>(const DebugMessage& rhs) const {
-			return timeElapsed > rhs.timeElapsed;
+			return id > rhs.id;
 		}
 		bool operator<(const DebugMessage& rhs) const {
 			return timeElapsed < rhs.timeElapsed;
@@ -45,6 +42,7 @@ public:
 		}
 		std::string message;
 		double timeElapsed;
+		int id;
 	};
 	Entity(const float& size, const Vecf3& loc, const float& worldSize, const int& gridSize, std::shared_ptr<EntityQueryHandler>& entityQueryHandler)
 		:
@@ -78,6 +76,7 @@ public:
 		SetUniqueID();
 	}
 	virtual void Update(Keyboard&kbd, Mouse& mouse, float dt) = 0;
+	virtual void ChildMessage(const MessageDispatcher::Telegram& msg) = 0;
 	virtual void Draw(const Matf4& viewMatrix, const Matf4& projectionMatrix) {
 		/*entityPipeline->effect.vertexShader.BindWorld(Matf4::RotationZ(0.0f) * Matf4::RotationX(0.0f) * Matf4::RotationY(0.0f) * Matf4::Translation(spawnLocationOffset));
 		entityPipeline->effect.vertexShader.BindView(viewMatrix);
@@ -144,18 +143,30 @@ public:
 	void InsertDebugString(const std::string& string) {
 		std::clock_t now = clock();
 		double timeElapsed = now - Clock::begin;
-		debugQueue.push_back({ string, timeElapsed });
+		debugQueue.push_back({ string, timeElapsed, nextValidMessageID});
+		nextValidMessageID++;
 	}
 	bool HandleMessage(const MessageDispatcher::Telegram& msg) {
 		InsertDebugString("entity /y" + std::to_string(entityUniqueID) + " message received.");
 		receivedMessage = true;
+		ChildMessage(msg);
 		return true;
+	}
+	bool UnableToReceiveMessage() {
+		return unableToReceiveMessage;
+	}
+	// returns distance squared
+	float DistanceBetween(const Vecf3 p1, const Vecf3 p2) {
+		return sqrt((sq(p2.x - p1.x) + sq(p2.y - p1.y) + sq(p2.z - p1.z)));
 	}
 public:
 	std::vector<DebugMessage> debugQueue;
 
 	// handles the query of other entities in the world
 	std::shared_ptr<EntityQueryHandler> entityQueryHandler;
+
+	// flag to see if entity still exists as simulated object in game world
+	bool exists = true;
 protected:
 	// 2d location based on board range (x, z) (0-99, 0-99), y coordinate is always world coordinate not (0-99)
 	Veci2 locationOnBoard2D; 
@@ -183,6 +194,8 @@ protected:
 	// finite state machine variables
 	int entityUniqueID;
 	static int nextValidID;
+	static int nextValidMessageID;
 	// testing bool
 	bool receivedMessage = false;
+	bool unableToReceiveMessage = false;
 };

@@ -112,6 +112,24 @@
     <Filter Include="Header Files\AI\TelegramMessenger">
       <UniqueIdentifier>{e71256dc-e184-42dc-8737-5f96544b62c1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\AI\BuildingStates">
+      <UniqueIdentifier>{5b85ad77-0f11-414a-afe4-171f5adbc516}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\AI\BuildingStates\HeaderFiles">
+      <UniqueIdentifier>{ff30cafd-b3bd-47ef-9017-721278deb457}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\AI\BuildingStates\SourceFiles">
+      <UniqueIdentifier>{8a61ee89-e649-4cc5-b137-d15a35b9b6f8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\AI\TurretStates">
+      <UniqueIdentifier>{38bdff6d-de57-4b46-b18d-0e356697b2d1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\AI\TurretStates\HeaderFiles">
+      <UniqueIdentifier>{d28143bd-cbe8-400f-8d0e-4b099ba80052}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\AI\TurretStates\SourceFiles">
+      <UniqueIdentifier>{7b94a43a-eb15-4ca4-833d-2b359537c8b6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ChiliWin.h">
@@ -378,6 +396,27 @@
     <ClInclude Include="MessageDispatcher.h">
       <Filter>Header Files\AI\TelegramMessenger</Filter>
     </ClInclude>
+    <ClInclude Include="EnemyAttack.h">
+      <Filter>Header Files\AI\EnemyStates\HeaderFiles</Filter>
+    </ClInclude>
+    <ClInclude Include="BuildingAlive.h">
+      <Filter>Header Files\AI\BuildingStates\HeaderFiles</Filter>
+    </ClInclude>
+    <ClInclude Include="BuildingDead.h">
+      <Filter>Header Files\AI\BuildingStates\HeaderFiles</Filter>
+    </ClInclude>
+    <ClInclude Include="TurretIdle.h">
+      <Filter>Header Files\AI\TurretStates\HeaderFiles</Filter>
+    </ClInclude>
+    <ClInclude Include="TurretAttack.h">
+      <Filter>Header Files\AI\TurretStates\HeaderFiles</Filter>
+    </ClInclude>
+    <ClInclude Include="EnemyAlive.h">
+      <Filter>Header Files\AI\EnemyStates\HeaderFiles</Filter>
+    </ClInclude>
+    <ClInclude Include="EnemyDead.h">
+      <Filter>Header Files\AI\EnemyStates\HeaderFiles</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DXErr.cpp">
@@ -427,6 +466,27 @@
     </ClCompile>
     <ClCompile Include="MessageDispatcher.cpp">
       <Filter>Header Files\AI\TelegramMessenger</Filter>
+    </ClCompile>
+    <ClCompile Include="EnemyAttack.cpp">
+      <Filter>Header Files\AI\EnemyStates\SourceFiles</Filter>
+    </ClCompile>
+    <ClCompile Include="BuildingAlive.cpp">
+      <Filter>Header Files\AI\BuildingStates\SourceFiles</Filter>
+    </ClCompile>
+    <ClCompile Include="BuildingDead.cpp">
+      <Filter>Header Files\AI\BuildingStates\SourceFiles</Filter>
+    </ClCompile>
+    <ClCompile Include="TurretIdle.cpp">
+      <Filter>Header Files\AI\TurretStates\SourceFiles</Filter>
+    </ClCompile>
+    <ClCompile Include="TurretAttack.cpp">
+      <Filter>Header Files\AI\TurretStates\SourceFiles</Filter>
+    </ClCompile>
+    <ClCompile Include="EnemyAlive.cpp">
+      <Filter>Header Files\AI\EnemyStates\SourceFiles</Filter>
+    </ClCompile>
+    <ClCompile Include="EnemyDead.cpp">
+      <Filter>Header Files\AI\EnemyStates\SourceFiles</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

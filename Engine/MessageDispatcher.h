@@ -6,6 +6,9 @@
 class Entity;
 class MessageDispatcher {
 public:
+	enum class Messages {
+		AttackFor1Damage
+	};
 	struct Telegram {
 		bool operator()(const Telegram& lhs, const Telegram& rhs) {
 			return lhs < rhs;

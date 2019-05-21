@@ -32,14 +32,15 @@ public:
 		ProjectileTwo,
 		ProjectileThree
 	};
+	// adds projectile to projectileData array to be passed to entityHandler to spawn
 	virtual void SpawnProjectile(const ProjectileType& type) {
 		Vecf3 velocityHolder;
 		if (CalculateVelocity(velocityHolder, type)) {
 			struct ProjectileData data = { static_cast<int>(type), velocityHolder };
 			ProjectileData.push_back(data);
 		}
-		
 	}
+	// fire projectile at rateOfFire/second
 	virtual void FireAtRate(const ProjectileType& type) {
 		if (clock < timePerProjectile) {
 			clock += 1.0f / 60.0f;
@@ -49,12 +50,15 @@ public:
 			clock = 0.0f;
 		}
 	}
+	// calculates angle of projection to fire at projectilespeed in order to hit the target
 	virtual bool CalculateAngleOfProjection(float& theta, const ProjectileType& type, const float& projectileSpeed) {
 		if (Physics::GetProjectionAngleElevated(spawnLocationOffset, targetLocation, projectileSpeed, theta, ProjectileCatalogue::GetType(static_cast<int>(type)))) {
 			return true;
 		}
 		return false;
 	}
+	// takes speed of projectile from projectile catalogue
+	// calculates angle of projection, calculates velocity based of those 2
 	virtual bool CalculateVelocity(Vecf3& velocityHolder, const ProjectileType& type) {
 		float theta;
 		float projectileSpeed = ProjectileCatalogue::GetSpeed(static_cast<int>(type));
@@ -80,6 +84,7 @@ public:
 		return false;
 	}
 public:
+	// array of projectiles the turret wants to fire, passing it to entityHandler to spawn
 	std::vector<ProjectileData> ProjectileData;
 	int rateOfFire;
 	float clock = 0.0f;
@@ -90,5 +95,6 @@ public:
 
 	// enemy target lock
 	bool targetFound = false;
+	// reference to entity target
 	Entity* target;
 };

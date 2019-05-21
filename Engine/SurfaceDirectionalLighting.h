@@ -234,6 +234,7 @@ public:
 					(int)std::min(input.texpos.y * tex_height, height_clamp));
 				return (Color)(colorReturn * input.intensity);
 			}
+			// if calling instance requires different textures per entity
 			else {
 				Vecf3 colorReturn = (Vecf3)textureList[entityType].texture->GetPixel(
 					(int)std::min(input.texpos.x * textureList[entityType].tex_width, textureList[entityType].width_clamp),
@@ -267,6 +268,7 @@ public:
 		}
 	private:
 		// texture attributes
+		// array of textures for drawing entities with different textures
 		std::vector<Texture> textureList;
 		std::unique_ptr<Surface> texture;
 		float tex_width;
@@ -274,6 +276,7 @@ public:
 		float width_clamp;
 		float height_clamp;
 		int entityType = 0;
+		// whether calling entities require different textures
 		bool staticTexture = true;
 	};
 public:

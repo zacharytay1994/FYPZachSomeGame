@@ -17,9 +17,11 @@ void EnemyMove::Enter(EnemyOne *& entity)
 
 void EnemyMove::Execute(EnemyOne *& entity)
 {
+	// if entity has not reached destination, continue executing path
 	if (entity->reachedDestination == false) {
 		entity->ExecutePath(entity->GetStepCounter());
 	}
+	// else terminate path, and change state back to idle
 	else {
 		entity->TerminatePath();
 		entity->stateMachine->ChangeState(EnemyIdle::Instance());

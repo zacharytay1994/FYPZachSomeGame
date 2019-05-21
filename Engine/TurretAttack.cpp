@@ -16,10 +16,13 @@ void TurretAttack::Enter(TurretOne *& entity)
 
 void TurretAttack::Execute(TurretOne *& entity)
 {
+	// update target location with target entity location
 	entity->targetLocation = entity->target->GetSpawnLocationOffset();
+	// if target is within firing range, and target exists, i.e. alive, calls attack
 	if (!(entity->DistanceBetween(entity->GetSpawnLocationOffset(), entity->targetLocation) > entity->maxRange) && entity->target->exists) {
 		entity->Attack();
 	}
+	// else set targetFound flag to false, and switch state back to idle state
 	else {
 		entity->targetFound = false;
 		entity->stateMachine->ChangeState(TurretIdle::Instance());

@@ -28,35 +28,26 @@ public:
 	{}
 	virtual void Update(Keyboard&kbd, Mouse& mouse, float dt) 
 	{
-		// execute current state
-		/*if (currentState) {
-			currentState->Execute(this);
-		}*/
 		ChildUpdates(kbd, mouse, dt);
-		/*if (reachedDestination == false) {
-			ExecutePath(stepCounter);
-		}
-		else {
-			TerminatePath();
-			reachedDestination = true;
-		}*/
 	}
 	virtual void ChildUpdates(Keyboard&kbd, Mouse& mouse, float dt) = 0;
 	virtual void ChildMessage(const MessageDispatcher::Telegram& msg) override {}
+	// elaborate set method to set current path, together with other relavant attributes, also trims the path
 	virtual bool SetCurrentPath(const std::vector<Vecf3>& newPath) {
 		currentPath = newPath;
 		TrimPath(currentPath);
 		pathSize = (int)currentPath.size();
-		//InsertDebugString("/renemy /y" + std::to_string(entityUniqueID) + " path /cfound.");
 		InitStartPath();
 		return true;
 	}
+	// calculates the velocity required to traverse 2 points at a particular speed (in this case pathSpeed)
 	Vecf3 ApproximatePoints(const Vecf3& startPoint, const Vecf3& endPoint) {
 		const float xStep = (endPoint.x - startPoint.x) * pathSpeed;
 		const float yStep = (endPoint.y - startPoint.y) * pathSpeed;
 		const float zStep = (endPoint.z - startPoint.z) * pathSpeed;
 		return { xStep, yStep, zStep };
 	}
+	// intializes the current path by setting and calculating various variables to be used while executing path
 	void InitStartPath() {
 		assert(pathSize != 0);
 		pathStep = 0;
@@ -65,16 +56,14 @@ public:
 		nextPoint = currentPath[pathStep + 1];
 		spawnLocationOffset = currentPath[pathStep];
 		velBetweenPoints = ApproximatePoints(currentPoint, nextPoint);
-		//InsertDebugString("/renemy /y" + std::to_string(entityUniqueID) + " path /cexecuted.");
 	}
+	// clears currentPath array, and sets reachedDestination flag back to false
 	void TerminatePath() {
-		//pathStep = 0;
-		//stepCounter = 0;
 		currentPath.clear();
-		notreversed = true;
 		reachedDestination = false;
 		InsertDebugString("/renemyone id: /y" + std::to_string(GetUniqueID()) + " /cpath terminated.");
 	}
+	// executed the path, following the Vecf3 point array
 	void ExecutePath(const int& stepCounterIn) {
 		// traverse edge
 		if (stepCounterIn < stepCounterMax) {
@@ -89,18 +78,13 @@ public:
 			velBetweenPoints = ApproximatePoints(currentPoint, nextPoint);
 			spawnLocationOffset = currentPoint;
 			stepCounter = 0;
-			//InsertDebugString("/renemy /y" + std::to_string(entityUniqueID) + " /bexecuting path step /y" + std::to_string(pathStep) + ".");
 		}
-		/*else if (notreversed) {
-			std::reverse(currentPath.begin(), currentPath.end());
-			InsertDebugString("/renemy /y" + std::to_string(entityUniqueID) + " path /creversed.");
-			InitStartPath();
-			notreversed = false;
-		}*/
+		// if reached the second last elements of currentPath array, i.e. end of path
 		else {
 			reachedDestination = true;
 		}
 	}
+	// shortens the path (Vecf3 point array) to stop once within attack range
 	void TrimPath(std::vector<Vecf3>& currentPathIn) {
 		float trimVal = 0.0f;
 		std::vector<Vecf3>::iterator front = currentPathIn.begin();
@@ -109,9 +93,7 @@ public:
 			currentPathIn.pop_back();
 		}
 	}
-	int GetStepCounter() {
-		return stepCounter;
-	}
+	// attacks at speed of attackSpeed/second
 	virtual bool AttackAtSpeed() {
 		if (clock < timePerAttack) {
 			clock += 1.0f / 60.0f;
@@ -124,36 +106,44 @@ public:
 			return true;
 		}
 	}
+	int GetStepCounter() {
+		return stepCounter;
+	}
 	bool IsDead() {
 		return isDead;
 	}
 public:
-	bool needPath = false;
-	Vecf3 targetDestination = {-8.0f, 0.1f, -8.0f};
-	bool reachedDestination = false;
-	bool notreversed = true;
+	// path flags
+	// needPath not really used, but just leaving it in case for the future
+	bool	needPath = false;
+	// target destination
+	Vecf3	targetDestination;
+	bool	reachedDestination = false;
+
 	// attack variables
-	int targetID;
-	float attackRange;
-	int attackSpeed; 
-	float clock = 0.0f;
-	float timePerAttack = 1.0f / attackSpeed;
-	int health = 3;
-	bool isDead = false;
+	// entityUniqueID of current entity target
+	int		targetID;
+	float	attackRange;
+	int		attackSpeed; 
+	float	clock = 0.0f;
+	float	timePerAttack = 1.0f / attackSpeed;
+	int		health = 3;
+
+	// global flag to whether enemy is dead
+	bool	isDead = false;
 
 	// reference to query path
 	std::shared_ptr<TerrainWithPath> terrainWithPath;
 private:
 	std::vector<Vecf3> currentPath;
-	int pathSize = (int)currentPath.size();
-	float pathSpeed = 0.05f;
-	int stepCounterMax = (int)(1 / pathSpeed);
-	Vecf3 currentPoint;
-	Vecf3 nextPoint;
-	Vecf3 velBetweenPoints;
-	int pathStep;
-	int stepCounter;
+	int		pathSize = (int)currentPath.size();
+	float	pathSpeed = 0.05f;
+	int		stepCounterMax = (int)(1 / pathSpeed);
+	int		pathStep;
+	int		stepCounter;
+	Vecf3	currentPoint;
+	Vecf3	nextPoint;
+	Vecf3	velBetweenPoints;
 
 	std::wstringstream ss;
-
 };

@@ -22,7 +22,7 @@ public:
 				InsertDebugString("/bbuildingone id: /y" + std::to_string(entityUniqueID) + " has lost /y1 health.");
 				if (health <= 0) {
 					isDestroyed = true;
-					unableToReceiveMessage = true;
+					exists = false;
 				}
 				break;
 		}

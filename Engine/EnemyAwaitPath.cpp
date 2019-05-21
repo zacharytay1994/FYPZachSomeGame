@@ -18,7 +18,6 @@ void EnemyAwaitPath::Enter(EnemyOne *& entity)
 
 void EnemyAwaitPath::Execute(EnemyOne *& entity)
 {
-	//entity->InsertDebugString("now executing /cawaiting /cpath /c state.");
 	// attempt to find path to target destination
 	std::vector<Vecf3> holder;
 	if (entity->terrainWithPath->FindAndReturnPath(entity->GetSpawnLocationOffset(), entity->targetDestination, holder)) {
@@ -26,6 +25,7 @@ void EnemyAwaitPath::Execute(EnemyOne *& entity)
 		entity->SetCurrentPath(holder);
 		entity->stateMachine->ChangeState(EnemyMove::Instance());
 	}
+	// else adds entity to, inaccessible array, and changes state to back to idle (to be added)
 }
 
 void EnemyAwaitPath::Exit(EnemyOne *& entity)

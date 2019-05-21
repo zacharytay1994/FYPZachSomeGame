@@ -10,10 +10,9 @@ class EnemyOne : public EnemyParent {
 public:
 	EnemyOne(const float& size, const Vecf3& loc, std::shared_ptr<EntityQueryHandler>& entityQueryHandler, std::shared_ptr<TerrainWithPath>& terrainWithPath)
 		:
-		EnemyParent(size, loc, entityQueryHandler, terrainWithPath, 5.0f, 1),
+		EnemyParent(size, loc, entityQueryHandler, terrainWithPath, 5.0f, 1), // attackRange, attackSpeed
 		stateMachine(std::make_unique<StateMachine<EnemyOne>>(this))
 	{
-		//entityPipeline->effect.pixelShader.BindTexture("greenimage.bmp");
 		InsertDebugString("/renemyone id: /y" + std::to_string(entityUniqueID) + " has been /ccreated");
 	}
 	EnemyOne(const float& size, const Veci2& loc, const float& heightDisplaced, const float& worldSize, const int& gridSize, std::shared_ptr<EntityQueryHandler>& entityQueryHandler, std::shared_ptr<TerrainWithPath>& terrainWithPath)
@@ -22,7 +21,7 @@ public:
 		stateMachine(std::make_unique<StateMachine<EnemyOne>>(this))
 	{
 		InsertDebugString("/renemyone id: /y" + std::to_string(entityUniqueID) + " has been /ccreated.");
-		//MessageDispatcher::Instance()->DispatchMsg(0.0, this, 0, 1, nullptr);
+		// initialized state machine variables
 		stateMachine->SetCurrentState(EnemyIdle::Instance());
 		stateMachine->SetGlobalState(EnemyAlive::Instance());
 	}

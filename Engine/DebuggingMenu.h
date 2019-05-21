@@ -60,6 +60,4 @@ private:
 	Vecf2 mousePosition;
 	ConsoleScene consoleScene = ConsoleScene(gfx, fontList);
 	bool consoleOut = false;
-	// scene reference to be passed to entity select screen menu
-	//DebugWorld* scene;
 };

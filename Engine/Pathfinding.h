@@ -181,6 +181,7 @@ public:
 		}
 		return false;
 	}
+	// returns Vecf3 array of nodes converted to points, representing an array of world coordinates forming a path
 	std::vector<Vecf3> GetPointsOfPath() {
 		std::vector<Vecf3> holder;
 		for (NodeAStar* n : currentPath) {

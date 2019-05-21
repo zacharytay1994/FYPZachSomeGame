@@ -25,9 +25,11 @@ public:
 		entityMap(entityMap),
 		projectileQt(projectileQt)
 	{}
+	// returns squared distance between 2 points in world coordinates
 	float DistanceBetween(const Vecf3& p1, const Vecf3& p2) {
 		return (sq(p2.x - p1.x) + sq(p2.y - p1.y) + sq(p2.z - p1.z));
 	}
+	// return details of the nearest building found relative to a specific position in world coordinates from the building buffer, i.e. buildings in world
 	bool QueryNearestBuilding(const Vecf3& fromLocation, Vecf3& toLocation, float& distanceAway, int& targetID) {
 		if (BuildingBuffer.size() > 0) {
 			bool buildingExists = false;
@@ -54,9 +56,11 @@ public:
 		}
 		return false;
 	}
+	// returns pointer to entity of targetID taken from entityMap
 	Entity* GetEntityFromID(const int& entity) {
 		return entityMap[entity];
 	}
+	// returns nearest entity reference relative to a position in world
 	bool QueryNearestEnemy(const Vecf3 fromLocation, Entity*& entity) {
 		if (EnemyBuffer.size() > 0) {
 			bool enemyExists = false;
@@ -79,6 +83,7 @@ public:
 		}
 		return false;
 	}
+	// returns number of projectiles that overlap with an entity relative to its size, i.e aabb 
 	int CheckProjectileEnemyCollision(Entity* entity) {
 		int hits = 0;
 		projectileQt.QueryQt(Rect(Vecf2(entity->GetSpawnLocationOffset().x, entity->GetSpawnLocationOffset().z), entity->GetSize()/2.0f, entity->GetSize()/2.0f), hits, entity->GetSpawnLocationOffset().y, entity->GetSize()/2.0f);
@@ -90,6 +95,7 @@ private:
 	std::vector <std::unique_ptr<BuildingParent>>& BuildingBuffer;
 	std::vector <std::unique_ptr<ProjectileParent>>& ProjectileBuffer;
 
+	// stores all entities in the world with <key:uniqueEntityID, value:Entity*>
 	std::map<int, Entity*>& entityMap;
 	// quadtree data structure used to store projectiles for positional queries
 	Quadtree<ProjectileParent>& projectileQt;

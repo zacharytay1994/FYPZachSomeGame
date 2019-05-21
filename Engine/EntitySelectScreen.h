@@ -67,18 +67,6 @@ public:
 					(*scenes.begin())->mouseInteract.SetEntitySelected(static_cast<int>(EntitySelected::none));
 					break;
 				}
-				/*if (eventID == 1) {
-					surface = supSurfaces[1];
-				}
-				else if (eventID == 2) {
-					surface = supSurfaces[2];
-				}
-				else if (eventID == 3) {
-					surface = supSurfaces[3];
-				}
-				else if (eventID == 4) {
-					menuScenes.pop();
-				}*/
 			}
 		}
 	}
@@ -89,8 +77,6 @@ private:
 	const Surface supSurfaces[4] = { Surface("entityselectscreen.bmp"), Surface("entityselectscreen2.bmp"),
 		Surface("entityselectscreen3.bmp"), Surface("entityselectscreen4.bmp") };
 	Vecf2 mousePosition;
-	// scene reference
-	//DebugWorld* debugWorld;
 	// mouse interact variables
 	int entitySelected = 0;
 };

@@ -77,12 +77,8 @@ public:
 	}
 	virtual void Update(Keyboard&kbd, Mouse& mouse, float dt) = 0;
 	virtual void ChildMessage(const MessageDispatcher::Telegram& msg) = 0;
-	virtual void Draw(const Matf4& viewMatrix, const Matf4& projectionMatrix) {
-		/*entityPipeline->effect.vertexShader.BindWorld(Matf4::RotationZ(0.0f) * Matf4::RotationX(0.0f) * Matf4::RotationY(0.0f) * Matf4::Translation(spawnLocationOffset));
-		entityPipeline->effect.vertexShader.BindView(viewMatrix);
-		entityPipeline->effect.vertexShader.BindProjection(projectionMatrix);
-		entityPipeline->Draw(cubeList);*/
-	}
+	// redundant draw call, not used as drawing is done by entityHandler and not by entity, left here for now
+	virtual void Draw(const Matf4& viewMatrix, const Matf4& projectionMatrix) {}
 	virtual Veci2 Get2DLocation() {
 		return locationOnBoard2D;
 	}
@@ -133,6 +129,7 @@ public:
 		}
 		return false;
 	}
+	// sets and increments
 	void SetUniqueID() {
 		entityUniqueID = nextValidID;
 		nextValidID++;
@@ -140,20 +137,19 @@ public:
 	int GetUniqueID() {
 		return entityUniqueID;
 	}
+	// created Entity::DebugMessage and inserts it into debugQueue to be read by entityHandler to display to console
 	void InsertDebugString(const std::string& string) {
 		std::clock_t now = clock();
 		double timeElapsed = now - Clock::begin;
 		debugQueue.push_back({ string, timeElapsed, nextValidMessageID});
 		nextValidMessageID++;
 	}
+	// handles message sent by other entities, executing based on msg.enumMessage from MessageDispatcher::Messages
 	bool HandleMessage(const MessageDispatcher::Telegram& msg) {
 		InsertDebugString("entity /y" + std::to_string(entityUniqueID) + " message received.");
 		receivedMessage = true;
 		ChildMessage(msg);
 		return true;
-	}
-	bool UnableToReceiveMessage() {
-		return unableToReceiveMessage;
 	}
 	// returns distance squared
 	float DistanceBetween(const Vecf3 p1, const Vecf3 p2) {
@@ -173,7 +169,7 @@ protected:
 	Vecf3 locationOnBoard3D;
 	float size;
 	float worldSize;
-	int gridSize;
+	int	gridSize;
 	float cellDiameter = worldSize / gridSize;
 	float cellRadius = cellDiameter / 2;
 	// boundaries
@@ -193,9 +189,9 @@ protected:
 
 	// finite state machine variables
 	int entityUniqueID;
+	// next valid ID based on all entities in the world
 	static int nextValidID;
 	static int nextValidMessageID;
 	// testing bool
 	bool receivedMessage = false;
-	bool unableToReceiveMessage = false;
 };

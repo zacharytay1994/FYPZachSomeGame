@@ -16,10 +16,11 @@ void EnemyAttack::Enter(EnemyOne *& entity)
 
 void EnemyAttack::Execute(EnemyOne *& entity)
 {
-	//MessageDispatcher::Instance()->DispatchMsg(0.0, entity, entity->targetID, 1, nullptr);
-	if (!entity->entityQueryHandler->GetEntityFromID(entity->targetID)->UnableToReceiveMessage()) {
+	// if entity of targetID still exists, i.e. is alive, calls attack on it
+	if (entity->entityQueryHandler->GetEntityFromID(entity->targetID)->exists) {
 		entity->AttackAtSpeed();
 	}
+	// else changes state back to idle
 	else {
 		entity->stateMachine->ChangeState(EnemyIdle::Instance());
 	}

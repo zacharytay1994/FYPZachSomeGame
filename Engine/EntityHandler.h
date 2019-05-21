@@ -105,11 +105,7 @@ public:
 				(*x)->Update(kbd, mouse, dt);
 				ReadDebugQueue((*x)->debugQueue);
 			}
-			//ReadDebugQueue((*x)->debugQueue);
-			// check if enemy needs new path, find it a new path
-			/*if ((*x)->needPath) {
-				QueryPathfinder((*x));
-			}*/
+			ReadDebugQueue((*x)->debugQueue);
 		}
 		// update building entities buffer
 		std::vector<std::unique_ptr<BuildingParent>>::iterator bEnd = buildingBuffer.end();
@@ -127,8 +123,8 @@ public:
 		//	// set query range variable of quadtree object for debugging purposes
 		//	projectileQt.SetQueryRange(Rect(Vecf2(enemyBuffer[0]->GetSpawnLocationOffset().x, enemyBuffer[0]->GetSpawnLocationOffset().z), 4.0f, 4.0f));
 		//}
-		// Write entity debug messages to console
-		//WriteEDMToConsole();
+		// Write entity debug messages to console, i.e. all InsertDebugString() functions
+		WriteEDMToConsole();
 	}
 
 	void Draw(const Matf4& viewMatrix, const Matf4& projectionMatrix) {
@@ -226,7 +222,7 @@ public:
 	}
 	void AddTurret(const float& size, const Veci2& loc) {
 		float temp = heightmap->heightDisplacementGrid[loc.y*heightmap->width + loc.x];
-		turretBuffer.emplace_back(std::make_unique<TurretOne>(size, loc, temp, worldSize, gridSize, 1, entityQueryHandler));
+		turretBuffer.emplace_back(std::make_unique<TurretOne>(size, loc, temp + 1.0f, worldSize, gridSize, 1, entityQueryHandler));
 		(*(turretBuffer.end() - 1))->Calculate3DLocationOffset();
 		entityMap[(*(turretBuffer.end() - 1))->GetUniqueID()] = (*(turretBuffer.end() - 1)).get();
 	}

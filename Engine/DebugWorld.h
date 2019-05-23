@@ -31,7 +31,7 @@ public:
 		:
 		sceneZBuffer(std::make_shared<ZBuffer>(gfx.ScreenWidth, gfx.ScreenHeight)),
 		Scene("Debug world", sceneZBuffer, gfx),
-		terrainWithPath(std::make_shared<TerrainWithPath>(gfx, sceneZBuffer, "heightmap2.bmp", "parchmentpaper.bmp", worldSize, gridSize, 0.0f, 8.0f)), // TerrainWithPath(graphics, zbuffer, heightmap, surface texture, world size, grid size, min world height, max world height)
+		terrainWithPath(std::make_shared<TerrainWithPath>(gfx, sceneZBuffer, "blackimage.bmp", "whiteimage.bmp", worldSize, gridSize, 0.0f, 8.0f)), // TerrainWithPath(graphics, zbuffer, heightmap, surface texture, world size, grid size, min world height, max world height)
 		entityHandler(gfx, sceneZBuffer, worldSize, gridSize, terrainWithPath, consoleBox),
 		consoleBox(std::make_shared<ConsoleBox>(gfx, sceneZBuffer, fontList))
 	{
@@ -41,6 +41,7 @@ public:
 		//entityHandler.AddEnemy(1.0f, { 8.0f, 0.1f, 8.0f });
 		//entityHandler.AddBuilding(3.0f, { 25, 25 });
 		//entityHandler.AddEnemy(1.0f, { 75, 75 });
+		entityHandler.AddEnemyAA(0.5f, { 75, 75 });
 		//entityHandler.PopulateRandomTurrets(15);
 		//entityHandler.AddTurret(2.5f, { 50, 50 });
 		// make known to world terrain of solid obstacle entities

@@ -137,7 +137,7 @@ public:
 private:
 	std::vector<Vecf3> currentPath;
 	int		pathSize = (int)currentPath.size();
-	float	pathSpeed = 0.05f;
+	float	pathSpeed = 0.1f;
 	int		stepCounterMax = (int)(1 / pathSpeed);
 	int		pathStep;
 	int		stepCounter;

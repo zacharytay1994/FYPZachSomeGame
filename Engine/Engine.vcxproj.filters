@@ -130,6 +130,9 @@
     <Filter Include="Header Files\AI\TurretStates\SourceFiles">
       <UniqueIdentifier>{7b94a43a-eb15-4ca4-833d-2b359537c8b6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\AI\Steering">
+      <UniqueIdentifier>{d7882b19-c5a7-4715-973a-0a3fcdb5379d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ChiliWin.h">
@@ -417,6 +420,12 @@
     <ClInclude Include="EnemyDead.h">
       <Filter>Header Files\AI\EnemyStates\HeaderFiles</Filter>
     </ClInclude>
+    <ClInclude Include="Steering.h">
+      <Filter>Header Files\AI\Steering</Filter>
+    </ClInclude>
+    <ClInclude Include="EnemyAAOne.h">
+      <Filter>Header Files\Entity\Enemies</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DXErr.cpp">
@@ -487,6 +496,9 @@
     </ClCompile>
     <ClCompile Include="EnemyDead.cpp">
       <Filter>Header Files\AI\EnemyStates\SourceFiles</Filter>
+    </ClCompile>
+    <ClCompile Include="Steering.cpp">
+      <Filter>Header Files\AI\Steering</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

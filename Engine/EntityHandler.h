@@ -17,6 +17,7 @@
 // typed of enemies
 #include "EnemyParent.h"
 #include "EnemyOne.h"
+#include "EnemyAAOne.h"
 
 // types of buildings
 #include "BuildingOne.h"
@@ -232,7 +233,13 @@ public:
 	}
 	void AddEnemy(const float& size, const Veci2& loc) {
 		float temp = heightmap->heightDisplacementGrid[loc.y*heightmap->width + loc.x];
-		enemyBuffer.emplace_back(std::make_unique<EnemyOne>(size, loc, temp, worldSize, gridSize, entityQueryHandler, terrainWithPath));
+		enemyBuffer.emplace_back(std::make_unique<EnemyAAOne>(size, loc, temp, worldSize, gridSize, entityQueryHandler, terrainWithPath));
+		(*(enemyBuffer.end() - 1))->Calculate3DLocationOffset();
+		entityMap[(*(enemyBuffer.end() - 1))->GetUniqueID()] = (*(enemyBuffer.end() - 1)).get();
+	}
+	void AddEnemyAA(const float& size, const Veci2& loc) {
+		float temp = heightmap->heightDisplacementGrid[loc.y*heightmap->width + loc.x];
+		enemyBuffer.emplace_back(std::make_unique<EnemyAAOne>(size, loc, temp, worldSize, gridSize, entityQueryHandler, terrainWithPath));
 		(*(enemyBuffer.end() - 1))->Calculate3DLocationOffset();
 		entityMap[(*(enemyBuffer.end() - 1))->GetUniqueID()] = (*(enemyBuffer.end() - 1)).get();
 	}

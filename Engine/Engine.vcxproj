@@ -158,6 +158,7 @@
     <ClInclude Include="DebugWorld.h" />
     <ClInclude Include="DefaultVertexShader.h" />
     <ClInclude Include="DXErr.h" />
+    <ClInclude Include="EnemyAAOne.h" />
     <ClInclude Include="EnemyAlive.h" />
     <ClInclude Include="EnemyAttack.h" />
     <ClInclude Include="EnemyAwaitPath.h" />
@@ -211,6 +212,7 @@
     <ClInclude Include="StartMenuScene.h" />
     <ClInclude Include="State.h" />
     <ClInclude Include="StateMachine.h" />
+    <ClInclude Include="Steering.h" />
     <ClInclude Include="Surface.h" />
     <ClInclude Include="SurfaceDirectionalLighting.h" />
     <ClInclude Include="Terrain.h" />
@@ -255,6 +257,7 @@
     <ClCompile Include="MessageDispatcher.cpp" />
     <ClCompile Include="Mouse.cpp" />
     <ClCompile Include="Sound.cpp" />
+    <ClCompile Include="Steering.cpp" />
     <ClCompile Include="Surface.cpp" />
     <ClCompile Include="TurretAttack.cpp" />
     <ClCompile Include="TurretIdle.cpp" />

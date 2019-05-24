@@ -114,12 +114,12 @@ public:
 		return size;
 	}
 	virtual void CalculateBoundaries() {
-		leftBound = spawnLocationOffset.x - size / 2;
-		rightBound = spawnLocationOffset.x + size / 2;
-		farBound = spawnLocationOffset.z + size / 2;
-		nearBound = spawnLocationOffset.z - size / 2;
-		upBound = spawnLocationOffset.y + size / 2;
-		bottomBound = spawnLocationOffset.y - size / 2;
+		leftBound = spawnLocationOffset.x - size / 2 - cellDiameter * 2;
+		rightBound = spawnLocationOffset.x + size / 2 + cellDiameter * 2;
+		farBound = spawnLocationOffset.z + size / 2 + cellDiameter * 2;
+		nearBound = spawnLocationOffset.z - size / 2 - cellDiameter * 2;
+		upBound = spawnLocationOffset.y + size / 2 + cellDiameter * 2;
+		bottomBound = spawnLocationOffset.y - size / 2 - cellDiameter * 2;
 	}
 	virtual bool PointCollide(const Vecf3& point) {
 		if (point.x > leftBound && point.x < rightBound &&
@@ -154,6 +154,18 @@ public:
 	// returns distance squared
 	float DistanceBetween(const Vecf3 p1, const Vecf3 p2) {
 		return sqrt((sq(p2.x - p1.x) + sq(p2.y - p1.y) + sq(p2.z - p1.z)));
+	}
+	Vecf2 CalculateGridPosition(const Vecf3& vecIn) {
+		return Vecf2((vecIn.x + worldSize / 2.0f)/worldSize*(float)gridSize, gridSize - ((vecIn.z + worldSize / 2.0f)/worldSize*gridSize));
+	}
+	float GetWorldSize() {
+		return worldSize;
+	}
+	int GetGridSize() {
+		return gridSize;
+	}
+	float GetCellDiameter() {
+		return cellDiameter;
 	}
 public:
 	std::vector<DebugMessage> debugQueue;

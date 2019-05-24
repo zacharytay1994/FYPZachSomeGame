@@ -1,11 +1,167 @@
 #include "Steering.h"
 
-Vecf3 Steering::Seek(Vecf3 & currentVelocity, const Vecf3 & currentLocation, const Vecf3 & targetDestination, const float& speed, const float & turningForce)
+#include "EnemyAAOne.h"
+#include "TerrainWithPath.h"
+
+Vecf3 Steering::Seek(EnemyAAOne* entity)
 {
 	// calculate desired velocity
-	Vecf3 desiredVelocity = (targetDestination - currentLocation).GetNormalized() * speed;
+	Vecf3 desiredVelocity = (entity->targetDestination - entity->GetSpawnLocationOffset()).GetNormalized() * entity->speed;
 	// get and return steering velocity
-	Vecf3 steeringForce = (desiredVelocity - currentVelocity).GetNormalized();
+	Vecf3 steeringForce = (desiredVelocity - entity->currentVelocity).GetNormalized();
 	// limit the steering force
-	return currentVelocity = currentVelocity + steeringForce * turningForce;
+	return steeringForce * entity->turningForce;
+}
+
+std::vector<Veci2> Steering::FeelerGridCollision(EnemyAAOne* enemy)
+{
+	std::vector<Veci2> container;
+	int gridSize = enemy->GetGridSize();
+	// get start and end positions of the feeler in grid position
+	Vecf2 startPos = enemy->CalculateGridPosition(enemy->GetSpawnLocationOffset());
+	Vecf2 endPos = enemy->CalculateGridPosition(enemy->GetSpawnLocationOffset() + enemy->currentVelocity * 2);
+	// calculate line segment
+	float rise = endPos.y - startPos.y;
+	float run = endPos.x - startPos.x;
+	// if run != 0
+	if (run != 0) {
+		float gradient = rise / run;
+		float intercept = startPos.y - gradient * startPos.x;
+		// if run < gridCellDiameter, calculate points using rise
+		float increment;
+		int y;
+		int x;
+		// if dx and dy are both not smaller then gridCellDiameter
+		//if (abs(run) > enemy->GetCellDiameter() && abs(rise) > enemy->GetCellDiameter()) {
+		if (abs(rise) < abs(run)) {
+			// calculate using run for more accuracy, also rise might be 0
+			increment = startPos.x;
+			// if run is positive
+			if (run < 0) {
+				while (increment > endPos.x) {
+					increment -= 1.0f;
+					// round y to int closest to start
+					x = int(increment);
+					// round x to int closest to point
+					y = int((gradient*x + intercept) + 0.5f);
+					if (x < gridSize && x > 0 && y < gridSize && y > 0) {
+						container.emplace_back(Veci2(x, y));
+					}
+				}
+			}
+			else if (run > 0) {
+				while (increment < endPos.x) {
+					increment += 1.0f;
+					// round y to int closest to start
+					x = int(increment);
+					// round x to int closest to point
+					y = int((gradient*x + intercept) + 0.5f);
+					if (x < gridSize && x > 0 && y < gridSize && y > 0) {
+						container.emplace_back(Veci2(x, y));
+					}
+				}
+			}
+		}
+		else if (abs(run) < abs(rise)) {
+			// calculate using rise for more accuracy, and rise cannot be 0 in this case
+			increment = startPos.y;
+			// if rise is positive
+			if (rise < 0) {
+				while (increment > endPos.y) {
+					increment -= 1.0f;
+					// round y to int closest to start
+					y = int(increment);
+					// round x to int closest to point
+					x = int(((y - intercept) / gradient) + 0.5f);
+					if (x < gridSize && x > 0 && y < gridSize && y > 0) {
+						container.emplace_back(Veci2(x, y));
+					}
+				}
+			}
+			else if (rise > 0) {
+				while (increment < endPos.y) {
+					increment += 1.0f;
+					// round y to int closest to start
+					y = int(increment);
+					// round x to int closest to point
+					x = int(((y - intercept) / gradient) + 0.5f);
+					if (x < gridSize && x > 0 && y < gridSize && y > 0) {
+						container.emplace_back(Veci2(x, y));
+					}
+				}
+			}
+		}
+		else if (abs(run) == abs(rise)) {
+			// calculate using run for more accuracy, in case rise is 0
+			increment = startPos.y;
+			// if rise is positive
+			if (rise < 0) {
+				while (increment > endPos.y) {
+					increment -= 1.0f;
+					// round y to int closest to start
+					y = int(increment);
+					// round x to int closest to point
+					x = int(((y - intercept) / gradient) + 0.5f);
+					if (x < gridSize && x > 0 && y < gridSize && y > 0) {
+						container.emplace_back(Veci2(x, y));
+					}
+				}
+			}
+			else if (rise < 0) {
+				while (increment < endPos.y) {
+					increment += 1.0f;
+					// round y to int closest to start
+					y = int(increment);
+					// round x to int closest to point
+					x = int(((y - intercept) / gradient) + 0.5f);
+					if (x < gridSize && x > 0 && y < gridSize && y > 0) {
+						container.emplace_back(Veci2(x, y));
+					}
+				}
+			}
+		}
+	}
+	return container;
+}
+
+bool Steering::FeelerCollideSolid(EnemyAAOne* entity, const std::vector<Veci2>& feelerCells, NodeAStar*& node)
+{
+	for (Veci2 i : feelerCells) {
+		NodeAStar* test = entity->terrainWithPath->GetGridCell(i);
+		if (!test->GetWalkable()) {
+			node = test;
+			return true;
+		}
+	}
+	return false;
+}
+
+Vecf3 Steering::AvoidObstacles(const float & incomingMagnitude, const Vecf3 & centerPosition, const Vecf3 & collidePosition)
+{
+	// calculate outward vector
+	Vecf3 outwardVector = (Vecf3(collidePosition.x - centerPosition.x, 0.0f, collidePosition.z - centerPosition.z)).GetNormalized();
+	return outwardVector * incomingMagnitude;
+}
+
+void Steering::ProcessFeelers(EnemyAAOne * entity)
+{
+	//FeelerGridCollision(entity)
+}
+
+Vecf3 Steering::CalculateSteering(EnemyAAOne * entity)
+{
+	Vecf3 seekingForce = Seek(entity);
+	// calculate obstancle avoidance force
+	Vecf3 obstacleAvoid = { 0.0f, 0.0f, 0.0f };
+	// if an obstacle is detected
+	NodeAStar* node;
+	if (FeelerCollideSolid(entity, FeelerGridCollision(entity), node)) {
+		obstacleAvoid = entity->steering.AvoidObstacles(1.0f, node->GetSolidCenter(), node->GetWorldPos());
+	}
+	//float directionCheck = seekingForce * (obstacleAvoid * -1.0f);
+	//// if both vectors cancel each other out
+	//if ((directionCheck > 0.98f && directionCheck < 1.02f)/* || (directionCheck > -1.02f && directionCheck < -0.99f)*/) {
+	//	obstacleAvoid.x = obstacleAvoid.x + 1.0f;
+	//}
+	return seekingForce + obstacleAvoid;
 }

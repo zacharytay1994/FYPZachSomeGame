@@ -247,6 +247,7 @@ public:
 		float temp = heightmap->heightDisplacementGrid[loc.y*heightmap->width + loc.x];
 		buildingBuffer.emplace_back(std::make_unique<BuildingOne>(size, loc, temp, worldSize, gridSize, entityQueryHandler));
 		(*(buildingBuffer.end() - 1))->Calculate3DLocationOffset();
+		(*(buildingBuffer.end() - 1))->CalculateBoundaries();
 		entityMap[(*(buildingBuffer.end() - 1))->GetUniqueID()] = (*(buildingBuffer.end() - 1)).get();
 	}
 	void PopulateRandomTurrets(const int& amount) {
@@ -347,9 +348,12 @@ public:
 			debugMessagePQ.pop();
 		}
 	}
+	
 public:
 	// buffer that holds all solid inanimate entities in the world
 	std::vector <std::unique_ptr<Entity>> solidBuffer;
+	// buffer that holds all buildings in the world
+	std::vector<std::unique_ptr<BuildingParent>> buildingBuffer;
 	// world variables
 	const float worldSize;
 	const int gridSize;
@@ -365,8 +369,6 @@ private:
 	std::vector<std::unique_ptr<EnemyParent>> enemyBuffer;
 	// buffer that holds all enemies in the world that are waiting for a path
 	std::vector<std::unique_ptr<EnemyParent>> enemiesAwaitingPath;
-	// buffer that holds all buildings in the world
-	std::vector<std::unique_ptr<BuildingParent>> buildingBuffer;
 	// map storing all entities in the game
 	std::map<int, Entity*> entityMap;
 	// entity query handler

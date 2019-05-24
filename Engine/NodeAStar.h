@@ -57,6 +57,12 @@ public:
 	void SetInOpen(bool boolIn) {
 		inOpen = boolIn;
 	}
+	void SetSolidCenter(const Vecf3& center) {
+		solidCenter = center;
+	}
+	Vecf3 GetSolidCenter() {
+		return solidCenter;
+	}
 public:
 	// distance from start node to this node
 	int gCost = 0;
@@ -68,6 +74,7 @@ public:
 	float heightValue;
 private:
 	bool walkable;
+	Vecf3 solidCenter;
 	Vecf3 worldPos;
 	// parent node
 	NodeAStar* parent;

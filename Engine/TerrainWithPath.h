@@ -11,6 +11,7 @@
 #include <string>
 #include <cmath>
 #include <sstream>
+#include <assert.h>
 
 // mainly just a wrapper to wrap both Terrain.h and Pathfinding.h neatly together
 class TerrainWithPath {
@@ -33,7 +34,7 @@ public:
 		pathfinding.BindHeightMap(terrain);
 	}
 	// updates pathfinding grid with solid obstacle entities to recognize untraversable terrain
-	void SyncWithWorldEntities(std::vector<std::unique_ptr<Entity>>& solidBuffer) {
+	void SyncWithWorldEntities(std::vector<std::unique_ptr<BuildingParent>>& solidBuffer) {
 		pathfinding.UpdateGridObstacles(solidBuffer);
 	}
 	// renders terrain
@@ -132,6 +133,10 @@ public:
 			return true;
 		}
 		return false;
+	}
+	NodeAStar* GetGridCell(const Veci2& cell) {
+		assert(cell.x < gridSize && cell.x > 0 && cell.y < gridSize && cell.y > 0);
+		return pathfinding.grid->grid[cell.y*gridSize + cell.x].get();
 	}
 public:
 	// size of the grid, i.e. number of square tiles (2 triangular quads) making up the world

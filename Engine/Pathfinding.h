@@ -136,7 +136,7 @@ public:
 
 	// update grid with obstacle entities from solidBuffer in entityHandler, 
 	// CALLS: GridAStar.h, CALLEDBY: TerrainWithPath::SyncWithWorldEntities
-	void Pathfinding::UpdateGridObstacles(std::vector<std::unique_ptr<Entity>>& solidBuffer) {
+	void Pathfinding::UpdateGridObstacles(std::vector<std::unique_ptr<BuildingParent>>& solidBuffer) {
 		grid->UpdateWalkable(solidBuffer);
 	}
 
@@ -151,7 +151,7 @@ public:
 		grid->DrawPath(viewMatrix, projectionMatrix, currentPath);
 	}
 	// redefine node grid, no longer used at the moment
-	void Pathfinding::RedefineGrid(const float & radius, std::vector<std::unique_ptr<Entity>>& solidBuffer) {
+	void Pathfinding::RedefineGrid(const float & radius, std::vector<std::unique_ptr<BuildingParent>>& solidBuffer) {
 		grid->RedefineGrid(radius, solidBuffer);
 	}
 	// sets the height value of nodes in the world grid to their respective heights based on the heightmap used for terrain generation,
@@ -189,10 +189,10 @@ public:
 		}
 		return holder;
 	}
-
-private:
+public:
 	// grid of nodes/gridcells used in pathfinding
 	std::unique_ptr<GridAStar> grid;
+private:
 	// stores the last path calculated by FindPath();
 	std::vector<NodeAStar*> currentPath;
 	// container of nodes used in previous calculations to reset

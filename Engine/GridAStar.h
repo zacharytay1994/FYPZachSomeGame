@@ -42,20 +42,21 @@ public:
 		gridPipeline->effect.pixelShader.BindTexture("greenimage.bmp");
 	}
 	// updates nodes in grid array with walkable boolean based on solid entities in the world
-	void UpdateWalkable(std::vector<std::unique_ptr<Entity>>& solidBuffer) {
-		std::vector<std::unique_ptr<Entity>>::iterator end = solidBuffer.end();
+	void UpdateWalkable(std::vector<std::unique_ptr<BuildingParent>>& solidBuffer) {
+		std::vector<std::unique_ptr<BuildingParent>>::iterator end = solidBuffer.end();
 		std::vector<std::unique_ptr<NodeAStar>>::iterator gridEnd = grid.end();
 		for (std::vector<std::unique_ptr<NodeAStar>>::iterator j = grid.begin(); j != gridEnd; std::advance(j,1)) {
 			(*j)->SetWalkable(true);
-			for (std::vector<std::unique_ptr<Entity>>::iterator i = solidBuffer.begin(); i != end; std::advance(i, 1)) {
+			for (std::vector<std::unique_ptr<BuildingParent>>::iterator i = solidBuffer.begin(); i != end; std::advance(i, 1)) {
 				if ((*i)->PointCollide((*j)->GetWorldPos())) {
 					(*j)->SetWalkable(false);
+					(*j)->SetSolidCenter((*i)->GetSpawnLocationOffset());
 				}
 			}
 		}
 	}
 	// redefines the grid parameters, not used anymore at the moment
-	void RedefineGrid(const float& radius, std::vector<std::unique_ptr<Entity>>& solidBuffer) {
+	void RedefineGrid(const float& radius, std::vector<std::unique_ptr<BuildingParent>>& solidBuffer) {
 		grid.clear();
 		nodeRadius = radius;
 		nodeDiameter = nodeRadius * 2;

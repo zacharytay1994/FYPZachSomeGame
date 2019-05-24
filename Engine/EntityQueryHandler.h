@@ -16,14 +16,16 @@ public:
 		std::vector <std::unique_ptr<BuildingParent>>& buildingBuffer,
 		std::vector <std::unique_ptr<ProjectileParent>>& projectileBuffer,
 		std::map<int, Entity*>& entityMap,
-		Quadtree<ProjectileParent>& projectileQt)
+		Quadtree<ProjectileParent>& projectileQt,
+		Quadtree<EnemyParent>& enemyQt)
 		:
 		TurretBuffer(turretBuffer),
 		EnemyBuffer(enemyBuffer),
 		BuildingBuffer(buildingBuffer),
 		ProjectileBuffer(projectileBuffer),
 		entityMap(entityMap),
-		projectileQt(projectileQt)
+		projectileQt(projectileQt),
+		enemyQt(enemyQt)
 	{}
 	// returns squared distance between 2 points in world coordinates
 	float DistanceBetween(const Vecf3& p1, const Vecf3& p2) {
@@ -86,8 +88,12 @@ public:
 	// returns number of projectiles that overlap with an entity relative to its size, i.e aabb 
 	int CheckProjectileEnemyCollision(Entity* entity) {
 		int hits = 0;
-		projectileQt.QueryQt(Rect(Vecf2(entity->GetSpawnLocationOffset().x, entity->GetSpawnLocationOffset().z), entity->GetSize()/2.0f, entity->GetSize()/2.0f), hits, entity->GetSpawnLocationOffset().y, entity->GetSize()/2.0f);
+		projectileQt.QueryQt(Rect(Vecf2(entity->GetSpawnLocationOffset().x, entity->GetSpawnLocationOffset().z), entity->GetSize(), entity->GetSize()), hits, entity->GetSpawnLocationOffset().y, entity->GetSize()/2.0f);
 		return hits;
+	}
+	// returns a container of enemy positions within range of this enemy
+	std::vector<EnemyParent*> GetEnemiesWithinRange(EnemyParent* entity) {
+		return enemyQt.GetElements(Rect(Vecf2(entity->GetSpawnLocationOffset().x, entity->GetSpawnLocationOffset().z), entity->GetSize() * 5.0f, entity->GetSize() * 5.0f), entity);
 	}
 private:
 	std::vector <std::unique_ptr<TurretParent>>& TurretBuffer;
@@ -99,4 +105,5 @@ private:
 	std::map<int, Entity*>& entityMap;
 	// quadtree data structure used to store projectiles for positional queries
 	Quadtree<ProjectileParent>& projectileQt;
+	Quadtree<EnemyParent>& enemyQt;
 };

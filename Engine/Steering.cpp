@@ -6,7 +6,7 @@
 Vecf3 Steering::Seek(EnemyAAOne* entity)
 {
 	// calculate desired velocity
-	Vecf3 desiredVelocity = (entity->targetDestination - entity->GetSpawnLocationOffset()).GetNormalized() * entity->speed;
+	Vecf3 desiredVelocity = (entity->autonomousAgentDestination - entity->GetSpawnLocationOffset()).GetNormalized() * entity->speed;
 	// get and return steering velocity
 	Vecf3 steeringForce = (desiredVelocity - entity->currentVelocity).GetNormalized();
 	// limit the steering force
@@ -19,7 +19,7 @@ std::vector<Veci2> Steering::FeelerGridCollision(EnemyAAOne* enemy)
 	int gridSize = enemy->GetGridSize();
 	// get start and end positions of the feeler in grid position
 	Vecf2 startPos = enemy->CalculateGridPosition(enemy->GetSpawnLocationOffset());
-	Vecf2 endPos = enemy->CalculateGridPosition(enemy->GetSpawnLocationOffset() + enemy->currentVelocity * 2);
+	Vecf2 endPos = enemy->CalculateGridPosition(enemy->GetSpawnLocationOffset() + enemy->currentVelocity * 2.0f);
 	// calculate line segment
 	float rise = endPos.y - startPos.y;
 	float run = endPos.x - startPos.x;
@@ -143,6 +143,29 @@ Vecf3 Steering::AvoidObstacles(const float & incomingMagnitude, const Vecf3 & ce
 	return outwardVector * incomingMagnitude;
 }
 
+Vecf3 Steering::Seperation(EnemyAAOne * entity)
+{
+	Vecf3 seperationForce = {0.0f, 0.0f, 0.0f};
+	Vecf3 headingForce = { 0.0f, 0.0f, 0.0f };
+	int count = 0;
+	std::vector<EnemyParent*> neighbourContainer = entity->entityQueryHandler->GetEnemiesWithinRange(entity);
+	Vecf3 vectorToPosition;
+	for (EnemyParent* e : neighbourContainer) {
+		vectorToPosition = Vecf3(entity->GetSpawnLocationOffset().x - e->GetSpawnLocationOffset().x, 0.0f, entity->GetSpawnLocationOffset().z - e->GetSpawnLocationOffset().z);
+		if (vectorToPosition.x > 0.1f || vectorToPosition.y > 0.1f || vectorToPosition.z > 0.1f) {
+			seperationForce = seperationForce + (vectorToPosition.GetNormalized()) / vectorToPosition.Len();
+		}
+		headingForce = headingForce + entity->headingVector;
+		count++;
+	}
+	if (count != 0) {
+		headingForce = headingForce / (float)count;
+	}
+	headingForce.y = 0.0f;
+	seperationForce.y = 0.0f;
+	return seperationForce * 0.3f + headingForce * 0.0f;
+}
+
 void Steering::ProcessFeelers(EnemyAAOne * entity)
 {
 	//FeelerGridCollision(entity)
@@ -158,10 +181,8 @@ Vecf3 Steering::CalculateSteering(EnemyAAOne * entity)
 	if (FeelerCollideSolid(entity, FeelerGridCollision(entity), node)) {
 		obstacleAvoid = entity->steering.AvoidObstacles(1.0f, node->GetSolidCenter(), node->GetWorldPos());
 	}
-	//float directionCheck = seekingForce * (obstacleAvoid * -1.0f);
-	//// if both vectors cancel each other out
-	//if ((directionCheck > 0.98f && directionCheck < 1.02f)/* || (directionCheck > -1.02f && directionCheck < -0.99f)*/) {
-	//	obstacleAvoid.x = obstacleAvoid.x + 1.0f;
-	//}
-	return seekingForce + obstacleAvoid;
+	// calculate seperation force
+	Vecf3 flockingForce = entity->steering.Seperation(entity);
+	
+	return seekingForce + obstacleAvoid + flockingForce;
 }

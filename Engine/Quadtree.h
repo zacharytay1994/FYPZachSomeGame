@@ -156,6 +156,26 @@ public:
 				}
 			}
 		}
+		// normal query returning elements within range
+		void GetElements(Rect& range, std::vector<T*>& passDownContainer, T* self) {
+			if (range.IsOverlapRect(boundary)) {
+				// if not divided return points within boundary
+				if (!divided) {
+					for (T* e : nodeArray) {
+						if (e->GetUniqueID() != self->GetUniqueID()) {
+							passDownContainer.push_back(e);
+						}
+					}
+				}
+				// if divided query inner nodes
+				else {
+					northWest->GetElements(range, passDownContainer, self);
+					northEast->GetElements(range, passDownContainer, self);
+					southWest->GetElements(range, passDownContainer, self);
+					southEast->GetElements(range, passDownContainer, self);
+				}
+			}
+		}
 		// another draw query mainly for debugging purposes (too lazy to create a function in graphics so its here)
 		void DrawQueryRange(Rect& range, const float& displaySize, const float& rootSize, Graphics& gfx) {
 			Vecf2 topLeft = { range.rectCenter.x - range.width / 2.0f,-(range.rectCenter.y + range.height / 2.0f) };
@@ -220,6 +240,11 @@ public:
 	// queries the quadtree recursively through the nodes, and does stuff to elements that falls within range
 	void QueryQt(Rect& queryRange, int& hits, const float& yHeight, const float& sizeRadius) {
 		rootNode->QueryQt(queryRange, hits, yHeight, sizeRadius);
+	}
+	std::vector<T*> GetElements(Rect& queryRange, T* self) {
+		std::vector<T*> container;
+		rootNode->GetElements(queryRange, container, self);
+		return container;
 	}
 	// sets query range mainly for debugging purposes
 	void SetQueryRange(Rect& queryRangeIn) {

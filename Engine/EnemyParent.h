@@ -132,6 +132,13 @@ public:
 	// global flag to whether enemy is dead
 	bool	isDead = false;
 
+	// steering variables
+	float speed = 8.0f;
+	float turningForce = 0.5f;
+	Vecf3 currentVelocity = Vecf3(0.0f, 0.0f, 0.0f);
+	Vecf3 autonomousAgentDestination = Vecf3(0.0f, 0.0f, 0.0f);
+	Vecf3 headingVector = Vecf3(0.0f, 0.0f, 0.0f);
+
 	// reference to query path
 	std::shared_ptr<TerrainWithPath> terrainWithPath;
 private:

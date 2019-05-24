@@ -50,11 +50,12 @@ public:
 		gridSize(gridSize),
 		terrainWithPath(terrainWithPath),
 		projectileQt(worldSize),
+		enemyQt(worldSize),
 		gfx(gfx),
 		consoleBox(consoleBox)
 	{
 		// initialize entity query handler
-		entityQueryHandler = std::make_shared<EntityQueryHandler>(turretBuffer, enemyBuffer, buildingBuffer, projectileBuffer, entityMap, projectileQt);
+		entityQueryHandler = std::make_shared<EntityQueryHandler>(turretBuffer, enemyBuffer, buildingBuffer, projectileBuffer, entityMap, projectileQt, enemyQt);
 		// initialized the effect used by the pipeline, non static textures, red for enemy, green for turret, and blue for buildings
 		entityPipeline->effect.pixelShader.SetStaticTexture(false);
 		entityPipeline->effect.pixelShader.AddTexture("redimage.bmp");
@@ -100,6 +101,7 @@ public:
 			}
 		}
 		// update enemy entities buffer
+		enemyQt.Reset();
 		std::vector<std::unique_ptr<EnemyParent>>::iterator eEnd = enemyBuffer.end();
 		for (std::vector<std::unique_ptr<EnemyParent>>::iterator x = enemyBuffer.begin(); x != eEnd; std::advance(x, 1)) {
 			if (!(*x)->isDead) {
@@ -107,6 +109,7 @@ public:
 				ReadDebugQueue((*x)->debugQueue);
 			}
 			ReadDebugQueue((*x)->debugQueue);
+			enemyQt.InsertElement((*x).get());
 		}
 		// update building entities buffer
 		std::vector<std::unique_ptr<BuildingParent>>::iterator bEnd = buildingBuffer.end();
@@ -386,6 +389,8 @@ private:
 	Graphics& gfx;
 	// quadtree data structure used to store projectiles for positional queries
 	Quadtree<ProjectileParent> projectileQt;
+	// quadtree data structure used to store entities
+	Quadtree<EnemyParent> enemyQt;
 
 	// rendering pipeline stuff 
 	std::shared_ptr<ZBuffer> entityZBuffer;

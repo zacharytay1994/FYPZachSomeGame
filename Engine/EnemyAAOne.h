@@ -24,6 +24,9 @@ public:
 	}
 	virtual void ChildUpdates(Keyboard&kbd, Mouse& mouse, float dt) override {
 		spawnLocationOffset = spawnLocationOffset + currentVelocity * dt;
+		if (currentVelocity.x > 0.1f || currentVelocity.y > 0.1f || currentVelocity.z > 0.1f) {
+			headingVector = currentVelocity.GetNormalized();
+		}
 		currentVelocity = currentVelocity + steering.CalculateSteering(this);
 	}
 	void InitializeMessage() {
@@ -31,10 +34,7 @@ public:
 	}
 public:
 	std::unique_ptr<StateMachine<EnemyAAOne>> stateMachine;
-	float speed = 8.0f;
-	float turningForce = 0.15f;
-	Vecf3 currentVelocity = Vecf3( 0.0f, 0.0f, 0.0f ) * speed;
-	Vecf3 targetDestination = { 0.0f, 0.0f, 0.0f };
+	
 	Steering steering;
 	// test container
 	std::vector<Veci2> container;

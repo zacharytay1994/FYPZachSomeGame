@@ -17,6 +17,8 @@ public:
 	static bool FeelerCollideSolid(EnemyAAOne* entity, const std::vector<Veci2>& feelerCells, NodeAStar*& node);
 	// calculate obstacle avoid steering force
 	Vecf3 AvoidObstacles(const float& incomingMagnitude, const Vecf3& centerPosition, const Vecf3& collidePosition);
+	// calculate seperation force
+	Vecf3 Seperation(EnemyAAOne* entity);
 	// process feeler logic
 	static void ProcessFeelers(EnemyAAOne* entity);
 	// accumulated steering force

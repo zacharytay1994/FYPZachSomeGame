@@ -500,6 +500,9 @@
     <ClCompile Include="Steering.cpp">
       <Filter>Header Files\AI\Steering</Filter>
     </ClCompile>
+    <ClCompile Include="EnemyParent.cpp">
+      <Filter>Header Files\Entity\Enemies</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="FramebufferPS.hlsl">

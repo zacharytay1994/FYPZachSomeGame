@@ -23,7 +23,7 @@ public:
 		gridSize(gridSize)
 	{}
 	// executes a*search algorithm and CALLS: this::RetracePath(), if path is found, nothing if not
-	bool FindPath(const Vecf3& startPos, const Vecf3& endPos) {
+	bool FindPath(const Vecf3& startPos, const Vecf3& endPos, const float& radiusBuffer) {
 		// custom comparator for priority queue, max heap to min heap
 		auto nodePointerGreaterComparator = [](NodeAStar*& p1, NodeAStar* p2) {
 			return *p1 > *p2;
@@ -60,7 +60,7 @@ public:
 			// find/update fcost of neighbours and add them to the openset
 			for (NodeAStar* n : grid->GetNeighbours(currentNode)) {
 				// if not traversable or already in closeSet or too high to traverse, skip
-				if (!n->GetWalkable() || n->GetInClosed() || TooHighToTraverse(currentNode, n) || TooLowToTraverse(currentNode, n)) {
+				if ((!n->GetWalkable() && abs((n->GetWorldPos() - endPos).LenSq()) > radiusBuffer) || n->GetInClosed() || TooHighToTraverse(currentNode, n) || TooLowToTraverse(currentNode, n)) {
 					continue;
 				}
 				// if newgCost < gCost (need updating), or if not in openset, update/calculate fcost, add to openset

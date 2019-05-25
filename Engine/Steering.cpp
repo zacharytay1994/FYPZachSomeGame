@@ -3,7 +3,7 @@
 #include "EnemyAAOne.h"
 #include "TerrainWithPath.h"
 
-Vecf3 Steering::Seek(EnemyAAOne* entity)
+Vecf3 Steering::Seek(EnemyParent* entity)
 {
 	// calculate desired velocity
 	Vecf3 desiredVelocity = (entity->autonomousAgentDestination - entity->GetSpawnLocationOffset()).GetNormalized() * entity->speed;
@@ -15,7 +15,7 @@ Vecf3 Steering::Seek(EnemyAAOne* entity)
 	return steeringForce * entity->turningForce;
 }
 
-Vecf3 Steering::Seek(EnemyAAOne* entity, const Vecf3& endPos)
+Vecf3 Steering::Seek(EnemyParent* entity, const Vecf3& endPos)
 {
 	// calculate desired velocity
 	Vecf3 desiredVelocity = (endPos - entity->GetSpawnLocationOffset()).GetNormalized() * entity->speed;
@@ -27,7 +27,7 @@ Vecf3 Steering::Seek(EnemyAAOne* entity, const Vecf3& endPos)
 	return steeringForce * entity->turningForce;
 }
 
-std::vector<Veci2> Steering::FeelerGridCollision(EnemyAAOne* enemy)
+std::vector<Veci2> Steering::FeelerGridCollision(EnemyParent* enemy)
 {
 	std::vector<Veci2> container;
 	int gridSize = enemy->GetGridSize();
@@ -138,7 +138,7 @@ std::vector<Veci2> Steering::FeelerGridCollision(EnemyAAOne* enemy)
 	return container;
 }
 
-bool Steering::FeelerCollideSolid(EnemyAAOne* entity, const std::vector<Veci2>& feelerCells, NodeAStar*& node)
+bool Steering::FeelerCollideSolid(EnemyParent* entity, const std::vector<Veci2>& feelerCells, NodeAStar*& node)
 {
 	for (Veci2 i : feelerCells) {
 		NodeAStar* test = entity->terrainWithPath->GetGridCell(i);
@@ -157,7 +157,7 @@ Vecf3 Steering::AvoidObstacles(const float & incomingMagnitude, const Vecf3 & ce
 	return outwardVector * incomingMagnitude;
 }
 
-Vecf3 Steering::Flocking(EnemyAAOne * entity)
+Vecf3 Steering::Flocking(EnemyParent * entity)
 {
 	Vecf3 seperationForce = {0.0f, 0.0f, 0.0f};
 	Vecf3 headingForce = { 0.0f, 0.0f, 0.0f };
@@ -192,12 +192,12 @@ Vecf3 Steering::Flocking(EnemyAAOne * entity)
 	return seperationForce * 0.3f + headingForce * 0.01f + cohesionForce * 0.5f;
 }
 
-void Steering::ProcessFeelers(EnemyAAOne * entity)
+void Steering::ProcessFeelers(EnemyParent * entity)
 {
 	//FeelerGridCollision(entity)
 }
 
-Vecf3 Steering::CalculateSteering(EnemyAAOne * entity)
+Vecf3 Steering::CalculateSteering(EnemyParent * entity)
 {
 	Vecf3 seekingForce = Seek(entity);
 	// calculate obstancle avoidance force

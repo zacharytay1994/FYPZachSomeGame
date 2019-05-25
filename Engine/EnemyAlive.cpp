@@ -3,6 +3,7 @@
 
 #include "EnemyDead.h"
 
+
 std::shared_ptr<EnemyAlive> EnemyAlive::Instance()
 {
 	static std::shared_ptr<EnemyAlive> instance = std::make_shared<EnemyAlive>();

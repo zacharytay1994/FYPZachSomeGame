@@ -248,6 +248,7 @@
     <ClCompile Include="EnemyDead.cpp" />
     <ClCompile Include="EnemyIdle.cpp" />
     <ClCompile Include="EnemyMove.cpp" />
+    <ClCompile Include="EnemyParent.cpp" />
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Graphics.cpp" />

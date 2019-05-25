@@ -2,6 +2,7 @@
 
 #include "Entity.h"
 #include "BuildingParent.h"
+#include "Steering.h"
 
 #include <assert.h>
 #include <sstream>
@@ -26,10 +27,7 @@ public:
 		attackRange(attackRange),
 		attackSpeed(attackSpeed)
 	{}
-	virtual void Update(Keyboard&kbd, Mouse& mouse, float dt) 
-	{
-		ChildUpdates(kbd, mouse, dt);
-	}
+	virtual void Update(Keyboard&kbd, Mouse& mouse, float dt);
 	virtual void ChildUpdates(Keyboard&kbd, Mouse& mouse, float dt) = 0;
 	virtual void ChildMessage(const MessageDispatcher::Telegram& msg) override {}
 	// elaborate set method to set current path, together with other relavant attributes, also trims the path
@@ -53,6 +51,7 @@ public:
 		pathStep = 0;
 		stepCounter = 0;
 		currentPoint = currentPath[pathStep];
+		autonomousAgentDestination = currentPoint;
 		nextPoint = currentPath[pathStep + 1];
 		spawnLocationOffset = currentPath[pathStep];
 		velBetweenPoints = ApproximatePoints(currentPoint, nextPoint);
@@ -82,6 +81,20 @@ public:
 		// if reached the second last elements of currentPath array, i.e. end of path
 		else {
 			reachedDestination = true;
+		}
+	}
+	void ExecutePathSteering() {
+		if (currentPath.size() != 0) {
+			if (pathStep < pathSize - 1) {
+				if ((currentPoint - spawnLocationOffset).LenSq() < sq(wayPointRange)) {
+					pathStep++;
+					currentPoint = currentPath[pathStep];
+					autonomousAgentDestination = currentPoint;
+				}
+			}
+			else {
+				reachedDestination = true;
+			}
 		}
 	}
 	// shortens the path (Vecf3 point array) to stop once within attack range
@@ -140,7 +153,10 @@ public:
 	float turningForce = 0.5f;
 	Vecf3 currentVelocity = Vecf3(0.0f, 0.0f, 0.0f);
 	Vecf3 autonomousAgentDestination = Vecf3(0.0f, 0.0f, 0.0f);
-	Vecf3 headingVector = Vecf3(0.0f, 0.0f, 0.0f);
+	Vecf3 headingVector = Vecf3(0.0f, 0.0f, 0.0f); 
+	Vecf3 gravitationalAcceleration = { 0.0f, -9.81f, 0.0f };
+	float wayPointRange = 5.0f;
+	Steering steering;
 
 	// reference to query path
 	std::shared_ptr<TerrainWithPath> terrainWithPath;

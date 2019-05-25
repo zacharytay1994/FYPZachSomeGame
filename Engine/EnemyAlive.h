@@ -10,7 +10,7 @@ public:
 		State()
 	{}
 public:
-	// singleton reference
+	// singleton referencer
 	static std::shared_ptr<EnemyAlive> Instance();
 	virtual void Enter(EnemyOne*& entity) override;
 	virtual void Execute(EnemyOne*& entity) override;

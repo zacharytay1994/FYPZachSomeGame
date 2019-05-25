@@ -128,7 +128,7 @@ public:
 		//	projectileQt.SetQueryRange(Rect(Vecf2(enemyBuffer[0]->GetSpawnLocationOffset().x, enemyBuffer[0]->GetSpawnLocationOffset().z), 4.0f, 4.0f));
 		//}
 		// Write entity debug messages to console, i.e. all InsertDebugString() functions
-		WriteEDMToConsole();
+		//WriteEDMToConsole();
 	}
 
 	void Draw(const Matf4& viewMatrix, const Matf4& projectionMatrix) {
@@ -236,7 +236,7 @@ public:
 	}
 	void AddEnemy(const float& size, const Veci2& loc) {
 		float temp = heightmap->heightDisplacementGrid[loc.y*heightmap->width + loc.x];
-		enemyBuffer.emplace_back(std::make_unique<EnemyAAOne>(size, loc, temp, worldSize, gridSize, entityQueryHandler, terrainWithPath));
+		enemyBuffer.emplace_back(std::make_unique<EnemyOne>(size, loc, temp, worldSize, gridSize, entityQueryHandler, terrainWithPath));
 		(*(enemyBuffer.end() - 1))->Calculate3DLocationOffset();
 		entityMap[(*(enemyBuffer.end() - 1))->GetUniqueID()] = (*(enemyBuffer.end() - 1)).get();
 	}
@@ -315,7 +315,7 @@ public:
 	// if path found, set its temporary needPath state to false, true if otherwise
 	void QueryPathfinder(std::unique_ptr<EnemyParent>& enemy) {
 		std::vector<Vecf3> holder;
-		if (terrainWithPath->FindAndReturnPath(enemy->GetSpawnLocationOffset(), enemy->targetDestination, holder)) {
+		if (terrainWithPath->FindAndReturnPath(enemy->GetSpawnLocationOffset(), enemy->targetDestination, holder, 3.0f)) {
 			enemy->SetCurrentPath(holder);
 			enemy->needPath = false;
 		}

@@ -8,6 +8,9 @@
 #include "MatTemplate.h"
 #include "Vec3.h"
 
+#include "ProjectileParent.h"
+#include "EnemyParent.h"
+
 #include <string>
 #include <cmath>
 #include <sstream>
@@ -50,16 +53,16 @@ public:
 		pathfinding.DrawGridPath(viewMatrix, projectionMatrix);
 	}
 	// Finds the path
-	bool FindPath(const Vecf3& startPos, const Vecf3& endPos) {
-		return pathfinding.FindPath(startPos, endPos);
+	bool FindPath(const Vecf3& startPos, const Vecf3& endPos, const float& radiusBuffer) {
+		return pathfinding.FindPath(startPos, endPos, radiusBuffer);
 	}
 	// converts path in node position to world coordinates
 	std::vector<Vecf3> GetPathInWorldCoordinates() {
 		return pathfinding.GetPointsOfPath();
 	}
 	// queries a path and if found, return the path as a container of world coordinates (waypoints)
-	bool FindAndReturnPath(const Vecf3& startPos, const Vecf3& endPos, std::vector<Vecf3>& pathInOut) {
-		if (FindPath(startPos, endPos)) {
+	bool FindAndReturnPath(const Vecf3& startPos, const Vecf3& endPos, std::vector<Vecf3>& pathInOut, const float& radiusBuffer) {
+		if (FindPath(startPos, endPos, radiusBuffer)) {
 			pathInOut.push_back(startPos);
 			std::vector<Vecf3> temp = GetPathInWorldCoordinates();
 			for (Vecf3 v : temp) {
@@ -137,7 +140,7 @@ public:
 	// queries a coordinate in world space to see if it falls below the surface, if so applies a rebounding force
 	// together with other relevant forces to simulate collision with the surface, if not returns false
 	// for enemies temporarily for testing
-	bool QueryQuadCollisionEstimate(const Vecf3& locationIn, EnemyParent* projectile) {
+	bool QueryQuadCollisionEstimateEnemy(const Vecf3& locationIn, EnemyParent* projectile) {
 		// get rounded cell location
 		int gridX = std::clamp(int(std::trunc((worldSize / 2 + locationIn.x) / unitsPerCell)), 0, gridSize - 1);
 		int gridZ = std::clamp(gridSize - int(std::trunc((worldSize / 2 + locationIn.z) / unitsPerCell)), 0, gridSize - 1);
@@ -148,8 +151,9 @@ public:
 		float excessY = locationIn.z - gridZ * unitsPerCell;
 		// value used to determine if triangle falls on the right of left side of a square
 		float sideDeterminant = excessX + excessY;
-		if (locationIn.y < terrainHeight) {
-			projectile->SetSpawnLocationOffsetY(terrainHeight + 0.1f);
+		float yOffset = projectile->GetSize() / 2.0f;
+		if ((locationIn.y - yOffset) < terrainHeight) {
+			projectile->SetSpawnLocationOffsetY(terrainHeight + yOffset);
 			// calculate external force
 			Vecf3 surfaceNormal;
 			// right triangle in square
@@ -164,14 +168,14 @@ public:
 			Vecf3 normalForce = surfaceNormal * (-projectile->currentVelocity * surfaceNormal);
 			// applying the normal force, i.e. the normalalized surface perpendicular vector * perpendicular magnitude of incoming object
 			// multiplied by 2 to achieve an elastic rebound
-			projectile->ApplyExternalForce(normalForce * 2);
+			projectile->ApplyExternalForce(normalForce);
 			// applying dampening and frictional force
-			Vecf3 frictionalForce = -((projectile->currentVelocity + normalForce) * 0.1f);
-			// if entity velocity is above a set threshold, apply force
-			if (abs(projectile->currentVelocity.x) > 0.1f && abs(projectile->currentVelocity.z) > 0.1f && abs(projectile->currentVelocity.y) > 0.1f) {
-				projectile->ApplyExternalForce(frictionalForce);
-				projectile->ApplyExternalForce(-projectile->currentVelocity * 0.1f);
-			}
+			//Vecf3 frictionalForce = -((projectile->currentVelocity + normalForce) * 0.1f);
+			//// if entity velocity is above a set threshold, apply force
+			//if (abs(projectile->currentVelocity.x) > 0.1f && abs(projectile->currentVelocity.z) > 0.1f && abs(projectile->currentVelocity.y) > 0.1f) {
+			//	projectile->ApplyExternalForce(frictionalForce);
+			//	projectile->ApplyExternalForce(-projectile->currentVelocity * 0.1f);
+			//}
 			//// else set its velocity to rest
 			//else {
 			//	projectile->stop = true;

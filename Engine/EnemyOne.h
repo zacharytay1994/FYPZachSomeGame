@@ -5,6 +5,7 @@
 #include "EnemyIdle.h"
 #include "EnemyAwaitPath.h"
 #include "EnemyAlive.h"
+#include "TerrainWithPath.h"
 
 class EnemyOne : public EnemyParent {
 public:

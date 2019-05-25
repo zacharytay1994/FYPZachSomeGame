@@ -24,12 +24,6 @@ public:
 		InsertDebugString("/renemyone id: /y" + std::to_string(entityUniqueID) + " has been /ccreated.");
 	}
 	virtual void ChildUpdates(Keyboard&kbd, Mouse& mouse, float dt) override {
-		terrainWithPath->QueryQuadCollisionEstimate(spawnLocationOffset, this);
-		spawnLocationOffset = spawnLocationOffset + (currentVelocity + gravitationalAcceleration) * dt;
-		if (currentVelocity.x > 0.1f || currentVelocity.y > 0.1f || currentVelocity.z > 0.1f) {
-			headingVector = currentVelocity.GetNormalized();
-		}
-		currentVelocity = currentVelocity + steering.CalculateSteering(this);
 	}
 	void InitializeMessage() {
 		InsertDebugString("/renemyone id: /y" + std::to_string(entityUniqueID) + " has been /ccreated.");

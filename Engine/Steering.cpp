@@ -9,6 +9,20 @@ Vecf3 Steering::Seek(EnemyAAOne* entity)
 	Vecf3 desiredVelocity = (entity->autonomousAgentDestination - entity->GetSpawnLocationOffset()).GetNormalized() * entity->speed;
 	// get and return steering velocity
 	Vecf3 steeringForce = (desiredVelocity - entity->currentVelocity).GetNormalized();
+	// setting vertical force to 0
+	steeringForce.y = 0.0f;
+	// limit the steering force
+	return steeringForce * entity->turningForce;
+}
+
+Vecf3 Steering::Seek(EnemyAAOne* entity, const Vecf3& endPos)
+{
+	// calculate desired velocity
+	Vecf3 desiredVelocity = (endPos - entity->GetSpawnLocationOffset()).GetNormalized() * entity->speed;
+	// get and return steering velocity
+	Vecf3 steeringForce = (desiredVelocity - entity->currentVelocity).GetNormalized();
+	// setting vertical force to 0
+	steeringForce.y = 0.0f;
 	// limit the steering force
 	return steeringForce * entity->turningForce;
 }
@@ -143,27 +157,39 @@ Vecf3 Steering::AvoidObstacles(const float & incomingMagnitude, const Vecf3 & ce
 	return outwardVector * incomingMagnitude;
 }
 
-Vecf3 Steering::Seperation(EnemyAAOne * entity)
+Vecf3 Steering::Flocking(EnemyAAOne * entity)
 {
 	Vecf3 seperationForce = {0.0f, 0.0f, 0.0f};
 	Vecf3 headingForce = { 0.0f, 0.0f, 0.0f };
+	Vecf3 averagePosition = { 0.0f, 0.0f, 0.0f };
 	int count = 0;
 	std::vector<EnemyParent*> neighbourContainer = entity->entityQueryHandler->GetEnemiesWithinRange(entity);
 	Vecf3 vectorToPosition;
 	for (EnemyParent* e : neighbourContainer) {
+		// calculating seperation force
 		vectorToPosition = Vecf3(entity->GetSpawnLocationOffset().x - e->GetSpawnLocationOffset().x, 0.0f, entity->GetSpawnLocationOffset().z - e->GetSpawnLocationOffset().z);
 		if (vectorToPosition.x > 0.1f || vectorToPosition.y > 0.1f || vectorToPosition.z > 0.1f) {
 			seperationForce = seperationForce + (vectorToPosition.GetNormalized()) / vectorToPosition.Len();
 		}
+		// calculating heading force
 		headingForce = headingForce + entity->headingVector;
+		// calculating cohesion force, summing up positions
+		averagePosition = averagePosition + entity->GetSpawnLocationOffset();
+
 		count++;
 	}
+	// getting average heading
 	if (count != 0) {
 		headingForce = headingForce / (float)count;
+		averagePosition = averagePosition / (float)count;
 	}
+	// setting vertical forces to 0
 	headingForce.y = 0.0f;
 	seperationForce.y = 0.0f;
-	return seperationForce * 0.3f + headingForce * 0.0f;
+	averagePosition.y = 0.0f;
+	// getting cohesion steering force
+	Vecf3 cohesionForce = Seek(entity, averagePosition);
+	return seperationForce * 0.3f + headingForce * 0.01f + cohesionForce * 0.5f;
 }
 
 void Steering::ProcessFeelers(EnemyAAOne * entity)
@@ -182,7 +208,7 @@ Vecf3 Steering::CalculateSteering(EnemyAAOne * entity)
 		obstacleAvoid = entity->steering.AvoidObstacles(1.0f, node->GetSolidCenter(), node->GetWorldPos());
 	}
 	// calculate seperation force
-	Vecf3 flockingForce = entity->steering.Seperation(entity);
+	Vecf3 flockingForce = entity->steering.Flocking(entity);
 	
 	return seekingForce + obstacleAvoid + flockingForce;
 }

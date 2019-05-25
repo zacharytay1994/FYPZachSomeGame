@@ -106,6 +106,9 @@ public:
 			return true;
 		}
 	}
+	virtual void ApplyExternalForce(const Vecf3& force) {
+		currentVelocity += force;
+	}
 	int GetStepCounter() {
 		return stepCounter;
 	}

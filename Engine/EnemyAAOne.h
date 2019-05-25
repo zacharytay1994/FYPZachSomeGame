@@ -3,6 +3,7 @@
 #include "EnemyParent.h"
 #include "StateMachine.h"
 #include "Steering.h"
+#include "TerrainWithPath.h"
 
 #include <vector>
 
@@ -23,7 +24,8 @@ public:
 		InsertDebugString("/renemyone id: /y" + std::to_string(entityUniqueID) + " has been /ccreated.");
 	}
 	virtual void ChildUpdates(Keyboard&kbd, Mouse& mouse, float dt) override {
-		spawnLocationOffset = spawnLocationOffset + currentVelocity * dt;
+		terrainWithPath->QueryQuadCollisionEstimate(spawnLocationOffset, this);
+		spawnLocationOffset = spawnLocationOffset + (currentVelocity + gravitationalAcceleration) * dt;
 		if (currentVelocity.x > 0.1f || currentVelocity.y > 0.1f || currentVelocity.z > 0.1f) {
 			headingVector = currentVelocity.GetNormalized();
 		}
@@ -34,7 +36,7 @@ public:
 	}
 public:
 	std::unique_ptr<StateMachine<EnemyAAOne>> stateMachine;
-	
+	Vecf3 gravitationalAcceleration = { 0.0f, -9.81f, 0.0f };
 	Steering steering;
 	// test container
 	std::vector<Veci2> container;

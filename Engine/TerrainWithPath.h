@@ -134,6 +134,52 @@ public:
 		}
 		return false;
 	}
+	// queries a coordinate in world space to see if it falls below the surface, if so applies a rebounding force
+	// together with other relevant forces to simulate collision with the surface, if not returns false
+	// for enemies temporarily for testing
+	bool QueryQuadCollisionEstimate(const Vecf3& locationIn, EnemyParent* projectile) {
+		// get rounded cell location
+		int gridX = std::clamp(int(std::trunc((worldSize / 2 + locationIn.x) / unitsPerCell)), 0, gridSize - 1);
+		int gridZ = std::clamp(gridSize - int(std::trunc((worldSize / 2 + locationIn.z) / unitsPerCell)), 0, gridSize - 1);
+		// gets the terrain height with rounded cell location, i.e. height of the closest estimated vertex
+		float terrainHeight = terrain.terrainList.vertices[gridZ * (gridSize + 1) + gridX].pos.y;
+		// calculating which triangle in a square it is
+		float excessX = locationIn.x - gridX * unitsPerCell;
+		float excessY = locationIn.z - gridZ * unitsPerCell;
+		// value used to determine if triangle falls on the right of left side of a square
+		float sideDeterminant = excessX + excessY;
+		if (locationIn.y < terrainHeight) {
+			projectile->SetSpawnLocationOffsetY(terrainHeight + 0.1f);
+			// calculate external force
+			Vecf3 surfaceNormal;
+			// right triangle in square
+			if (sideDeterminant > unitsPerCell) {
+				// get surface normal from surface normal list
+				surfaceNormal = surfaceNormalList[gridZ * (gridSize * 2) + gridX * 2 + 1];
+			}
+			// left triangle in square
+			else {
+				surfaceNormal = surfaceNormalList[gridZ * (gridSize * 2) + gridX * 2];
+			}
+			Vecf3 normalForce = surfaceNormal * (-projectile->currentVelocity * surfaceNormal);
+			// applying the normal force, i.e. the normalalized surface perpendicular vector * perpendicular magnitude of incoming object
+			// multiplied by 2 to achieve an elastic rebound
+			projectile->ApplyExternalForce(normalForce * 2);
+			// applying dampening and frictional force
+			Vecf3 frictionalForce = -((projectile->currentVelocity + normalForce) * 0.1f);
+			// if entity velocity is above a set threshold, apply force
+			if (abs(projectile->currentVelocity.x) > 0.1f && abs(projectile->currentVelocity.z) > 0.1f && abs(projectile->currentVelocity.y) > 0.1f) {
+				projectile->ApplyExternalForce(frictionalForce);
+				projectile->ApplyExternalForce(-projectile->currentVelocity * 0.1f);
+			}
+			//// else set its velocity to rest
+			//else {
+			//	projectile->stop = true;
+			//}
+			return true;
+		}
+		return false;
+	}
 	NodeAStar* GetGridCell(const Veci2& cell) {
 		assert(cell.x < gridSize && cell.x > 0 && cell.y < gridSize && cell.y > 0);
 		return pathfinding.grid->grid[cell.y*gridSize + cell.x].get();

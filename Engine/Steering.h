@@ -10,7 +10,7 @@ class Steering {
 public:
 	// returns a velocity to seek to destination position, seeking velocity = desired velocity - current velocity
 	static Vecf3 Seek(EnemyAAOne* entity);
-
+	Vecf3 Seek(EnemyAAOne* entity, const Vecf3& endPos);
 	// returns a container of grid cells that fall within feeler range, currentVelocity is assumed to also be the heading
 	static std::vector<Veci2> FeelerGridCollision(EnemyAAOne* enemy);
 	// returns if feelers collide with grid cell marked solid
@@ -18,7 +18,7 @@ public:
 	// calculate obstacle avoid steering force
 	Vecf3 AvoidObstacles(const float& incomingMagnitude, const Vecf3& centerPosition, const Vecf3& collidePosition);
 	// calculate seperation force
-	Vecf3 Seperation(EnemyAAOne* entity);
+	Vecf3 Flocking(EnemyAAOne* entity);
 	// process feeler logic
 	static void ProcessFeelers(EnemyAAOne* entity);
 	// accumulated steering force

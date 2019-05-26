@@ -6,7 +6,7 @@ class BuildingParent : public Entity {
 public:
 	BuildingParent(const float& size, const Veci2& loc, const float& heightDisplaced, const float& worldSize, const int& gridSize, std::shared_ptr<EntityQueryHandler>& entityQueryHandler)
 		:
-		Entity(size, loc, heightDisplaced + size/4.0f, worldSize, gridSize, entityQueryHandler)
+		Entity(size, loc, heightDisplaced + 0.1f, worldSize, gridSize, entityQueryHandler)
 	{}
 	virtual void Update(Keyboard&kbd, Mouse& mouse, float dt)
 	{
@@ -32,7 +32,7 @@ public:
 		return isDestroyed;
 	}
 public:
-	int health = 3;
+	int health = 10;
 private:
 	bool isDestroyed = false;
 };

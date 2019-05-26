@@ -153,7 +153,7 @@ public:
 		float sideDeterminant = excessX + excessY;
 		float yOffset = projectile->GetSize() / 2.0f;
 		if ((locationIn.y - yOffset) < terrainHeight) {
-			projectile->SetSpawnLocationOffsetY(terrainHeight + yOffset);
+			projectile->SetSpawnLocationOffsetYControlled(terrainHeight + yOffset);
 			// calculate external force
 			Vecf3 surfaceNormal;
 			// right triangle in square
@@ -187,6 +187,9 @@ public:
 	NodeAStar* GetGridCell(const Veci2& cell) {
 		assert(cell.x < gridSize && cell.x > 0 && cell.y < gridSize && cell.y > 0);
 		return pathfinding.grid->grid[cell.y*gridSize + cell.x].get();
+	}
+	float GetCellDiameter() {
+		return worldSize / gridSize;
 	}
 public:
 	// size of the grid, i.e. number of square tiles (2 triangular quads) making up the world

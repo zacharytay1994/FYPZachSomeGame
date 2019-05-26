@@ -22,7 +22,7 @@ public:
 	EnemyParent(const float& size, const Veci2& loc, const float& heightDisplaced, const float& worldSize, const int& gridSize, std::shared_ptr<EntityQueryHandler>& entityQueryHandler, std::shared_ptr<TerrainWithPath>& terrainWithPath,
 		const float& attackRange, const int& attackSpeed)
 		:
-		Entity(size, loc, heightDisplaced + size/4.0f, worldSize, gridSize, entityQueryHandler),
+		Entity(size, loc, heightDisplaced + size/2.0f, worldSize, gridSize, entityQueryHandler),
 		terrainWithPath(terrainWithPath),
 		attackRange(attackRange),
 		attackSpeed(attackSpeed)
@@ -149,7 +149,7 @@ public:
 	bool	isDead = false;
 
 	// steering variables
-	float speed = 8.0f;
+	float speed = 12.0f;
 	float turningForce = 0.5f;
 	Vecf3 currentVelocity = Vecf3(0.0f, 0.0f, 0.0f);
 	Vecf3 autonomousAgentDestination = Vecf3(0.0f, 0.0f, 0.0f);
@@ -157,6 +157,7 @@ public:
 	Vecf3 gravitationalAcceleration = { 0.0f, -9.81f, 0.0f };
 	float wayPointRange = 5.0f;
 	Steering steering;
+	Entity* targetEntity;
 
 	// reference to query path
 	std::shared_ptr<TerrainWithPath> terrainWithPath;

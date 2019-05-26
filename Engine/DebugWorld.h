@@ -31,7 +31,7 @@ public:
 		:
 		sceneZBuffer(std::make_shared<ZBuffer>(gfx.ScreenWidth, gfx.ScreenHeight)),
 		Scene("Debug world", sceneZBuffer, gfx),
-		terrainWithPath(std::make_shared<TerrainWithPath>(gfx, sceneZBuffer, "heightmap2.bmp", "parchmentpaper.bmp", worldSize, gridSize, 0.0f, 8.0f)), // TerrainWithPath(graphics, zbuffer, heightmap, surface texture, world size, grid size, min world height, max world height)
+		terrainWithPath(std::make_shared<TerrainWithPath>(gfx, sceneZBuffer, "heightmap2.bmp", "parchmentpaper.bmp", worldSize, gridSize, 0.0f, 10.0f)), // TerrainWithPath(graphics, zbuffer, heightmap, surface texture, world size, grid size, min world height, max world height)
 		entityHandler(gfx, sceneZBuffer, worldSize, gridSize, terrainWithPath, consoleBox),
 		consoleBox(std::make_shared<ConsoleBox>(gfx, sceneZBuffer, fontList))
 	{
@@ -45,6 +45,7 @@ public:
 		entityHandler.AddBuilding(3.0f, { 30, 60 });
 		entityHandler.AddBuilding(3.0f, { 50, 50 });
 		entityHandler.AddBuilding(3.0f, { 55, 60 });
+		
 		//entityHandler.AddEnemy(1.0f, { 75, 75 });
 		//entityHandler.AddEnemyAA(0.5f, { 75, 25 });
 		//entityHandler.PopulateRandomTurrets(15);
@@ -53,6 +54,7 @@ public:
 		terrainWithPath->SyncWithWorldEntities(entityHandler.buildingBuffer);
 	}
 	virtual void Update(Keyboard&kbd, Mouse& mouse, float dt) override {
+		clock++;
 		// camera movement
 		if (kbd.KeyIsPressed('W')) {
 			cameraPosition += Vecf4{ 0.0f, 0.0f, 1.0f, 0.0f } * cameraSpeed * dt;
@@ -78,6 +80,16 @@ public:
 		if (kbd.KeyIsPressed('K')) {
 			camY -= 1.0f * dt;
 		}
+		/*if (clock > 300) {
+			if (!spawnCheck) {
+				for (int i = 0; i < 20; i++) {
+					entityHandler.AddEnemy(0.7f, { 15 + i, 75 + i });
+					entityHandler.AddEnemy(0.7f, { 85 - i, 75 + i });
+				}
+				spawnCheck = true;
+			}
+			ExecuteCameraMovement(dt);
+		}*/
 		// updating all entities in the entity buffer
 		entityHandler.Update(kbd, mouse, dt);
 		// updating world terrain, shifting worldEndPos per frame FindPath(worldStartPos, worldEndPos)
@@ -100,7 +112,7 @@ public:
 		sceneZBuffer->Clear();
 		// scene world and camera transformation matrices
 		const Matf4 projectionMatrix = Matf4::Projection(4.0f, 3.0f, 1.0f, 100.0f);
-		camRotInverse = Matf4::Identity() * Matf4::RotationY(camY) * Matf4::RotationX(-0.8f);
+		camRotInverse = Matf4::Identity() * Matf4::RotationY(camY) * Matf4::RotationX(camX);
 		const Matf4 viewMatrix = Matf4::Translation(-cameraPosition) * camRotInverse;
 		const Vecf3 translate = { 0.0f, 0.0f, 0.0f };
 		const Matf4 worldTransform = Matf4::RotationZ(theta_z) * Matf4::RotationX(theta_x) * Matf4::RotationY(theta_y) * Matf4::Translation(translate);
@@ -113,6 +125,9 @@ public:
 		//entityHandler.DrawDebugDisplay();
 		//terrainWithPath.DrawPath(viewMatrix, projectionMatrix);
 		consoleBox->Draw(viewMatrix, projectionMatrix);
+	}
+	void ExecuteCameraMovement(float dt) {
+		cameraPosition += Vecf4{ 0.0f, 0.0f, 1.0f, 0.0f } * camSpeed * dt;
 	}
 //public:
 //	// mouse interactivity
@@ -127,10 +142,11 @@ private:
 	float theta_z = 0.0f;
 	// projection inverse matrices, directional light position, camera variables
 	Matf4 camRotInverse = Matf4::Identity() * Matf4::RotationX(-0.8f) * Matf4::RotationY(camY);
-	Vecf3 cameraPosition = { -6.0f, 14.0f, -8.0f };
+	Vecf3 cameraPosition = { 0.0f, 20.0f, -18.0f };
 	Vecf3 lightPosition = { 0.0f, 0.0f, 0.6f };
 	const float cameraSpeed = 4.0f;
 	float camY = 0.0f;
+	float camX = -0.8f;
 	// external components
 	// entityHandler object, handles all scene objects that inherit the entity class
 	EntityHandler entityHandler;
@@ -146,4 +162,16 @@ private:
 	// debugging stuff
 	std::wstringstream ss;
 	bool mouseAct = false;
+
+	// cam scene variables
+	float camSpeed = 0.5f;
+	float rotationSpeed = 1.0f;
+	bool rotate = false;
+	bool rotateReverse = false;
+	bool move = true;
+	bool reverse = false;
+	bool center = false;
+	bool check = true;
+	int clock = 0;
+	bool spawnCheck = false;
 };

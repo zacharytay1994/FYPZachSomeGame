@@ -32,7 +32,7 @@ public:
 		return (sq(p2.x - p1.x) + sq(p2.y - p1.y) + sq(p2.z - p1.z));
 	}
 	// return details of the nearest building found relative to a specific position in world coordinates from the building buffer, i.e. buildings in world
-	bool QueryNearestBuilding(const Vecf3& fromLocation, Vecf3& toLocation, float& distanceAway, int& targetID) {
+	bool QueryNearestBuilding(EnemyParent* entity, float& distanceAway, int& targetID) {
 		if (BuildingBuffer.size() > 0) {
 			bool buildingExists = false;
 			float temp;
@@ -41,7 +41,7 @@ public:
 			for (std::unique_ptr<BuildingParent>& e : BuildingBuffer) {
 				if (!e->IsDestroyed()) {
 					buildingExists = true;
-					temp = DistanceBetween(fromLocation, e->GetSpawnLocationOffset());
+					temp = DistanceBetween(entity->GetSpawnLocationOffset(), e->GetSpawnLocationOffset());
 					if (temp < nearestDistanceHolder) {
 						nearestDistanceHolder = temp;
 						nearestBuildingLocation = e->GetSpawnLocationOffset();
@@ -51,7 +51,8 @@ public:
 			}
 			if (buildingExists) {
 				distanceAway = nearestDistanceHolder;
-				toLocation = nearestBuildingLocation;
+				entity->targetDestination = nearestBuildingLocation;
+				entity->targetEntity = GetEntityFromID(targetID);
 				return true;
 			}
 			return false;

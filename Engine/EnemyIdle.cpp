@@ -18,9 +18,8 @@ void EnemyIdle::Enter(EnemyOne *& entity)
 void EnemyIdle::Execute(EnemyOne *& entity)
 {
 	// if target found
-	Vecf3 targetDestination; float distanceAway; int targetID;
-	if (entity->entityQueryHandler->QueryNearestBuilding(entity->GetSpawnLocationOffset(), targetDestination, distanceAway, targetID)) {
-		entity->targetDestination = targetDestination;
+	float distanceAway; int targetID;
+	if (entity->entityQueryHandler->QueryNearestBuilding(entity, distanceAway, targetID)) {
 		entity->targetID = targetID;
 		entity->InsertDebugString("/renemyone id: /y" + std::to_string(entity->GetUniqueID()) + " target found.");
 		// if target out of attack range, change state to await path

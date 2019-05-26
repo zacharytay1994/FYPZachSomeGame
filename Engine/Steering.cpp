@@ -150,6 +150,23 @@ bool Steering::FeelerCollideSolid(EnemyParent* entity, const std::vector<Veci2>&
 	return false;
 }
 
+bool Steering::FeelerCollideHeight(EnemyParent* entity, std::vector<Veci2>& feelerCells, NodeAStar*& node)
+{
+	float mark = entity->GetSpawnLocationOffset().y;
+	if (feelerCells.size() > 5) {
+		int i = 0;
+		for (std::vector<Veci2>::iterator start = feelerCells.begin(); i < 5; std::advance(start, 1), i++) {
+			NodeAStar* test = entity->terrainWithPath->GetGridCell(*start);
+			if ((test->GetWorldPos().y - mark) > entity->terrainWithPath->GetCellDiameter()*2.0f) {
+				node = test;
+				return true;
+			}
+			mark = test->GetWorldPos().y;
+		}
+	}
+	return false;
+}
+
 Vecf3 Steering::AvoidObstacles(const float & incomingMagnitude, const Vecf3 & centerPosition, const Vecf3 & collidePosition)
 {
 	// calculate outward vector
@@ -157,10 +174,19 @@ Vecf3 Steering::AvoidObstacles(const float & incomingMagnitude, const Vecf3 & ce
 	return outwardVector * incomingMagnitude;
 }
 
+Vecf3 Steering::AvoidWall(const Vecf3 & collisionPosition, const Vecf3& currentPosition)
+{
+	Vecf3 counterForce = (Vecf3(collisionPosition.x - currentPosition.x, 0.0f, collisionPosition.z - currentPosition.z)).GetNormalized();
+	return counterForce * -1.0f;
+}
+
 Vecf3 Steering::Flocking(EnemyParent * entity)
 {
+	// used to calculate seperation
 	Vecf3 seperationForce = {0.0f, 0.0f, 0.0f};
+	// used to calculate alignment
 	Vecf3 headingForce = { 0.0f, 0.0f, 0.0f };
+	// used to calculate cohesion
 	Vecf3 averagePosition = { 0.0f, 0.0f, 0.0f };
 	int count = 0;
 	std::vector<EnemyParent*> neighbourContainer = entity->entityQueryHandler->GetEnemiesWithinRange(entity);
@@ -199,16 +225,75 @@ void Steering::ProcessFeelers(EnemyParent * entity)
 
 Vecf3 Steering::CalculateSteering(EnemyParent * entity)
 {
+	float maxMagnitudeSq = sq(100.0f);
 	Vecf3 seekingForce = Seek(entity);
 	// calculate obstancle avoidance force
+	std::vector<Veci2> feeler = FeelerGridCollision(entity);
 	Vecf3 obstacleAvoid = { 0.0f, 0.0f, 0.0f };
 	// if an obstacle is detected
 	NodeAStar* node;
-	if (FeelerCollideSolid(entity, FeelerGridCollision(entity), node)) {
+	if (FeelerCollideSolid(entity, feeler, node)) {
 		obstacleAvoid = entity->steering.AvoidObstacles(1.0f, node->GetSolidCenter(), node->GetWorldPos());
+	}
+	// calculate height avoidance force
+	NodeAStar* heightNode;
+	Vecf3 wallAvoid = { 0.0f, 0.0f, 0.0f };
+	if (FeelerCollideHeight(entity, feeler, heightNode)) {
+		wallAvoid = entity->steering.AvoidWall(heightNode->GetWorldPos(), entity->GetSpawnLocationOffset());
+		wallAvoid.y = 0.0f;
+		wallAvoid = wallAvoid * 1.0f;
 	}
 	// calculate seperation force
 	Vecf3 flockingForce = entity->steering.Flocking(entity);
-	
-	return seekingForce + obstacleAvoid + flockingForce;
+	// calculate forces with priority, obstacleAvoid > wallAvoid > seekingForce > flockingForce
+	Vecf3 steeringForce = { 0.0f, 0.0f, 0.0f };
+	float steeringForceMagnitudeSq = steeringForce.LenSq();
+	float surplusForce;
+	if (steeringForceMagnitudeSq < maxMagnitudeSq) {
+		// obstacleAvoid
+		surplusForce = maxMagnitudeSq - steeringForceMagnitudeSq;
+		if (obstacleAvoid.LenSq() < surplusForce) {
+			steeringForce = steeringForce + obstacleAvoid;
+		}
+		else if (obstacleAvoid.x != 0.0f || obstacleAvoid.y != 0.0f || obstacleAvoid.z != 0.0f) {
+			steeringForce = steeringForce + obstacleAvoid.GetNormalized() * surplusForce;
+		}
+		// wallAvoid
+		steeringForceMagnitudeSq = steeringForce.LenSq();
+		if (!(steeringForceMagnitudeSq < maxMagnitudeSq)) {
+			return steeringForce;
+		}
+		surplusForce = maxMagnitudeSq - steeringForceMagnitudeSq;
+		if (wallAvoid.LenSq() < surplusForce) {
+			steeringForce = steeringForce + wallAvoid;
+		}
+		else if (wallAvoid.x != 0.0f || wallAvoid.y != 0.0f || wallAvoid.z != 0.0f) {
+			steeringForce = steeringForce + wallAvoid.GetNormalized() * surplusForce;
+		}
+		// seekingForce
+		steeringForceMagnitudeSq = steeringForce.LenSq();
+		if (!(steeringForceMagnitudeSq < maxMagnitudeSq)) {
+			return steeringForce;
+		}
+		surplusForce = maxMagnitudeSq - steeringForceMagnitudeSq;
+		if (seekingForce.LenSq() < surplusForce) {
+			steeringForce = steeringForce + seekingForce;
+		}
+		else if (seekingForce.x != 0.0f || seekingForce.y != 0.0f || seekingForce.z != 0.0f) {
+			steeringForce = steeringForce + seekingForce.GetNormalized() * surplusForce;
+		}
+		// flockingForce
+		steeringForceMagnitudeSq = steeringForce.LenSq();
+		if (!(steeringForceMagnitudeSq < maxMagnitudeSq)) {
+			return steeringForce;
+		}
+		surplusForce = maxMagnitudeSq - steeringForceMagnitudeSq;
+		if (flockingForce.LenSq() < surplusForce) {
+			steeringForce = steeringForce + flockingForce;
+		}
+		else if (flockingForce.x != 0.0f || flockingForce.y != 0.0f || flockingForce.z != 0.0f) {
+			steeringForce = steeringForce + flockingForce.GetNormalized() * surplusForce;
+		}
+	}
+	return steeringForce;
 }

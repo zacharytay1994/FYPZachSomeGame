@@ -20,12 +20,14 @@ void EnemyAwaitPath::Execute(EnemyOne *& entity)
 {
 	// attempt to find path to target destination
 	std::vector<Vecf3> holder;
-	if (entity->terrainWithPath->FindAndReturnPath(entity->GetSpawnLocationOffset(), entity->targetDestination, holder, 6.0f)) {
-		entity->InsertDebugString("/renemyone id: /y" + std::to_string(entity->GetUniqueID()) + " /cpath /cfound.");
-		entity->SetCurrentPath(holder);
-		entity->stateMachine->ChangeState(EnemyMove::Instance());
+	if (entity->WithinWorld()) {
+		if (entity->terrainWithPath->FindAndReturnPath(entity->GetSpawnLocationOffset(), entity->targetDestination, holder, 6.0f)) {
+			entity->InsertDebugString("/renemyone id: /y" + std::to_string(entity->GetUniqueID()) + " /cpath /cfound.");
+			entity->SetCurrentPath(holder);
+			entity->stateMachine->ChangeState(EnemyMove::Instance());
+		}
+		// else adds entity to, inaccessible array, and changes state to back to idle (to be added)
 	}
-	// else adds entity to, inaccessible array, and changes state to back to idle (to be added)
 }
 
 void EnemyAwaitPath::Exit(EnemyOne *& entity)

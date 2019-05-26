@@ -107,6 +107,14 @@ public:
 	virtual void SetSpawnLocationOffsetY(const float& posIn) {
 		spawnLocationOffset.y = posIn;
 	}
+	virtual void SetSpawnLocationOffsetYControlled(const float& posIn) {
+		if (!(spawnLocationOffset.y > (posIn - 0.02f) && spawnLocationOffset.y < (posIn + 0.02))) {
+			spawnLocationOffset.y += (posIn - spawnLocationOffset.y) / 2.0f;
+		}
+		else {
+			spawnLocationOffset.y = posIn;
+		}
+	}
 	virtual void SetSpawnLocationOffset(const Vecf3& posIn) {
 		spawnLocationOffset = posIn;
 	}
@@ -166,6 +174,9 @@ public:
 	}
 	float GetCellDiameter() {
 		return cellDiameter;
+	}
+	bool WithinWorld() {
+		return (spawnLocationOffset.x > -worldSize/2.0f && spawnLocationOffset.x < worldSize/2.0f && spawnLocationOffset.z > -worldSize/2.0f && spawnLocationOffset.z < worldSize/2.0f);
 	}
 public:
 	std::vector<DebugMessage> debugQueue;

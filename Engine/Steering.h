@@ -15,8 +15,10 @@ public:
 	static std::vector<Veci2> FeelerGridCollision(EnemyParent* enemy);
 	// returns if feelers collide with grid cell marked solid
 	static bool FeelerCollideSolid(EnemyParent* entity, const std::vector<Veci2>& feelerCells, NodeAStar*& node);
+	static bool FeelerCollideHeight(EnemyParent* entity, std::vector<Veci2>& feelerCells, NodeAStar*& node);
 	// calculate obstacle avoid steering force
 	Vecf3 AvoidObstacles(const float& incomingMagnitude, const Vecf3& centerPosition, const Vecf3& collidePosition);
+	Vecf3 AvoidWall(const Vecf3& collisionPosition, const Vecf3& currentPosition);
 	// calculate seperation force
 	Vecf3 Flocking(EnemyParent* entity);
 	// process feeler logic

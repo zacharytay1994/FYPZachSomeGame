@@ -22,8 +22,9 @@ public:
 	void Update(Keyboard&kbd, Mouse& mouse, float dt) {
 		ChildUpdates(kbd, mouse, dt);
 	}
-	void Draw(const Matf4& viewMatrix, const Matf4& projectionMatrix) {
+	void Draw(const Matf4& viewMatrix, const Matf4& projectionMatrix, const Matf4& reflectionViewMatrix) {
 		skyBoxPipeline->effect.vertexShader.BindView(viewMatrix);
+		skyBoxPipeline->effect.vertexShader.BindReflectionView(reflectionViewMatrix);
 		skyBoxPipeline->effect.vertexShader.BindProjection(projectionMatrix);
 		skyBoxPipeline->Draw(skyCubeList);
 	}

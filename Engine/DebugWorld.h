@@ -12,6 +12,7 @@
 #include "TerrainWithPath.h"
 #include "ConsoleBox.h"
 #include "MouseInteract.h"
+#include "Water.h"
 
 #include <string>
 #include <sstream>
@@ -31,9 +32,11 @@ public:
 		:
 		sceneZBuffer(std::make_shared<ZBuffer>(gfx.ScreenWidth, gfx.ScreenHeight)),
 		Scene("Debug world", sceneZBuffer, gfx),
-		terrainWithPath(std::make_shared<TerrainWithPath>(gfx, sceneZBuffer, "heightmap2.bmp", "parchmentpaper.bmp", worldSize, gridSize, 0.0f, 10.0f)), // TerrainWithPath(graphics, zbuffer, heightmap, surface texture, world size, grid size, min world height, max world height)
+		terrainWithPath(std::make_shared<TerrainWithPath>(gfx, sceneZBuffer, "heightmap2.bmp", "test.bmp", worldSize, gridSize, 0.0f, 10.0f)), // TerrainWithPath(graphics, zbuffer, heightmap, surface texture, world size, grid size, min world height, max world height)
 		entityHandler(gfx, sceneZBuffer, worldSize, gridSize, terrainWithPath, consoleBox),
-		consoleBox(std::make_shared<ConsoleBox>(gfx, sceneZBuffer, fontList))
+		consoleBox(std::make_shared<ConsoleBox>(gfx, sceneZBuffer, fontList)),
+		water(std::make_shared<Water>(gfx, sceneZBuffer,4.0f, cameraPosition, camX, camY)),
+		gfx(gfx)
 	{
 		//entityHandler.AddSolid(1.0f, { 55, 0, 45 });
 		// let entityHandler know about the heightmap to implicitly place some entities
@@ -57,28 +60,36 @@ public:
 		clock++;
 		// camera movement
 		if (kbd.KeyIsPressed('W')) {
-			cameraPosition += Vecf4{ 0.0f, 0.0f, 1.0f, 0.0f } * cameraSpeed * dt;
+			zOffset += cameraSpeed * dt;
 		}
 		if (kbd.KeyIsPressed('A')) {
-			cameraPosition += Vecf4{ -1.0f, 0.0f, 0.0f, 0.0f } * cameraSpeed * dt;
+			xOffset -= cameraSpeed * dt;
 		}
 		if (kbd.KeyIsPressed('S')) {
-			cameraPosition += Vecf4{ 0.0f, 0.0f, -1.0f, 0.0f } * cameraSpeed * dt;
+			zOffset -= cameraSpeed * dt;
 		}
 		if (kbd.KeyIsPressed('D')) {
-			cameraPosition += Vecf4{ 1.0f, 0.0f, 0.0f, 0.0f } * cameraSpeed * dt;
+			xOffset += cameraSpeed * dt;
 		}
 		if (kbd.KeyIsPressed('N')) {
-			cameraPosition += Vecf4{ 0.0f, 1.0f, 0.0f, 0.0f } *cameraSpeed * dt;
+			yOffset += cameraSpeed * dt;
 		}
 		if (kbd.KeyIsPressed('M')) {
-			cameraPosition += Vecf4{ 0.0f, -1.0f, 0.0f, 0.0f } *cameraSpeed * dt;
+			yOffset -= cameraSpeed * dt;
 		}
 		if (kbd.KeyIsPressed('J')) {
 			camY += 1.0f * dt;
 		}
 		if (kbd.KeyIsPressed('K')) {
 			camY -= 1.0f * dt;
+		}
+		if (kbd.KeyIsPressed('U')) {
+			camX += 1.0f * dt;
+			reflectionCamX -= 1.0f * dt;
+		}
+		if (kbd.KeyIsPressed('H')) {
+			camX -= 1.0f * dt;
+			reflectionCamX += 1.0f * dt;
 		}
 		/*if (clock > 300) {
 			if (!spawnCheck) {
@@ -113,18 +124,41 @@ public:
 		// scene world and camera transformation matrices
 		const Matf4 projectionMatrix = Matf4::Projection(4.0f, 3.0f, 1.0f, 100.0f);
 		camRotInverse = Matf4::Identity() * Matf4::RotationY(camY) * Matf4::RotationX(camX);
+		// reflection camRotInverse
+		cameraPosition = { xOffset, yOffset, zOffset };
+		reflectionCameraPosition = { xOffset, 0.0f, zOffset };
+		reflectionCamRotInverse = Matf4::Identity() * Matf4::RotationY(camY+PI) * Matf4::RotationX(camX+PI);
 		const Matf4 viewMatrix = Matf4::Translation(-cameraPosition) * camRotInverse;
-		const Vecf3 translate = { 0.0f, 0.0f, 0.0f };
-		const Matf4 worldTransform = Matf4::RotationZ(theta_z) * Matf4::RotationX(theta_x) * Matf4::RotationY(theta_y) * Matf4::Translation(translate);
+		// reflection view Matrix
+		const Matf4 reflectionViewMatrix = Matf4::Translation(-reflectionCameraPosition) * reflectionCamRotInverse;
+		Vecf3 translate = { 0.0f, 0.0f, 0.0f };
+		Matf4 worldTransform = Matf4::RotationZ(theta_z) * Matf4::RotationX(theta_x) * Matf4::RotationY(theta_y) * Matf4::Translation(translate);
 		const Matf4 orientation = Matf4::RotationZ(theta_z) * Matf4::RotationX(theta_x) * Matf4::RotationY(theta_y);
 		// binding transformation matrices to external components and draws them
 		// draws all entities in entity handler
-		entityHandler.Draw(viewMatrix, projectionMatrix);
+		entityHandler.Draw(viewMatrix, projectionMatrix, reflectionViewMatrix);
 		// draws world terrain and path found TerrainWithPath::FindPath()
-		terrainWithPath->Draw(worldTransform, viewMatrix, projectionMatrix);
+		terrainWithPath->Draw(worldTransform, viewMatrix, projectionMatrix, reflectionViewMatrix);
 		//entityHandler.DrawDebugDisplay();
 		//terrainWithPath.DrawPath(viewMatrix, projectionMatrix);
-		consoleBox->Draw(viewMatrix, projectionMatrix);
+		consoleBox->Draw(viewMatrix, projectionMatrix, reflectionViewMatrix);
+		// drawing the water plane
+		translate = { 0.0f, water->GetYOffSet(), 0.0f };
+		worldTransform = Matf4::RotationZ(theta_z) * Matf4::RotationX(theta_x) * Matf4::RotationY(theta_y) * Matf4::Translation(translate);
+		water->Draw(worldTransform, viewMatrix, projectionMatrix);
+
+		//// debug gui test
+		//int bufferSize = sceneZBuffer->width * sceneZBuffer->height;
+		//int startX = 1;
+		//int startY = 1;
+		//int guiSize = 500;
+		//for (int x = startX; x < guiSize; x++) {
+		//	for (int y = startY; y < guiSize; y++) {
+		//		int xInt = x*gfx.ScreenWidth/guiSize;
+		//		int yInt = (guiSize-y)*gfx.ScreenHeight / guiSize;
+		//		gfx.PutPixel(x, y, sceneZBuffer->ColorAt(xInt, yInt));
+		//	}
+		//}
 	}
 	void ExecuteCameraMovement(float dt) {
 		cameraPosition += Vecf4{ 0.0f, 0.0f, 1.0f, 0.0f } * camSpeed * dt;
@@ -140,13 +174,19 @@ private:
 	float theta_x = 0.0f;
 	float theta_y = 0.0f;
 	float theta_z = 0.0f;
+	float yOffset = 20.0f;
+	float xOffset = 0.0f;
+	float zOffset = -18.0f;
 	// projection inverse matrices, directional light position, camera variables
-	Matf4 camRotInverse = Matf4::Identity() * Matf4::RotationX(-0.8f) * Matf4::RotationY(camY);
-	Vecf3 cameraPosition = { 0.0f, 20.0f, -18.0f };
+	Matf4 camRotInverse;// = Matf4::Identity() * Matf4::RotationX(-0.8f) * Matf4::RotationY(camY);
+	Matf4 reflectionCamRotInverse;// = Matf4::Identity() * Matf4::RotationX(0.8f) * Matf4::RotationY(camY);
+	Vecf3 cameraPosition = { xOffset, yOffset, zOffset };
+	Vecf3 reflectionCameraPosition = { xOffset, yOffset, zOffset };
 	Vecf3 lightPosition = { 0.0f, 0.0f, 0.6f };
 	const float cameraSpeed = 4.0f;
 	float camY = 0.0f;
-	float camX = -0.8f;
+	float camX = 0.0f;
+	float reflectionCamX = 0.0f;
 	// external components
 	// entityHandler object, handles all scene objects that inherit the entity class
 	EntityHandler entityHandler;
@@ -158,6 +198,7 @@ private:
 
 	// environment object
 	std::shared_ptr<ConsoleBox> consoleBox;
+	std::shared_ptr<Water> water;
 
 	// debugging stuff
 	std::wstringstream ss;
@@ -174,4 +215,7 @@ private:
 	bool check = true;
 	int clock = 0;
 	bool spawnCheck = false;
+
+	// testing graphics
+	Graphics& gfx;
 };

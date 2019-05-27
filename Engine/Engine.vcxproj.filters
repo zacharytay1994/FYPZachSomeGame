@@ -133,6 +133,9 @@
     <Filter Include="Header Files\AI\Steering">
       <UniqueIdentifier>{d7882b19-c5a7-4715-973a-0a3fcdb5379d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Water">
+      <UniqueIdentifier>{465fcad8-7b81-45c4-b5f8-7944ff0f12dd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ChiliWin.h">
@@ -425,6 +428,12 @@
     </ClInclude>
     <ClInclude Include="EnemyAAOne.h">
       <Filter>Header Files\Entity\Enemies</Filter>
+    </ClInclude>
+    <ClInclude Include="Water.h">
+      <Filter>Header Files\Water</Filter>
+    </ClInclude>
+    <ClInclude Include="WaterPipeline.h">
+      <Filter>Header Files\Pipelines</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

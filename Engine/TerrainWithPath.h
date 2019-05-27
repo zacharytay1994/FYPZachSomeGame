@@ -41,10 +41,11 @@ public:
 		pathfinding.UpdateGridObstacles(solidBuffer);
 	}
 	// renders terrain
-	void Draw(const Matf4& worldTransform, const Matf4& viewMatrix, const Matf4& projectionMatrix) {
+	void Draw(const Matf4& worldTransform, const Matf4& viewMatrix, const Matf4& projectionMatrix, const Matf4& reflectionViewMatrix) {
 		// binding transformation matrices to rendering pipeline
 		groundPipeline->effect.vertexShader.BindWorld(worldTransform);
 		groundPipeline->effect.vertexShader.BindView(viewMatrix);
+		groundPipeline->effect.vertexShader.BindReflectionView(reflectionViewMatrix);
 		groundPipeline->effect.vertexShader.BindProjection(projectionMatrix);
 		groundPipeline->Draw(terrain.terrainList);
 	}

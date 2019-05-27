@@ -131,9 +131,10 @@ public:
 		//WriteEDMToConsole();
 	}
 
-	void Draw(const Matf4& viewMatrix, const Matf4& projectionMatrix) {
+	void Draw(const Matf4& viewMatrix, const Matf4& projectionMatrix, const Matf4& reflectionViewMatrix) {
 		entityPipeline->BeginFrame();
 		entityPipeline->effect.vertexShader.BindView(viewMatrix);
+		entityPipeline->effect.vertexShader.BindReflectionView(reflectionViewMatrix);
 		entityPipeline->effect.vertexShader.BindProjection(projectionMatrix);
 		
 		// loop through and render normal entity buffer

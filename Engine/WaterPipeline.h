@@ -12,22 +12,20 @@
 #include <string>
 
 template<class Effect>
-class Pipeline {
+class WaterPipeline {
 public:
 	// gets Vertex from effect class
 	typedef typename Effect::Vertex Vertex;
 	// output vertex from vertex shader
 	typedef typename Effect::VertexShader::Output outputVertex;
-	// output struct from vertex shader
-	typedef typename Effect::VertexShader::OutputStruct outputVertexStruct;
 	// output vertex from geom shader
 	typedef typename Effect::GeomShader::Output outputGeom;
 public:
-	Pipeline(Graphics& gfx)
+	WaterPipeline(Graphics& gfx)
 		:
-		Pipeline(gfx, std::make_shared<ZBuffer>(gfx.ScreenWidth, gfx.ScreenHeight))
+		WaterPipeline(gfx, std::make_shared<ZBuffer>(gfx.ScreenWidth, gfx.ScreenHeight))
 	{}
-	Pipeline(Graphics& gfx, std::shared_ptr<ZBuffer> zBuffer)
+	WaterPipeline(Graphics& gfx, std::shared_ptr<ZBuffer> zBuffer)
 		:
 		gfx(gfx),
 		zBuffer(std::move(zBuffer))
@@ -47,7 +45,7 @@ public:
 private:
 	void ProcessVertices(std::vector<Vertex>& vertices, std::vector<size_t>& indices) {
 		// create holder vector of output vertices
-		std::vector<outputVertexStruct> verticesOut(vertices.size());
+		std::vector<outputVertex> verticesOut(vertices.size());
 
 		// transform vertices using vertex shader
 		std::transform(vertices.begin(), vertices.end(), verticesOut.begin(), effect.vertexShader);
@@ -55,25 +53,20 @@ private:
 		// pass it on
 		AssembleTriangles(verticesOut, indices);
 	}
-	void AssembleTriangles(const std::vector<outputVertexStruct>& vertices, const std::vector<size_t>& indices) {
+	void AssembleTriangles(const std::vector<outputVertex>& vertices, const std::vector<size_t>& indices) {
 		// calculate origin with perspective projection matrix
 		const Vecf4 eyepos = Vecf4{ 0.0f, 0.0f, 0.0f, 1.0f } *effect.vertexShader.GetProj();
 		// loops and create triangles
 		for (size_t i = 0, end = indices.size() / 3; i < end; i++) {
 			// get vertices by index
-			const outputVertexStruct& v0 = vertices[indices[i * 3]];
-			const outputVertexStruct& v1 = vertices[indices[i * 3 + 1]];
-			const outputVertexStruct& v2 = vertices[indices[i * 3 + 2]];
+			const outputVertex& v0 = vertices[indices[i * 3]];
+			const outputVertex& v1 = vertices[indices[i * 3 + 1]];
+			const outputVertex& v2 = vertices[indices[i * 3 + 2]];
 
-			// backface cull basic vertices
-			float testVal = ((v1.basicVertices.pos - v0.basicVertices.pos) % (v2.basicVertices.pos - v0.basicVertices.pos)) * Vecf3(v0.basicVertices.pos - eyepos);
-			if ((v1.basicVertices.pos - v0.basicVertices.pos) % (v2.basicVertices.pos - v0.basicVertices.pos) * Vecf3(v0.basicVertices.pos - eyepos) <= 0.0f) {
-				ProcessTriangle(v0.basicVertices, v1.basicVertices, v2.basicVertices);
-			}
-			// backface cull reflection vertices
-			float reflectionTestVal = ((v1.reflectionVertices.pos - v0.reflectionVertices.pos) % (v2.reflectionVertices.pos - v0.reflectionVertices.pos)) * Vecf3(v0.reflectionVertices.pos - eyepos);
-			if ((v1.reflectionVertices.pos - v0.reflectionVertices.pos) % (v2.reflectionVertices.pos - v0.reflectionVertices.pos) * Vecf3(v0.reflectionVertices.pos - eyepos) <= 0.0f) {
-				ProcessTriangle(v0.reflectionVertices, v1.reflectionVertices, v2.reflectionVertices);
+			// backface cull
+			float testVal = ((v1.pos - v0.pos) % (v2.pos - v0.pos)) * Vecf3(v0.pos - eyepos);
+			if ((v1.pos - v0.pos) % (v2.pos - v0.pos) * Vecf3(v0.pos - eyepos) <= 0.0f) {
+				ProcessTriangle(v0, v1, v2);
 			}
 		}
 	}
@@ -269,7 +262,7 @@ private:
 
 			// get x start and end
 			const int xStart = std::max((int)ceil(leftInterpolant.pos.x - 0.5f), 0);
-			
+
 			const int xEnd = std::min((int)ceil(rightInterpolant.pos.x - 0.5f), (int)Graphics::ScreenWidth - 1);
 
 			float testvalue = rightInterpolant.pos.x - leftInterpolant.pos.x;
@@ -283,45 +276,27 @@ private:
 
 			// loop for x
 			Color tempColor;
-			outputGeom modelSpace;
-			//outputGeom modelSpace;
 			for (int x = xStart; x < xEnd; x++, leftToRight = leftToRight + changeX) {
 				// get z value
-				const float zValue = 1.0f/leftToRight.pos.w;
-				// bring output vertex back into orthographic space
-				outputGeom passIn = leftToRight * zValue;
-				if (!isWater) {
-					tempColor = effect.pixelShader(passIn, false, screenWidth, screenHeight);
-				}
-				else {
-					tempColor = effect.pixelShader(passIn/zValue, true, screenWidth, screenHeight);
-				}
-				if (!passIn.isReflection) {
-					if (zBuffer->TestAndSetZ(x, y, zValue, passIn.texpos)) {
-						// getting color from orthographic texture coordinates
+				const float zValue = 1.0f / leftToRight.pos.w;
+				const outputGeom passIn = leftToRight * zValue;
+				if (zBuffer->TestAndSetColor(x, y, zValue)) {
+					// getting color from orthographic texture coordinates
+					tempColor = effect.pixelShader(passIn);
+					if (toDraw) {
 						gfx.PutPixel(x, y, tempColor);
-						//else {
-						//	// filling the reflection buffer used in water
-						//	modelSpace = trans.TransformClipToModel(leftToRight);
-						//	zBuffer->FillReflectionBuffer(x, y, tempColor, modelSpace.pos.y);
-						//}
 					}
-				}
-				else {
-					modelSpace = trans.TransformClipToModel(leftToRight);
-					zBuffer->FillReflectionBuffer(x, y, zValue, tempColor, modelSpace.pos.y);
+					// filling the reflection buffer used in water
+					outputGeom modelSpace = trans.TransformClipToModel(leftToRight);
+					zBuffer->FillReflectionBuffer(x, y, tempColor, modelSpace.pos.y);
 				}
 			}
 		}
 	}
 public:
 	Effect effect;
-	bool toDraw = true;
-	bool isWater = false;
 private:
 	Graphics& gfx;
-	float screenWidth = gfx.ScreenWidth;
-	float screenHeight = gfx.ScreenHeight;
 	NDCTransformer<outputGeom> trans;
 	std::shared_ptr<ZBuffer> zBuffer;
 	bool isOccupied = false;

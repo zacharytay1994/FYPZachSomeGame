@@ -105,3 +105,21 @@ int Surface::GetHeight()
 {
 	return height;
 }
+
+void Surface::SetWidth(const int & widthIn)
+{
+	width = widthIn;
+}
+
+void Surface::SetHeight(const int & heightIn)
+{
+	height = heightIn;
+}
+
+void Surface::Reset(int widthIn, int heightIn)
+{
+	width = widthIn;
+	height = heightIn;
+	delete[] nPixels;
+	nPixels = new Color[width*height];
+}

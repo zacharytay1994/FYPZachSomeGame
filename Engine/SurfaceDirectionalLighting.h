@@ -65,10 +65,11 @@ public:
 				pos(pos),
 				texpos(texpos)
 			{}
-			Output(const Vecf4& pos, const Vertex& vertex_in)
+			Output(const Vecf4& pos, const Vertex& vertex_in, const bool& isReflection)
 				:
 				pos(pos),
-				texpos(vertex_in.texpos)
+				texpos(vertex_in.texpos),
+				isReflection(isReflection)
 			{}
 			// operators
 			Output operator+(const Output& rhs) const {
@@ -98,10 +99,17 @@ public:
 		public:
 			Vecf4 pos;
 			Vecf2 texpos;
+			bool isReflection;
 		};
-		Output operator()(const Vertex& vertex_in) {
+		struct OutputStruct {
+			Output basicVertices;
+			Output reflectionVertices;
+			//Output refractionVertices;
+		};
+		OutputStruct operator()(const Vertex& vertex_in) {
 			Vecf4 tempPos = Vecf4(vertex_in.pos) * worldViewProj;
-			return { tempPos, vertex_in };
+			Vecf4 reflectionTempPos = Vecf4(vertex_in.pos) * reflectionWorldViewProj;
+			return { Output(tempPos, vertex_in, false), Output(reflectionTempPos, vertex_in, true) };
 		}
 		void BindWorld(const Matf4& transformation_in) {
 			world = transformation_in;
@@ -120,6 +128,12 @@ public:
 		const Matf4& GetProj() const {
 			return proj;
 		}
+		// reflecton proj
+		void BindReflectionView(const Matf4& transformation_in) {
+			reflectionView = transformation_in;
+			reflectionWorldView = world * reflectionView;
+			reflectionWorldViewProj = reflectionWorldView * proj;
+		}
 	private:
 		// world transform
 		Matf4 world = Matf4::Identity();
@@ -131,6 +145,12 @@ public:
 		Matf4 proj = Matf4::Identity();
 		// both together
 		Matf4 worldViewProj = Matf4::Identity();
+		// reflection view transform
+		Matf4 reflectionView = Matf4::Identity();
+		// reflection world view transform
+		Matf4 reflectionWorldView = Matf4::Identity();
+		// reflection world view proj
+		Matf4 reflectionWorldViewProj = Matf4::Identity();
 	};
 
 	class GeomShader {
@@ -139,23 +159,25 @@ public:
 		public:
 			// constructors
 			Output() = default;
-			Output(const Vecf4 pos, const Vecf2& texpos, float intensity)
+			Output(const Vecf4 pos, const Vecf2& texpos, float intensity, const bool& isReflection)
 				:
 				pos(pos),
 				texpos(texpos),
-				intensity(intensity)
+				intensity(intensity),
+				isReflection(isReflection)
 			{}
 			Output(const Vecf4& pos, const VertexShader::Output& vertex_in, float intensity)
 				:
 				pos(pos),
 				texpos(vertex_in.texpos),
-				intensity(intensity)
+				intensity(intensity),
+				isReflection(vertex_in.isReflection)
 			{}
 			// operators
 			Output operator+(const Output& rhs) const {
 				Vecf4 temppos = pos + rhs.pos;
 				Vecf2 temptexpos = texpos + rhs.texpos;
-				return { temppos, temptexpos, intensity };
+				return { temppos, temptexpos, intensity, isReflection };
 			}
 			Output operator+=(const Output& rhs) {
 				return *this + rhs;
@@ -163,13 +185,13 @@ public:
 			Output operator-(const Output& rhs) const {
 				Vecf4 temppos = pos - rhs.pos;
 				Vecf2 temptexpos = texpos - rhs.texpos;
-				return { temppos, temptexpos, intensity };
+				return { temppos, temptexpos, intensity, isReflection };
 			}
 			Output operator-=(const Output& rhs) {
 				return *this - rhs;
 			}
 			Output operator*(float val) const {
-				return Output(pos * val, texpos * val, intensity);
+				return Output(pos * val, texpos * val, intensity, isReflection);
 			}
 			Output& operator/(float val) {
 				pos = pos / val;
@@ -180,6 +202,7 @@ public:
 			Vecf4 pos;
 			Vecf2 texpos;
 			float intensity;
+			bool isReflection;
 		};
 	public:
 		Triangle<Output> operator()(const VertexShader::Output& v0, const VertexShader::Output& v1, const VertexShader::Output& v2) {
@@ -227,19 +250,28 @@ public:
 		};
 	public:
 		template<class Input>
-		Color operator()(const Input& input) const {
-			if (staticTexture) {
-				Vecf3 colorReturn = (Vecf3)texture->GetPixel(
-					(int)std::min(input.texpos.x * tex_width, width_clamp),
-					(int)std::min(input.texpos.y * tex_height, height_clamp));
-				return (Color)(colorReturn * input.intensity);
+		Color operator()(const Input& input, const bool& check, const float& screenWidth, const float& screenHeight) const {
+			if (!check) {
+				if (staticTexture) {
+					Vecf3 colorReturn = (Vecf3)texture->GetPixel(
+						(int)std::min(input.texpos.x * tex_width, width_clamp),
+						(int)std::min(input.texpos.y * tex_height, height_clamp));
+					return (Color)(colorReturn * input.intensity);
+				}
+				// if calling instance requires different textures per entity
+				else {
+					Vecf3 colorReturn = (Vecf3)textureList[entityType].texture->GetPixel(
+						(int)std::min(input.texpos.x * textureList[entityType].tex_width, textureList[entityType].width_clamp),
+						(int)std::min(input.texpos.y * textureList[entityType].tex_height, textureList[entityType].height_clamp));
+					return (Color)(colorReturn * input.intensity);
+				}
 			}
-			// if calling instance requires different textures per entity
 			else {
-				Vecf3 colorReturn = (Vecf3)textureList[entityType].texture->GetPixel(
-					(int)std::min(input.texpos.x * textureList[entityType].tex_width, textureList[entityType].width_clamp),
-					(int)std::min(input.texpos.y * textureList[entityType].tex_height, textureList[entityType].height_clamp));
+				Vecf3 colorReturn = (Vecf3)texture->GetPixel(
+					(int)std::min((input.pos.x / screenWidth)*tex_width, width_clamp),
+					(int)std::min((input.pos.y / screenHeight)*tex_height, height_clamp));
 				return (Color)(colorReturn * input.intensity);
+				//return Colors::Red;
 			}
 		}
 		void BindTexture(const std::string& filename) {
@@ -255,6 +287,18 @@ public:
 			tex_height = (float)texture->GetHeight();
 			width_clamp = tex_width - 1.0f;
 			height_clamp = tex_height - 1.0f;
+		}
+		void BindBuffer(Color* colorBuffer, const int& bufferWidth, const int& bufferHeight) {
+			texture->Reset(bufferWidth, bufferHeight);
+			tex_width = (float)texture->GetWidth();
+			tex_height = (float)texture->GetHeight();
+			width_clamp = tex_width - 1.0f;
+			height_clamp = tex_height - 1.0f;
+			for (int x = 0; x < tex_width; x++) {
+				for (int y = 0; y < tex_height; y++) {
+					texture->PutPixel(x, y, colorBuffer[y*(int)tex_width + x]);
+				}
+			}
 		}
 		void AddTexture(const std::string& filename) {
 			BindTexture(filename);

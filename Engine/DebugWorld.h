@@ -23,7 +23,7 @@
 class DebugWorld : public Scene {
 public:
 	// size of the world in world space coordinates (worldSize by worldSize large)
-	const float worldSize = 50.0f;
+	const float worldSize = 25.0f;
 	// size of the world in terms of a grid (gridSize by gridSize large)
 	const int gridSize = 100;
 	// hence, worldSize/gridSize = density of vertices in world space
@@ -32,10 +32,10 @@ public:
 		:
 		sceneZBuffer(std::make_shared<ZBuffer>(gfx.ScreenWidth, gfx.ScreenHeight)),
 		Scene("Debug world", sceneZBuffer, gfx),
-		terrainWithPath(std::make_shared<TerrainWithPath>(gfx, sceneZBuffer, "heightmap1.bmp", "test.bmp", worldSize, gridSize, 0.0f, 20.0f)), // TerrainWithPath(graphics, zbuffer, heightmap, surface texture, world size, grid size, min world height, max world height)
+		terrainWithPath(std::make_shared<TerrainWithPath>(gfx, sceneZBuffer, "heightmap1.bmp", "test.bmp", worldSize, gridSize, -10.0f, 20.0f)), // TerrainWithPath(graphics, zbuffer, heightmap, surface texture, world size, grid size, min world height, max world height)
 		entityHandler(gfx, sceneZBuffer, worldSize, gridSize, terrainWithPath, consoleBox),
 		consoleBox(std::make_shared<ConsoleBox>(gfx, sceneZBuffer, fontList)),
-		water(std::make_shared<Water>(gfx, sceneZBuffer,4.0f, cameraPosition, camX, camY)),
+		water(std::make_shared<Water>(gfx, sceneZBuffer,0.5f, cameraPosition, camX, camY)),
 		gfx(gfx)
 	{
 		//entityHandler.AddSolid(1.0f, { 55, 0, 45 });
@@ -55,6 +55,12 @@ public:
 		//entityHandler.AddTurret(2.5f, { 50, 50 });
 		// make known to world terrain of solid obstacle entities
 		terrainWithPath->SyncWithWorldEntities(entityHandler.buildingBuffer);
+		/*Pipeline<SurfaceDirectionalLighting>::uprightVector = { 0.0f, 1.0f, 0.0f };
+		Pipeline<SurfaceDirectionalLighting>::pitch = 0.0f;
+		Pipeline<SurfaceDirectionalLighting>::roll = 0.0f;
+		Pipeline<SurfaceDirectionalLighting>::yaw = 0.0f;*/
+		//Pipeline<SurfaceDirectionalLighting>::pitch = 3.14f/4;
+		//float test = Pipeline<SurfaceDirectionalLighting>::pitch;
 	}
 	virtual void Update(Keyboard&kbd, Mouse& mouse, float dt) override {
 		clock++;
@@ -79,17 +85,19 @@ public:
 		}
 		if (kbd.KeyIsPressed('J')) {
 			camY += 1.0f * dt;
+			//Pipeline<SurfaceDirectionalLighting>::yaw = -camY;
 		}
 		if (kbd.KeyIsPressed('K')) {
 			camY -= 1.0f * dt;
+			//Pipeline<SurfaceDirectionalLighting>::yaw = -camY;
 		}
 		if (kbd.KeyIsPressed('U')) {
 			camX += 1.0f * dt;
-			reflectionCamX += 1.0f * dt;
+			//Pipeline<SurfaceDirectionalLighting>::pitch = -camY;
 		}
 		if (kbd.KeyIsPressed('H')) {
 			camX -= 1.0f * dt;
-			reflectionCamX -= 1.0f * dt;
+			//Pipeline<SurfaceDirectionalLighting>::pitch = -camY;
 		}
 		/*if (clock > 300) {
 			if (!spawnCheck) {
@@ -117,6 +125,8 @@ public:
 		}
 		//ss << test.x << "," << test.y << std::endl;
 		OutputDebugString(ss.str().c_str());
+		/*Pipeline<SurfaceDirectionalLighting>::camWorldX = xOffset;
+		Pipeline<SurfaceDirectionalLighting>::camWorldZ = zOffset;*/
 	}
 	virtual void Draw() override {
 		// clearing shared zbuffer between all pipelines per frame
@@ -126,7 +136,7 @@ public:
 		camRotInverse = Matf4::Identity() * Matf4::RotationY(camY) * Matf4::RotationX(camX);
 		// reflection camRotInverse
 		cameraPosition = { xOffset, yOffset, zOffset };
-		reflectionCameraPosition = { xOffset, -yOffset + 8.0f, zOffset };
+		reflectionCameraPosition = { xOffset, -yOffset + 1.0f, zOffset };
 		reflectionCamRotInverse = Matf4::Identity() * Matf4::RotationY(camY+PI) * Matf4::RotationX(camX+PI);
 		const Matf4 viewMatrix = Matf4::Translation(-cameraPosition) * camRotInverse;
 		// reflection view Matrix
@@ -185,7 +195,7 @@ private:
 	Vecf3 lightPosition = { 0.0f, 0.0f, 0.6f };
 	const float cameraSpeed = 4.0f;
 	float camY = 0.0f;
-	float camX = 0.0f;
+	float camX = -3.14f/4.0f;
 	float reflectionCamX = 0.0f;
 	// external components
 	// entityHandler object, handles all scene objects that inherit the entity class

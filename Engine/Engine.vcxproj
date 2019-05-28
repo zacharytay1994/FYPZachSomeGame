@@ -259,6 +259,7 @@
     <ClCompile Include="MainWindow.cpp" />
     <ClCompile Include="MessageDispatcher.cpp" />
     <ClCompile Include="Mouse.cpp" />
+    <ClCompile Include="Pipeline.cpp" />
     <ClCompile Include="Sound.cpp" />
     <ClCompile Include="Steering.cpp" />
     <ClCompile Include="Surface.cpp" />

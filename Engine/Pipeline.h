@@ -314,15 +314,27 @@ private:
 				else {
 					// to get the model space coordinates of y for the clipping plane
 					modelSpace = trans.TransformClipToModel(leftToRight);
-					zBuffer->FillReflectionBuffer(x, y, zValue, tempColor, modelSpace.pos.y);
+					zBuffer->FillReflectionBuffer(x, y, zValue, tempColor, modelSpace.pos);
 				}
 			}
 		}
+	}
+	Vecf3 CalculateUprightVector() {
+		Matf4 rotationMatrix = Matf4::RotationZ(roll) * Matf4::RotationX(pitch) * Matf4::RotationY(yaw);
+		Vecf3 test = (Vecf3)((Vecf4)uprightVector * rotationMatrix);
+		return (Vecf3)((Vecf4)uprightVector * rotationMatrix);
 	}
 public:
 	Effect effect;
 	bool toDraw = true;
 	bool isWater = false;
+	// orientation
+	static Vecf3 uprightVector;
+	static float pitch;
+	static float yaw;
+	static float roll;
+	static float camWorldX;
+	static float camWorldZ;
 private:
 	Graphics& gfx;
 	float screenWidth = gfx.ScreenWidth;

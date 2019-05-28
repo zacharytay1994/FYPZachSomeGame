@@ -512,6 +512,9 @@
     <ClCompile Include="EnemyParent.cpp">
       <Filter>Header Files\Entity\Enemies</Filter>
     </ClCompile>
+    <ClCompile Include="Pipeline.cpp">
+      <Filter>Header Files\Pipelines</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="FramebufferPS.hlsl">

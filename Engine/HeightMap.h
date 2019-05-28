@@ -29,7 +29,7 @@ public:
 			for (int x = 0; x < height;  x++) {
 				holder = (Vecf3)image.GetPixel((int)(x*unitX), (int)(y*unitY));
 				float averageColor = (holder.x + holder.y + holder.z) / 3.0f;
-				heightDisplacementGrid.push_back((float)(averageColor*unitHeight));
+				heightDisplacementGrid.push_back((float)(minHeight + averageColor*unitHeight));
 			}
 		}
 		

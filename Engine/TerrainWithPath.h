@@ -45,8 +45,8 @@ public:
 		// binding transformation matrices to rendering pipeline
 		groundPipeline->effect.vertexShader.BindWorld(worldTransform);
 		groundPipeline->effect.vertexShader.BindView(viewMatrix);
-		groundPipeline->effect.vertexShader.BindReflectionView(reflectionViewMatrix);
 		groundPipeline->effect.vertexShader.BindProjection(projectionMatrix);
+		groundPipeline->effect.vertexShader.BindReflectionView(reflectionViewMatrix);
 		groundPipeline->Draw(terrain.terrainList);
 	}
 	// draws path found by pathfinding object

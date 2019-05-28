@@ -11,6 +11,8 @@
 #include "TextureEffect.h"
 #include <string>
 
+#include <assert.h>
+
 template<class Effect>
 class Pipeline {
 public:
@@ -296,7 +298,9 @@ private:
 				else {
 					tempColor = effect.pixelShader(passIn/zValue, true, screenWidth, screenHeight);
 				}
+				assert(passIn.isReflection == true || passIn.isReflection == false);
 				if (!passIn.isReflection) {
+					assert(x > 0 && x < screenWidth && y>0 && y < screenHeight);
 					if (zBuffer->TestAndSetZ(x, y, zValue, passIn.texpos)) {
 						// getting color from orthographic texture coordinates
 						gfx.PutPixel(x, y, tempColor);
@@ -308,6 +312,7 @@ private:
 					}
 				}
 				else {
+					// to get the model space coordinates of y for the clipping plane
 					modelSpace = trans.TransformClipToModel(leftToRight);
 					zBuffer->FillReflectionBuffer(x, y, zValue, tempColor, modelSpace.pos.y);
 				}

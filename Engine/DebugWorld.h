@@ -32,7 +32,7 @@ public:
 		:
 		sceneZBuffer(std::make_shared<ZBuffer>(gfx.ScreenWidth, gfx.ScreenHeight)),
 		Scene("Debug world", sceneZBuffer, gfx),
-		terrainWithPath(std::make_shared<TerrainWithPath>(gfx, sceneZBuffer, "heightmap2.bmp", "test.bmp", worldSize, gridSize, 0.0f, 10.0f)), // TerrainWithPath(graphics, zbuffer, heightmap, surface texture, world size, grid size, min world height, max world height)
+		terrainWithPath(std::make_shared<TerrainWithPath>(gfx, sceneZBuffer, "heightmap1.bmp", "test.bmp", worldSize, gridSize, 0.0f, 20.0f)), // TerrainWithPath(graphics, zbuffer, heightmap, surface texture, world size, grid size, min world height, max world height)
 		entityHandler(gfx, sceneZBuffer, worldSize, gridSize, terrainWithPath, consoleBox),
 		consoleBox(std::make_shared<ConsoleBox>(gfx, sceneZBuffer, fontList)),
 		water(std::make_shared<Water>(gfx, sceneZBuffer,4.0f, cameraPosition, camX, camY)),
@@ -85,11 +85,11 @@ public:
 		}
 		if (kbd.KeyIsPressed('U')) {
 			camX += 1.0f * dt;
-			reflectionCamX -= 1.0f * dt;
+			reflectionCamX += 1.0f * dt;
 		}
 		if (kbd.KeyIsPressed('H')) {
 			camX -= 1.0f * dt;
-			reflectionCamX += 1.0f * dt;
+			reflectionCamX -= 1.0f * dt;
 		}
 		/*if (clock > 300) {
 			if (!spawnCheck) {
@@ -126,7 +126,7 @@ public:
 		camRotInverse = Matf4::Identity() * Matf4::RotationY(camY) * Matf4::RotationX(camX);
 		// reflection camRotInverse
 		cameraPosition = { xOffset, yOffset, zOffset };
-		reflectionCameraPosition = { xOffset, 0.0f, zOffset };
+		reflectionCameraPosition = { xOffset, -yOffset + 8.0f, zOffset };
 		reflectionCamRotInverse = Matf4::Identity() * Matf4::RotationY(camY+PI) * Matf4::RotationX(camX+PI);
 		const Matf4 viewMatrix = Matf4::Translation(-cameraPosition) * camRotInverse;
 		// reflection view Matrix
@@ -174,14 +174,14 @@ private:
 	float theta_x = 0.0f;
 	float theta_y = 0.0f;
 	float theta_z = 0.0f;
-	float yOffset = 20.0f;
-	float xOffset = 0.0f;
+	float yOffset = 10.0f;
+	float xOffset = -18.0f;
 	float zOffset = -18.0f;
 	// projection inverse matrices, directional light position, camera variables
 	Matf4 camRotInverse;// = Matf4::Identity() * Matf4::RotationX(-0.8f) * Matf4::RotationY(camY);
 	Matf4 reflectionCamRotInverse;// = Matf4::Identity() * Matf4::RotationX(0.8f) * Matf4::RotationY(camY);
 	Vecf3 cameraPosition = { xOffset, yOffset, zOffset };
-	Vecf3 reflectionCameraPosition = { xOffset, yOffset, zOffset };
+	Vecf3 reflectionCameraPosition = { xOffset, 4.0f, zOffset };
 	Vecf3 lightPosition = { 0.0f, 0.0f, 0.6f };
 	const float cameraSpeed = 4.0f;
 	float camY = 0.0f;

@@ -60,22 +60,24 @@ public:
 		public:
 			// constructors
 			Output() = default;
-			Output(const Vecf4& pos, const Vecf2& texpos) // i dont really use this constructor
+			Output(const Vecf4& pos, const Vecf2& texpos, const Vecf4& directionalLight) // i dont really use this constructor
 				:
 				pos(pos),
-				texpos(texpos)
+				texpos(texpos),
+				directionalLight(directionalLight)
 			{}
-			Output(const Vecf4& pos, const Vertex& vertex_in, const bool& isReflection)
+			Output(const Vecf4& pos, const Vertex& vertex_in, const bool& isReflection, const Vecf4& directionalLight)
 				:
 				pos(pos),
 				texpos(vertex_in.texpos),
-				isReflection(isReflection)
+				isReflection(isReflection),
+				directionalLight(directionalLight)
 			{}
 			// operators
 			Output operator+(const Output& rhs) const {
 				Vecf4 temppos = pos + rhs.pos;
 				Vecf2 temptexpos = texpos + rhs.texpos;
-				return { temppos, temptexpos };
+				return { temppos, temptexpos, directionalLight };
 			}
 			Output operator+=(const Output& rhs) {
 				return *this + rhs;
@@ -83,13 +85,13 @@ public:
 			Output operator-(const Output& rhs) const {
 				Vecf4 temppos = pos - rhs.pos;
 				Vecf2 temptexpos = texpos - rhs.texpos;
-				return { temppos, temptexpos };
+				return { temppos, temptexpos, directionalLight };
 			}
 			Output operator-=(const Output& rhs) {
 				return *this - rhs;
 			}
 			Output operator*(float val) const {
-				return Output(pos * val, texpos * val);
+				return Output(pos * val, texpos * val, directionalLight);
 			}
 			Output& operator/(float val) {
 				pos = pos / val;
@@ -100,6 +102,7 @@ public:
 			Vecf4 pos;
 			Vecf2 texpos;
 			bool isReflection;
+			Vecf4 directionalLight;
 		};
 		struct OutputStruct {
 			Output basicVertices;
@@ -109,12 +112,17 @@ public:
 		OutputStruct operator()(const Vertex& vertex_in) {
 			Vecf4 tempPos = Vecf4(vertex_in.pos) * worldViewProj;
 			Vecf4 reflectionTempPos = Vecf4(vertex_in.pos) * reflectionWorldViewProj;
-			return { Output(tempPos, vertex_in, false), Output(reflectionTempPos, vertex_in, true) };
+			return { Output(tempPos, vertex_in, false, (Vecf4)directionalLightVec3*view),
+				Output(reflectionTempPos, vertex_in, true, (Vecf4)directionalLightVec3*reflectionView) };
 		}
 		void BindWorld(const Matf4& transformation_in) {
 			world = transformation_in;
+			// for basic vertices
 			worldView = world * view;
 			worldViewProj = worldView * proj;
+			// for reflection vertices
+			reflectionWorldView = world * reflectionView;
+			reflectionWorldViewProj = reflectionWorldView * proj;
 		}
 		void BindView(const Matf4& transformation_in) {
 			view = transformation_in;
@@ -124,6 +132,7 @@ public:
 		void BindProjection(const Matf4& transformation_in) {
 			proj = transformation_in;
 			worldViewProj = worldView * proj;
+			reflectionWorldViewProj = reflectionWorldView * proj;
 		}
 		const Matf4& GetProj() const {
 			return proj;
@@ -151,6 +160,9 @@ public:
 		Matf4 reflectionWorldView = Matf4::Identity();
 		// reflection world view proj
 		Matf4 reflectionWorldViewProj = Matf4::Identity();
+		// directional light
+		Vecf3 directionalLightVec3 = { 0.0f, 50.0f, 0.0f };
+		Vecf4 directionalLight;
 	};
 
 	class GeomShader {
@@ -159,25 +171,27 @@ public:
 		public:
 			// constructors
 			Output() = default;
-			Output(const Vecf4 pos, const Vecf2& texpos, float intensity, const bool& isReflection)
+			Output(const Vecf4 pos, const Vecf2& texpos, float intensity, const bool& isReflection, const Vecf4& directionalLight)
 				:
 				pos(pos),
 				texpos(texpos),
 				intensity(intensity),
-				isReflection(isReflection)
+				isReflection(isReflection),
+				directionalLight(directionalLight)
 			{}
 			Output(const Vecf4& pos, const VertexShader::Output& vertex_in, float intensity)
 				:
 				pos(pos),
 				texpos(vertex_in.texpos),
 				intensity(intensity),
-				isReflection(vertex_in.isReflection)
+				isReflection(vertex_in.isReflection),
+				directionalLight(vertex_in.directionalLight)
 			{}
 			// operators
 			Output operator+(const Output& rhs) const {
 				Vecf4 temppos = pos + rhs.pos;
 				Vecf2 temptexpos = texpos + rhs.texpos;
-				return { temppos, temptexpos, intensity, isReflection };
+				return { temppos, temptexpos, intensity, isReflection, directionalLight };
 			}
 			Output operator+=(const Output& rhs) {
 				return *this + rhs;
@@ -185,13 +199,13 @@ public:
 			Output operator-(const Output& rhs) const {
 				Vecf4 temppos = pos - rhs.pos;
 				Vecf2 temptexpos = texpos - rhs.texpos;
-				return { temppos, temptexpos, intensity, isReflection };
+				return { temppos, temptexpos, intensity, isReflection, directionalLight };
 			}
 			Output operator-=(const Output& rhs) {
 				return *this - rhs;
 			}
 			Output operator*(float val) const {
-				return Output(pos * val, texpos * val, intensity, isReflection);
+				return Output(pos * val, texpos * val, intensity, isReflection, directionalLight);
 			}
 			Output& operator/(float val) {
 				pos = pos / val;
@@ -203,13 +217,14 @@ public:
 			Vecf2 texpos;
 			float intensity;
 			bool isReflection;
+			Vecf4 directionalLight;
 		};
 	public:
 		Triangle<Output> operator()(const VertexShader::Output& v0, const VertexShader::Output& v1, const VertexShader::Output& v2) {
 			// calculating surface normal
 			surfaceNormal = ((v0.pos - v1.pos).GetNormalized() % (v2.pos - v1.pos)).GetNormalized();
 			// calculating intensity
-			float intensity = std::min(1.0f, std::max(0.0f, (-directionalLight * surfaceNormal)) * diffuseLight + ambientLight);
+			float intensity = std::min(1.0f, std::max(0.0f, (-/*(Vecf3)v0.*/directionalLight * surfaceNormal)) * diffuseLight + ambientLight);
 			return { {v0.pos, v0, intensity},
 			{v1.pos, v1, intensity},
 			{v2.pos, v2, intensity} };

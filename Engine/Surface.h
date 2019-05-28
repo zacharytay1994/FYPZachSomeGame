@@ -8,7 +8,6 @@ public:
 	Surface(int width, int height);
 	Surface(const std::string& filename);
 	Surface(const Surface&);
-	Surface(Color* color, int width, int height);
 	Surface& operator=(const Surface& rhs);
 	~Surface();
 	void PutPixel(int x, int y, Color c);

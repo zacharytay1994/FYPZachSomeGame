@@ -91,7 +91,7 @@ public:
 		return false;
 	}
 	bool FillReflectionBuffer(int x, int y, float depth, Color color, const float& yClipCoord) {
-		if (true) {
+		if ((true)) {
 			float& depthAtPoint = AtReflect(x, y);
 			if (depth < depthAtPoint) {
 				depthAtPoint = depth;

@@ -27,7 +27,7 @@ public:
 		v.pos.w = wInv;
 		return v;
 	}
-	T TransformClipToModel(T v) const {
+	T TransformScreenToClip(T v) const {
 		// get z value, 1/1/z
 		const float wInv = 1.0f / v.pos.w;
 		// transform from screen space to post perspective divide model space

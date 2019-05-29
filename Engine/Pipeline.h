@@ -50,7 +50,15 @@ private:
 	void ProcessVertices(std::vector<Vertex>& vertices, std::vector<size_t>& indices) {
 		// create holder vector of output vertices
 		std::vector<outputVertexStruct> verticesOut(vertices.size());
-
+		//std::vector<Vertex> tempVertices
+		if (isTerrain) {
+			for (Vertex& v : vertices) {
+				// if y in model space falls below 0, set above water to false
+				if (v.pos.y < 0) {
+					v.aboveWater = false;
+				}
+			}
+		}
 		// transform vertices using vertex shader
 		std::transform(vertices.begin(), vertices.end(), verticesOut.begin(), effect.vertexShader);
 
@@ -61,6 +69,9 @@ private:
 		// calculate origin with perspective projection matrix
 		const Vecf4 eyepos = Vecf4{ 0.0f, 0.0f, 0.0f, 1.0f } *effect.vertexShader.GetProj();
 		// loops and create triangles
+		if (isTerrain) {
+			int j = 1;
+		}
 		for (size_t i = 0, end = indices.size() / 3; i < end; i++) {
 			// get vertices by index
 			const outputVertexStruct& v0 = vertices[indices[i * 3]];
@@ -80,7 +91,13 @@ private:
 		}
 	}
 	void ProcessTriangle(const outputVertex& v0, const outputVertex& v1, const outputVertex& v2) {
+		// flag to return if all three vertices are under the water
+		//int flag = 0;
 		ClipCulling(effect.geomShader(v0, v1, v2));
+		// if flag returns 1, i.e. vertex y falls under 0 in model space
+		/*if (flag == 1) {
+			aboveWater = false;
+		}*/
 	} // makeshift geom shader
 
 	// clip culling of triangles
@@ -285,14 +302,14 @@ private:
 
 			// loop for x
 			Color tempColor;
-			outputGeom modelSpace;
+			outputGeom clipSpace;
 			//outputGeom modelSpace;
 			for (int x = xStart; x < xEnd; x++, leftToRight = leftToRight + changeX) {
 				// get z value
 				const float zValue = 1.0f/leftToRight.pos.w;
 				// bring output vertex back into orthographic space
 				outputGeom passIn = leftToRight * zValue;
-				if (!isWater) {
+				if (!isWater/* && leftToRight.aboveWater*/) {
 					tempColor = effect.pixelShader(passIn, false, screenWidth, screenHeight);
 				}
 				else {
@@ -303,7 +320,12 @@ private:
 					assert(x > 0 && x < screenWidth && y>0 && y < screenHeight);
 					if (zBuffer->TestAndSetZ(x, y, zValue, passIn.texpos)) {
 						// getting color from orthographic texture coordinates
-						gfx.PutPixel(x, y, tempColor);
+						if (leftToRight.aboveWater) {
+							gfx.PutPixel(x, y, tempColor);
+						}
+						else {
+							zBuffer->FillRefractionBuffer(x, y, zValue, tempColor);
+						}
 						//else {
 						//	// filling the reflection buffer used in water
 						//	modelSpace = trans.TransformClipToModel(leftToRight);
@@ -312,9 +334,12 @@ private:
 					}
 				}
 				else {
-					// to get the model space coordinates of y for the clipping plane
-					modelSpace = trans.TransformClipToModel(leftToRight);
-					zBuffer->FillReflectionBuffer(x, y, zValue, tempColor, modelSpace.pos);
+					// check if processing triangle quads fall under water
+					if (true) {
+						// to get the model space coordinates of y for the clipping plane
+						clipSpace = trans.TransformScreenToClip(leftToRight);
+						zBuffer->FillReflectionBuffer(x, y, zValue, tempColor, clipSpace.pos);
+					}
 				}
 			}
 		}
@@ -328,6 +353,8 @@ public:
 	Effect effect;
 	bool toDraw = true;
 	bool isWater = false;
+	bool aboveWater = true;
+	bool isTerrain = false;
 	// orientation
 	static Vecf3 uprightVector;
 	static float pitch;

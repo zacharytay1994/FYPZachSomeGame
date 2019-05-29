@@ -15,7 +15,7 @@ public:
 	Water(Graphics& gfx, std::shared_ptr<ZBuffer>& zbuffer, const float& yOffset, Vecf3& cameraPosition, float& camX, float& camY) 
 		:
 		waterPipeline(std::make_unique<Pipeline<SurfaceDirectionalLighting>>(gfx, zbuffer)),
-		waterPlane(PlaneVertex::GetPlaneHorizontalSplit<SurfaceDirectionalLighting::Vertex>(50.0f, 100)),
+		waterPlane(PlaneVertex::GetPlaneHorizontalSplit<SurfaceDirectionalLighting::Vertex>(50.0f, 10)),
 		yOffset(yOffset),
 		zBuffer(zbuffer),
 		cameraPosition(cameraPosition),
@@ -34,7 +34,8 @@ public:
 		waterPipeline->toDraw = false;
 		waterPipeline->effect.vertexShader.BindView(reflectedViewMatrix);*/
 		// draw water
-		waterPipeline->effect.pixelShader.BindBuffer(zBuffer->reflectionBuffer.get(), zBuffer->width, zBuffer->height);
+		waterPipeline->effect.pixelShader.BindBuffer(zBuffer->reflectionBuffer.get(), zBuffer->refractionBuffer.get(),
+			zBuffer->width, zBuffer->height);
 		waterPipeline->effect.vertexShader.BindWorld(worldTransform);
 		waterPipeline->effect.vertexShader.BindView(viewMatrix);
 		waterPipeline->effect.vertexShader.BindProjection(projectionMatrix);

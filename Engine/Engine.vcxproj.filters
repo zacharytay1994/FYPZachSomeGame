@@ -515,6 +515,12 @@
     <ClCompile Include="Pipeline.cpp">
       <Filter>Header Files\Pipelines</Filter>
     </ClCompile>
+    <ClCompile Include="DebugWorld.cpp">
+      <Filter>Header Files\Scenes\WorldScenes</Filter>
+    </ClCompile>
+    <ClCompile Include="ZBuffer.cpp">
+      <Filter>Header Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="FramebufferPS.hlsl">

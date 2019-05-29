@@ -13,6 +13,7 @@ public:
 		height(height),
 		zBuffer(new float[width * height]),
 		reflectionZBuffer(new float[width * height]),
+		refractionZBuffer(new float[width * height]),
 		pointBuffer(new Vecf2[(width * height)]),
 		reflectionBuffer(new Color[width*height]),
 		refractionBuffer(new Color[width*height])
@@ -23,8 +24,10 @@ public:
 		for (int i = 0; i < size; i++) {
 			zBuffer[i] = std::numeric_limits<float>::infinity();
 			reflectionZBuffer[i] = std::numeric_limits<float>::infinity();
+			refractionZBuffer[i] = std::numeric_limits<float>::infinity();
 			pointBuffer[i] = Vecf2(0.0f, 0.0f);
 			reflectionBuffer[i] = Colors::Red;
+			refractionBuffer[i] = Colors::Black;
 		}
 	}
 	// get at position
@@ -41,6 +44,13 @@ public:
 		assert(y >= 0);
 		assert(y < height);
 		return reflectionZBuffer[y * width + x];
+	}
+	float& AtRefract(int x, int y) {
+		assert(x >= 0);
+		assert(x < width);
+		assert(y >= 0);
+		assert(y < height);
+		return refractionZBuffer[y * width + x];
 	}
 	Color& ColorAt(int x, int y) {
 		assert(x >= 0);
@@ -90,31 +100,15 @@ public:
 		}
 		return false;
 	}
-	bool FillReflectionBuffer(int x, int y, float depth, Color color, const Vecf3& clipCoord) {
-		// check if yClipCoord is below plane
-		// since plane is horizontal, perpendicular vector to plane is {0.0f, 1.0f, 0.0f}
-		// dot with ycoord vector from plane
-		//float planeCheck = (Vecf3(0.0f, -4.0f, 0.0f) - clipCoord) * Vecf3(0.0f, 1.0f, 0.0f);
-		if (true) {
-			float& depthAtPoint = AtReflect(x, y);
-			if (depth < depthAtPoint) {
-				depthAtPoint = depth;
-				reflectionBuffer[y*width + (width-x)] = color;
-				return true;
-			}
-			return false;
+	bool FillReflectionBuffer(int x, int y, float depth, Color color, const Vecf3& clipCoord);
+	bool FillRefractionBuffer(int x, int y, float depth, Color color) {
+		float& depthAtPoint = AtRefract(x, y);
+		if (depth < depthAtPoint) {
+			depthAtPoint = depth;
+			refractionBuffer[y*width + x] = color;
+			return true;
 		}
 		return false;
-		/*if (yClipCoord > 10.0f) {
-			reflectionBuffer[y*width + x] = color;
-		}
-		else if (yClipCoord < 4.0f) {
-			refractionBuffer[y*width + x] = color;
-		}*/
-		/*if (yClipCoord > 4.0f) {
-			reflectionBuffer[y*width + x] = color;
-		}*/
-		//reflectionBuffer[y*width + x] = color;
 	}
 public:
 	int width;
@@ -126,4 +120,5 @@ public:
 private:
 	std::unique_ptr<float[]> zBuffer;
 	std::unique_ptr<float[]> reflectionZBuffer;
+	std::unique_ptr<float[]> refractionZBuffer;
 };

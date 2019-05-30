@@ -63,10 +63,12 @@ public:
 		public:
 			// constructors
 			Output() = default;
-			Output(const Vecf4& pos, const Vecf2& texpos, const Vecf4& directionalLight, const bool& aboveWater) // i dont really use this constructor
+			Output(const Vecf4& pos, const Vecf2& texpos, const bool& isReflection,
+				const Vecf4& directionalLight, const bool& aboveWater) // i dont really use this constructor
 				:
 				pos(pos),
 				texpos(texpos),
+				isReflection(isReflection),
 				directionalLight(directionalLight),
 				aboveWater(aboveWater)
 			{}
@@ -82,7 +84,7 @@ public:
 			Output operator+(const Output& rhs) const {
 				Vecf4 temppos = pos + rhs.pos;
 				Vecf2 temptexpos = texpos + rhs.texpos;
-				return { temppos, temptexpos, directionalLight, aboveWater || rhs.aboveWater };
+				return { temppos, temptexpos, isReflection, directionalLight, aboveWater || rhs.aboveWater };
 			}
 			Output operator+=(const Output& rhs) {
 				return *this + rhs;
@@ -90,13 +92,13 @@ public:
 			Output operator-(const Output& rhs) const {
 				Vecf4 temppos = pos - rhs.pos;
 				Vecf2 temptexpos = texpos - rhs.texpos;
-				return { temppos, temptexpos, directionalLight, aboveWater || rhs.aboveWater };
+				return { temppos, temptexpos, isReflection, directionalLight, aboveWater || rhs.aboveWater };
 			}
 			Output operator-=(const Output& rhs) {
 				return *this - rhs;
 			}
 			Output operator*(float val) const {
-				return Output(pos * val, texpos * val, directionalLight, aboveWater);
+				return Output(pos * val, texpos * val, isReflection, directionalLight, aboveWater);
 			}
 			Output& operator/(float val) {
 				pos = pos / val;
@@ -121,6 +123,14 @@ public:
 			return { Output(tempPos, vertex_in, false, (Vecf4)directionalLightVec3*view),
 				Output(reflectionTempPos, vertex_in, true, (Vecf4)directionalLightVec3*reflectionView) };
 		}
+		Vecf3 operator()(const Vecf3& vec_in) {
+			Vecf3 temp = (Vecf4)vec_in * inverseWorldViewProj;
+			return temp;
+		}
+		Vecf3 CalcPoint(const Vecf3& vec_in) {
+			Vecf3 temp = (Vecf4)vec_in * worldViewProj;
+			return temp;
+		}
 		void BindWorld(const Matf4& transformation_in) {
 			world = transformation_in;
 			// for basic vertices
@@ -129,6 +139,9 @@ public:
 			// for reflection vertices
 			reflectionWorldView = world * reflectionView;
 			reflectionWorldViewProj = reflectionWorldView * proj;
+
+			inverseWorldView = world * inverseView;
+			inverseWorldViewProj = inverseWorldView * proj;
 		}
 		void BindView(const Matf4& transformation_in) {
 			view = transformation_in;
@@ -139,6 +152,7 @@ public:
 			proj = transformation_in;
 			worldViewProj = worldView * proj;
 			reflectionWorldViewProj = reflectionWorldView * proj;
+			inverseWorldViewProj = inverseWorldView * proj;
 		}
 		const Matf4& GetProj() const {
 			return proj;
@@ -148,6 +162,11 @@ public:
 			reflectionView = transformation_in;
 			reflectionWorldView = world * reflectionView;
 			reflectionWorldViewProj = reflectionWorldView * proj;
+		}
+		void BindInverseView(const Matf4& transformation_in) {
+			inverseView = transformation_in;
+			inverseWorldView = world * inverseView;
+			inverseWorldViewProj = inverseWorldView * proj;
 		}
 	private:
 		// world transform
@@ -166,6 +185,10 @@ public:
 		Matf4 reflectionWorldView = Matf4::Identity();
 		// reflection world view proj
 		Matf4 reflectionWorldViewProj = Matf4::Identity();
+		Matf4 inverseView = Matf4::Identity();
+		Matf4 inverseReflection = Matf4::Identity();
+		Matf4 inverseWorldView = Matf4::Identity();
+		Matf4 inverseWorldViewProj = Matf4::Identity();
 		// directional light
 		Vecf3 directionalLightVec3 = { 0.0f, 50.0f, 0.0f };
 		Vecf4 directionalLight;
@@ -329,11 +352,11 @@ public:
 				for (int y = 0; y < tex_height; y++) {
 					Color reflection = reflectionBuffer[y*(int)tex_width + x];
 					Color refraction = refractionBuffer[y*(int)tex_width + x];
-					texture->PutPixel(x, y, reflection);
-					/*Color mixed = Colors::MakeRGB(reflection.GetR() * 0.5f + refraction.GetR() * 0.5f,
-						reflection.GetG() * 0.5f + refraction.GetG() * 0.5f,
-						reflection.GetB() * 0.5f + refraction.GetB() * 0.5f);
-					texture->PutPixel(x, y, mixed);*/
+					//texture->PutPixel(x, y, reflection);
+					Color mixed = Colors::MakeRGB(char(reflection.GetR() * 0.5f + refraction.GetR() * 0.5f),
+						char(reflection.GetG() * 0.5f + refraction.GetG() * 0.5f),
+						char(reflection.GetB() * 0.5f + refraction.GetB() * 0.5f));
+					texture->PutPixel(x, y, mixed);
 					/*if ((refraction.GetR() + refraction.GetG() + refraction.GetB()) == 0) {
 						
 					}

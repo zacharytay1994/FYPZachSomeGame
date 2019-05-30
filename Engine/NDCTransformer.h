@@ -34,7 +34,10 @@ public:
 		v.pos.x = (v.pos.x / horizontalF) - 1.0f;
 		v.pos.y = ((v.pos.y / verticalF) - 1.0f) * -1.0f;
 		// transform from post perspective divide, to pre perspective divide model space, by multiplying by z i.e. wInv
-		v = v * wInv;
+		v.pos.x = v.pos.x * wInv;
+		v.pos.y = v.pos.y * wInv;
+		// store z as z
+		v.pos.z = v.pos.z * wInv;
 		// store z as w, in case we wanna transform back to clip space
 		v.pos.w = wInv;
 		return v;

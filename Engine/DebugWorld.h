@@ -13,6 +13,7 @@
 #include "ConsoleBox.h"
 #include "MouseInteract.h"
 #include "Water.h"
+#include "NDCTransformer.h"
 
 #include <string>
 #include <sstream>
@@ -23,7 +24,7 @@
 class DebugWorld : public Scene {
 public:
 	// size of the world in world space coordinates (worldSize by worldSize large)
-	const float worldSize = 25.0f;
+	const float worldSize = 35.0f;
 	// size of the world in terms of a grid (gridSize by gridSize large)
 	const int gridSize = 100;
 	// hence, worldSize/gridSize = density of vertices in world space
@@ -32,7 +33,7 @@ public:
 		:
 		sceneZBuffer(std::make_shared<ZBuffer>(gfx.ScreenWidth, gfx.ScreenHeight)),
 		Scene("Debug world", sceneZBuffer, gfx),
-		terrainWithPath(std::make_shared<TerrainWithPath>(gfx, sceneZBuffer, "heightmap1.bmp", "test.bmp", worldSize, gridSize, -15.0f, 5.0f)), // TerrainWithPath(graphics, zbuffer, heightmap, surface texture, world size, grid size, min world height, max world height)
+		terrainWithPath(std::make_shared<TerrainWithPath>(gfx, sceneZBuffer, "heightmap1.bmp", "test.bmp", worldSize, gridSize, -5.0f, 10.0f)), // TerrainWithPath(graphics, zbuffer, heightmap, surface texture, world size, grid size, min world height, max world height)
 		entityHandler(gfx, sceneZBuffer, worldSize, gridSize, terrainWithPath, consoleBox),
 		consoleBox(std::make_shared<ConsoleBox>(gfx, sceneZBuffer, fontList)),
 		water(std::make_shared<Water>(gfx, sceneZBuffer,0.0f, cameraPosition, camX, camY)),
@@ -42,12 +43,12 @@ public:
 		// let entityHandler know about the heightmap to implicitly place some entities
 		entityHandler.SetHeightMap(terrainWithPath->GetHeightMap());
 		//entityHandler.AddEnemy(1.0f, { 8.0f, 0.1f, 8.0f });
-		/*entityHandler.AddBuilding(3.0f, { 60, 60 });
+		entityHandler.AddBuilding(3.0f, { 60, 60 });
 		entityHandler.AddBuilding(3.0f, { 30, 30 });
 		entityHandler.AddBuilding(3.0f, { 70, 30 });
 		entityHandler.AddBuilding(3.0f, { 30, 60 });
 		entityHandler.AddBuilding(3.0f, { 50, 50 });
-		entityHandler.AddBuilding(3.0f, { 55, 60 });*/
+		entityHandler.AddBuilding(3.0f, { 55, 60 });
 		
 		//entityHandler.AddEnemy(1.0f, { 75, 75 });
 		//entityHandler.AddEnemyAA(0.5f, { 75, 25 });
@@ -139,11 +140,11 @@ public:
 		sceneZBuffer->Clear();
 		// scene world and camera transformation matrices
 		const Matf4 projectionMatrix = Matf4::Projection(4.0f, 3.0f, 1.0f, 100.0f);
-		camRotInverse = Matf4::Identity() * Matf4::RotationY(camY) * Matf4::RotationX(camX);
+		camRotInverse = Matf4::RotationZ(camZ) * Matf4::RotationY(camY) * Matf4::RotationX(camX);
 		// reflection camRotInverse
 		cameraPosition = { xOffset, yOffset, zOffset };
 		reflectionCameraPosition = { xOffset, -yOffset, zOffset };
-		reflectionCamRotInverse = Matf4::Identity() * Matf4::RotationY(camY+PI) * Matf4::RotationX(camX+PI);
+		reflectionCamRotInverse = Matf4::RotationZ(camZ) * Matf4::RotationY(camY+PI) * Matf4::RotationX(camX+PI);
 		const Matf4 viewMatrix = Matf4::Translation(-cameraPosition) * camRotInverse;
 		// reflection view Matrix
 		const Matf4 reflectionViewMatrix = Matf4::Translation(-reflectionCameraPosition) * reflectionCamRotInverse;
@@ -159,10 +160,16 @@ public:
 		//terrainWithPath.DrawPath(viewMatrix, projectionMatrix);
 		consoleBox->Draw(viewMatrix, projectionMatrix, reflectionViewMatrix);
 		// drawing the water plane
+		const Matf4 camRotInverseInverse = Matf4::RotationZ(camZ) * Matf4::RotationY(camY + PI) * Matf4::RotationX(camX);
+		Vecf3 cameraPosition2 = { xOffset, -yOffset, zOffset };
+		const Matf4 viewMatrixInverse = Matf4::Translation(-cameraPosition) * camRotInverseInverse;
+		const Matf4 viewMatrixInverse2 = Matf4::Translation(-cameraPosition) * camRotInverse;
+		worldViewProj = Matf4::Identity() * viewMatrixInverse * projectionMatrix;
+		worldViewProj2 = Matf4::Identity() * viewMatrixInverse2 * projectionMatrix; 
 		translate = { 0.0f, water->GetYOffSet(), 0.0f };
 		worldTransform = Matf4::RotationZ(theta_z) * Matf4::RotationX(theta_x) * Matf4::RotationY(theta_y) * Matf4::Translation(translate);
-		water->Draw(worldTransform, viewMatrix, projectionMatrix);
-		worldViewProj = worldTransform * viewMatrix * projectionMatrix;
+		water->Draw(worldTransform, viewMatrix, projectionMatrix, viewMatrixInverse2);
+		//worldPoint = { -xOffset, -yOffset, -zOffset };
 		CalculateUprightVector();
 
 		//// debug gui test
@@ -177,33 +184,43 @@ public:
 		//		gfx.PutPixel(x, y, sceneZBuffer->ColorAt(xInt, yInt));
 		//	}
 		//}
+		//ToScreenSpace(pointOnPlane);
 		if (testCheck) {
 			if (debugClock > 60) {
-				consoleBox->Write(std::to_string(uprightVector.x) + "," + std::to_string(uprightVector.y) + "," + std::to_string(uprightVector.z));
+				//consoleBox->Write(std::to_string(uprightVector.x) + "," + std::to_string(uprightVector.y) + "," + std::to_string(uprightVector.z));
 				//consoleBox->Write(std::to_string(pointOnPlane.x) + "," + std::to_string(pointOnPlane.y) + "," + std::to_string(pointOnPlane.z));
 				//consoleBox->Write(std::to_string(zOffset));
+				consoleBox->Write(std::to_string(pointOnPlane.x) + "," + std::to_string(pointOnPlane.y));
 				debugClock = 0;
 			}
 			else {
 				debugClock++;
 			}
 		}
+		//gfx.PutLargePixel(pointOnPla, 50, Colors::Yellow, 20);
 	}
 	void ExecuteCameraMovement(float dt) {
 		cameraPosition += Vecf4{ 0.0f, 0.0f, 1.0f, 0.0f } * camSpeed * dt;
 	}
 	void CalculateUprightVector() {
-		Matf4 rotationMatrix = Matf4::RotationZ(0) * Matf4::RotationX(camX) * Matf4::RotationY(camY);
-		Vecf3 translatePoint = { xOffset, yOffset, zOffset };
-		Matf4 pointWorldTransform = Matf4::RotationZ(0) * Matf4::RotationX(camX) * Matf4::RotationY(camY) * Matf4::Translation(translatePoint);
 		Vecf3 vecHolder = (Vecf3)((Vecf4)worldVector * worldViewProj);
 		Vecf3 pointHolder = (Vecf3)((Vecf4)worldPoint * worldViewProj);
-		//pointHolder.x *= -1;
+		//consoleBox->Write("vecHolder" + std::to_string(vecHolder.x) + "," + std::to_string(vecHolder.y) + "," + std::to_string(vecHolder.z));
+		//pointHolder.y *= -1;
+		//vecHolder.z *= -1;
 		pointOnPlane = pointHolder;
-		vecHolder = (vecHolder - pointHolder).GetNormalized();
-		/*vecHolder.x /= 2;
-		vecHolder.z /= 2;*/
+		vecHolder = (vecHolder - pointHolder);
+		//consoleBox->Write("pointHolder" + std::to_string(pointHolder.x) + "," + std::to_string(pointHolder.y) + "," + std::to_string(pointHolder.z));
 		uprightVector = vecHolder;
+	}
+	void ToScreenSpace(Vecf3& coord) {
+		// NDC to screen space
+		// z divide the entire vertex
+		coord.x = coord.x / coord.z;
+		coord.y = coord.y / coord.z;
+		// transform x and y into screenspace
+		coord.x = (coord.x + 1.0f) * gfx.ScreenWidth;
+		coord.y = (-coord.y + 1.0f) * gfx.ScreenHeight;
 	}
 //public:
 //	// mouse interactivity
@@ -219,8 +236,8 @@ private:
 	float theta_y = 0.0f;
 	float theta_z = 0.0f;
 	float yOffset = 10.0f;
-	float xOffset = -18.0f;
-	float zOffset = -18.0f;
+	float xOffset = 0.0f;
+	float zOffset = -20.0f;
 	// projection inverse matrices, directional light position, camera variables
 	Matf4 camRotInverse;// = Matf4::Identity() * Matf4::RotationX(-0.8f) * Matf4::RotationY(camY);
 	Matf4 reflectionCamRotInverse;// = Matf4::Identity() * Matf4::RotationX(0.8f) * Matf4::RotationY(camY);
@@ -229,7 +246,7 @@ private:
 	Vecf3 lightPosition = { 0.0f, 0.0f, 0.6f };
 	const float cameraSpeed = 4.0f;
 	float camY = 0.0f;
-	float camX = -3.14f/4;
+	float camX = 0.0f/*-3.14f/4*/;
 	float camZ = 0.0f;
 	float reflectionCamX = 0.0f;
 	// external components
@@ -245,6 +262,7 @@ private:
 	std::shared_ptr<ConsoleBox> consoleBox;
 	std::shared_ptr<Water> water;
 	Matf4 worldViewProj = Matf4::Identity();
+	Matf4 worldViewProj2 = Matf4::Identity();
 
 	// debugging stuff
 	std::wstringstream ss;
@@ -264,10 +282,10 @@ private:
 
 	
 
-	Vecf3 worldVector = { 0.0f, 2.0f, 0.0f };
+	Vecf3 worldVector = { 0.0f, 1.0f, 0.0f };
 	Vecf3 worldPoint = { 0.0f, 0.0f, 0.0f };
 	int debugClock = 0;
-	bool testCheck = true;
+	bool testCheck = false;
 
 	// testing graphics
 	Graphics& gfx;

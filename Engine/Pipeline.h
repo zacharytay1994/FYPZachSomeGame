@@ -62,6 +62,25 @@ private:
 		// transform vertices using vertex shader
 		std::transform(vertices.begin(), vertices.end(), verticesOut.begin(), effect.vertexShader);
 
+		// calculate perpendicular of plane
+		if (isWater) {
+			/*Vecf3 vone = (Vecf3)verticesOut[0].basicVertices.pos;
+			Vecf3 vtwo = (Vecf3)verticesOut[1].basicVertices.pos;
+			Vecf3 vthree = (Vecf3)verticesOut[2].basicVertices.pos;*/
+			Vecf3 uprightVec = { 0.0f, 0.5f, 0.0f };
+			Vecf3 centerPoint = { 0.0f, 0.0f, 0.0f };
+			pointOnWaterPlane = effect.vertexShader.CalcPoint(centerPoint);
+			perpendicularVectorToWaterPlane = effect.vertexShader(uprightVec) - pointOnWaterPlane;
+			perpendicularVectorToWaterPlane.y *= 2.3f;
+			//perpendicularVectorToWaterPlane = (Vecf3)((Vecf4)perpendicularVectorToWaterPlane * Matf4::RotationY(PI));
+			/*SurfaceDirectionalLighting::Vertex vertex = { Vecf3(0.0f, 0.5f, 0.0f), Vecf2(1.0f, 0.0f), true };
+			SurfaceDirectionalLighting::Vertex vertex2 = { Vecf3(0.0f, 0.0f, 0.0f), Vecf2(1.0f, 0.0f), true };
+			pointOnWaterPlane = (Vecf3)effect.vertexShader(vertex2).basicVertices.pos;
+			perpendicularVectorToWaterPlane = (Vecf3)effect.vertexShader(vertex).basicVertices.pos - pointOnWaterPlane;*/
+			/*Vecf3 perp1 = vtwo - vone;
+			Vecf3 perp2 = vthree - vone;
+			perpendicularVectorToWaterPlane = perp2 % perp1;*/
+		}
 		// pass it on
 		AssembleTriangles(verticesOut, indices);
 	}
@@ -302,7 +321,8 @@ private:
 
 			// loop for x
 			Color tempColor;
-			outputGeom clipSpace;
+			outputGeom clipSpace; 
+			//clipSpace = trans.TransformScreenToClip(leftToRight);
 			//outputGeom modelSpace;
 			for (int x = xStart; x < xEnd; x++, leftToRight = leftToRight + changeX) {
 				// get z value
@@ -318,13 +338,19 @@ private:
 				assert(passIn.isReflection == true || passIn.isReflection == false);
 				if (!passIn.isReflection) {
 					assert(x > 0 && x < screenWidth && y>0 && y < screenHeight);
+					clipSpace = trans.TransformScreenToClip(leftToRight);
+					if (!AbovePlane(clipSpace.pos) && !isWater) {
+						zBuffer->FillRefractionBuffer(x, y, zValue, tempColor);
+					}
 					if (zBuffer->TestAndSetZ(x, y, zValue, passIn.texpos)) {
 						// getting color from orthographic texture coordinates
+						//
+						
 						if (leftToRight.aboveWater) {
 							gfx.PutPixel(x, y, tempColor);
 						}
 						else {
-							zBuffer->FillRefractionBuffer(x, y, zValue, tempColor);
+							
 						}
 						//else {
 						//	// filling the reflection buffer used in water
@@ -333,7 +359,7 @@ private:
 						//}
 					}
 				}
-				else {
+				else if (!isWater) {
 					// check if processing triangle quads fall under water
 					if (true) {
 						// to get the model space coordinates of y for the clipping plane
@@ -349,12 +375,22 @@ private:
 		Vecf3 test = (Vecf3)((Vecf4)uprightVector * rotationMatrix);
 		return (Vecf3)((Vecf4)uprightVector * rotationMatrix);
 	}
+	bool IsAbovePlane(const Vecf3& coord);
+	bool AbovePlane(const Vecf3& coord) {
+		Vecf3 pointToCheckVector = coord - pointOnWaterPlane;
+		float planeCheck = (pointToCheckVector) * perpendicularVectorToWaterPlane;
+		if (planeCheck > 0) {
+			return true;
+		}
+		return false;
+	}
 public:
 	Effect effect;
 	bool toDraw = true;
 	bool isWater = false;
 	bool aboveWater = true;
 	bool isTerrain = false;
+	bool testtrans = false;
 	// orientation
 	static Vecf3 uprightVector;
 	static float pitch;
@@ -362,6 +398,8 @@ public:
 	static float roll;
 	static float camWorldX;
 	static float camWorldZ;
+	static Vecf3 pointOnWaterPlane;
+	static Vecf3 perpendicularVectorToWaterPlane;
 private:
 	Graphics& gfx;
 	float screenWidth = gfx.ScreenWidth;

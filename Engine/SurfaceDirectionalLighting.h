@@ -308,7 +308,7 @@ public:
 			width_clamp = tex_width - 1.0f;
 			height_clamp = tex_height - 1.0f;
 		}
-		void BindBuffer(Color* reflectionBuffer, Color* refractionBuffer, const int& bufferWidth, const int& bufferHeight) {
+		void BindBuffer(const std::vector<Color>& reflectionBuffer, const std::vector<Color>& refractionBuffer, const int& bufferWidth, const int& bufferHeight) {
 			texture->Reset(bufferWidth, bufferHeight);
 			tex_width = (float)texture->GetWidth();
 			tex_height = (float)texture->GetHeight();

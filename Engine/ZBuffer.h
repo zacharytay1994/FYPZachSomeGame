@@ -26,7 +26,7 @@ public:
 			reflectionZBuffer[i] = std::numeric_limits<float>::infinity();
 			refractionZBuffer[i] = std::numeric_limits<float>::infinity();
 			pointBuffer[i] = Vecf2(0.0f, 0.0f);
-			reflectionBuffer[i] = Colors::Black;
+			reflectionBuffer[i] = Colors::Cyan;
 			refractionBuffer[i] = Colors::Black;
 		}
 	}

@@ -126,6 +126,8 @@ public:
 		}
 		//ss << test.x << "," << test.y << std::endl;
 		OutputDebugString(ss.str().c_str());
+
+		water->Update(dt);
 	}
 	virtual void Draw() override {
 		// clearing shared zbuffer between all pipelines per frame

@@ -343,6 +343,7 @@
     <Image Include="..\..\..\Memes\debuggingMenu1.bmp" />
     <Image Include="..\..\..\Memes\debuggingMenu2.bmp" />
     <Image Include="..\..\..\Memes\dudvmap1.bmp" />
+    <Image Include="..\..\..\Memes\dudvmap2.bmp" />
     <Image Include="..\..\..\Memes\entityselectscreen.bmp" />
     <Image Include="..\..\..\Memes\entityselectscreen2.bmp" />
     <Image Include="..\..\..\Memes\entityselectscreen3.bmp" />

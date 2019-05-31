@@ -309,7 +309,7 @@ private:
 				assert(passIn.isReflection == true || passIn.isReflection == false);
 				// if pipeline is not rendering a reflection coordinate
 				if (!passIn.isReflection) {
-					assert(x > 0 && x < screenWidth && y>0 && y < screenHeight);
+					//assert(x > 0 && x < screenWidth && y>0 && y < screenHeight);
 					// get clip space coordinates from screen space coordinates for water clipping plane comparison
 					clipSpace = trans.TransformScreenToClip(leftToRight);
 					// if pipeline is not rendering water and coordinates fall below the water plane,
@@ -335,6 +335,7 @@ private:
 	void CalculatePlaneOrientation() {
 		pointOnWaterPlane = effect.vertexShader.CalcPointTransform(centerPoint);
 		perpendicularVectorToWaterPlane = effect.vertexShader.CalcPointTransform(uprightVec) - pointOnWaterPlane;
+		// a little hacky scaler to offset unintended effect, still an unresolved problem
 		perpendicularVectorToWaterPlane.y *= 2.3f;
 	}
 	// check if reflection point falls above the water surface, i.e. have to to be clipped

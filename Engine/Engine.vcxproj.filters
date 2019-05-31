@@ -671,5 +671,8 @@
     <Image Include="..\..\..\Memes\dudvmap1.bmp">
       <Filter>Resource Files\dUdVMaps</Filter>
     </Image>
+    <Image Include="..\..\..\Memes\dudvmap2.bmp">
+      <Filter>Resource Files\dUdVMaps</Filter>
+    </Image>
   </ItemGroup>
 </Project>

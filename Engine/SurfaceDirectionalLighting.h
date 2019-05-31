@@ -14,23 +14,21 @@ public:
 	public:
 		// constructors
 		Vertex() = default;
-		Vertex(const Vecf3& pos, const Vecf2& texpos, const bool& aboveWater)
+		Vertex(const Vecf3& pos, const Vecf2& texpos)
 			:
 			pos(pos),
-			texpos(texpos),
-			aboveWater(aboveWater)
+			texpos(texpos)
 		{}
 		Vertex(const Vecf3& pos, const Vertex& vert_in)
 			:
 			pos(pos),
-			texpos(vert_in.texpos),
-			aboveWater(vert_in.aboveWater)
+			texpos(vert_in.texpos)
 		{}
 		// operators
 		Vertex operator+(const Vertex& rhs) const {
 			Vecf3 temppos = pos + rhs.pos;
 			Vecf2 temptexpos = texpos + rhs.texpos;
-			return { temppos, temptexpos, aboveWater || rhs.aboveWater };
+			return { temppos, temptexpos };
 		}
 		Vertex operator+=(const Vertex& rhs) {
 			return *this + rhs;
@@ -38,13 +36,13 @@ public:
 		Vertex operator-(const Vertex& rhs) const {
 			Vecf3 temppos = pos - rhs.pos;
 			Vecf2 temptexpos = texpos - rhs.texpos;
-			return { temppos, temptexpos, aboveWater || rhs.aboveWater };
+			return { temppos, temptexpos };
 		}
 		Vertex operator-=(const Vertex& rhs) {
 			return *this - rhs;
 		}
 		Vertex operator*(float val) const {
-			return Vertex(pos * val, texpos * val, aboveWater);
+			return Vertex(pos * val, texpos * val);
 		}
 		Vertex& operator/(float val) {
 			pos = pos / val;
@@ -55,7 +53,7 @@ public:
 		// attributes
 		Vecf3 pos;
 		Vecf2 texpos;
-		bool aboveWater = true;
+		//bool aboveWater = true;
 	};
 	class VertexShader {
 	public:
@@ -64,27 +62,25 @@ public:
 			// constructors
 			Output() = default;
 			Output(const Vecf4& pos, const Vecf2& texpos, const bool& isReflection,
-				const Vecf4& directionalLight, const bool& aboveWater) // i dont really use this constructor
+				const Vecf4& directionalLight) // i dont really use this constructor
 				:
 				pos(pos),
 				texpos(texpos),
 				isReflection(isReflection),
-				directionalLight(directionalLight),
-				aboveWater(aboveWater)
+				directionalLight(directionalLight)
 			{}
 			Output(const Vecf4& pos, const Vertex& vertex_in, const bool& isReflection, const Vecf4& directionalLight)
 				:
 				pos(pos),
 				texpos(vertex_in.texpos),
 				isReflection(isReflection),
-				directionalLight(directionalLight),
-				aboveWater(vertex_in.aboveWater)
+				directionalLight(directionalLight)
 			{}
 			// operators
 			Output operator+(const Output& rhs) const {
 				Vecf4 temppos = pos + rhs.pos;
 				Vecf2 temptexpos = texpos + rhs.texpos;
-				return { temppos, temptexpos, isReflection, directionalLight, aboveWater || rhs.aboveWater };
+				return { temppos, temptexpos, isReflection, directionalLight };
 			}
 			Output operator+=(const Output& rhs) {
 				return *this + rhs;
@@ -92,13 +88,13 @@ public:
 			Output operator-(const Output& rhs) const {
 				Vecf4 temppos = pos - rhs.pos;
 				Vecf2 temptexpos = texpos - rhs.texpos;
-				return { temppos, temptexpos, isReflection, directionalLight, aboveWater || rhs.aboveWater };
+				return { temppos, temptexpos, isReflection, directionalLight };
 			}
 			Output operator-=(const Output& rhs) {
 				return *this - rhs;
 			}
 			Output operator*(float val) const {
-				return Output(pos * val, texpos * val, isReflection, directionalLight, aboveWater);
+				return Output(pos * val, texpos * val, isReflection, directionalLight);
 			}
 			Output& operator/(float val) {
 				pos = pos / val;
@@ -110,12 +106,10 @@ public:
 			Vecf2 texpos;
 			bool isReflection;
 			Vecf4 directionalLight;
-			bool aboveWater;
 		};
 		struct OutputStruct {
 			Output basicVertices;
 			Output reflectionVertices;
-			//Output refractionVertices;
 		};
 		OutputStruct operator()(const Vertex& vertex_in) {
 			Vecf4 tempPos = Vecf4(vertex_in.pos) * worldViewProj;
@@ -123,11 +117,7 @@ public:
 			return { Output(tempPos, vertex_in, false, (Vecf4)directionalLightVec3*view),
 				Output(reflectionTempPos, vertex_in, true, (Vecf4)directionalLightVec3*reflectionView) };
 		}
-		Vecf3 operator()(const Vecf3& vec_in) {
-			Vecf3 temp = (Vecf4)vec_in * inverseWorldViewProj;
-			return temp;
-		}
-		Vecf3 CalcPoint(const Vecf3& vec_in) {
+		Vecf3 CalcPointTransform(const Vecf3& vec_in) {
 			Vecf3 temp = (Vecf4)vec_in * worldViewProj;
 			return temp;
 		}
@@ -139,9 +129,6 @@ public:
 			// for reflection vertices
 			reflectionWorldView = world * reflectionView;
 			reflectionWorldViewProj = reflectionWorldView * proj;
-
-			inverseWorldView = world * inverseView;
-			inverseWorldViewProj = inverseWorldView * proj;
 		}
 		void BindView(const Matf4& transformation_in) {
 			view = transformation_in;
@@ -152,7 +139,6 @@ public:
 			proj = transformation_in;
 			worldViewProj = worldView * proj;
 			reflectionWorldViewProj = reflectionWorldView * proj;
-			inverseWorldViewProj = inverseWorldView * proj;
 		}
 		const Matf4& GetProj() const {
 			return proj;
@@ -162,11 +148,6 @@ public:
 			reflectionView = transformation_in;
 			reflectionWorldView = world * reflectionView;
 			reflectionWorldViewProj = reflectionWorldView * proj;
-		}
-		void BindInverseView(const Matf4& transformation_in) {
-			inverseView = transformation_in;
-			inverseWorldView = world * inverseView;
-			inverseWorldViewProj = inverseWorldView * proj;
 		}
 	private:
 		// world transform
@@ -185,10 +166,6 @@ public:
 		Matf4 reflectionWorldView = Matf4::Identity();
 		// reflection world view proj
 		Matf4 reflectionWorldViewProj = Matf4::Identity();
-		Matf4 inverseView = Matf4::Identity();
-		Matf4 inverseReflection = Matf4::Identity();
-		Matf4 inverseWorldView = Matf4::Identity();
-		Matf4 inverseWorldViewProj = Matf4::Identity();
 		// directional light
 		Vecf3 directionalLightVec3 = { 0.0f, 50.0f, 0.0f };
 		Vecf4 directionalLight;
@@ -200,15 +177,13 @@ public:
 		public:
 			// constructors
 			Output() = default;
-			Output(const Vecf4 pos, const Vecf2& texpos, float intensity, const bool& isReflection, const Vecf4& directionalLight,
-				const bool& aboveWater)
+			Output(const Vecf4 pos, const Vecf2& texpos, float intensity, const bool& isReflection, const Vecf4& directionalLight)
 				:
 				pos(pos),
 				texpos(texpos),
 				intensity(intensity),
 				isReflection(isReflection),
-				directionalLight(directionalLight),
-				aboveWater(aboveWater)
+				directionalLight(directionalLight)
 			{}
 			Output(const Vecf4& pos, const VertexShader::Output& vertex_in, float intensity)
 				:
@@ -216,14 +191,13 @@ public:
 				texpos(vertex_in.texpos),
 				intensity(intensity),
 				isReflection(vertex_in.isReflection),
-				directionalLight(vertex_in.directionalLight),
-				aboveWater(vertex_in.aboveWater)
+				directionalLight(vertex_in.directionalLight)
 			{}
 			// operators
 			Output operator+(const Output& rhs) const {
 				Vecf4 temppos = pos + rhs.pos;
 				Vecf2 temptexpos = texpos + rhs.texpos;
-				return { temppos, temptexpos, intensity, isReflection, directionalLight, aboveWater || rhs.aboveWater };
+				return { temppos, temptexpos, intensity, isReflection, directionalLight };
 			}
 			Output operator+=(const Output& rhs) {
 				return *this + rhs;
@@ -231,13 +205,13 @@ public:
 			Output operator-(const Output& rhs) const {
 				Vecf4 temppos = pos - rhs.pos;
 				Vecf2 temptexpos = texpos - rhs.texpos;
-				return { temppos, temptexpos, intensity, isReflection, directionalLight, aboveWater || rhs.aboveWater };
+				return { temppos, temptexpos, intensity, isReflection, directionalLight };
 			}
 			Output operator-=(const Output& rhs) {
 				return *this - rhs;
 			}
 			Output operator*(float val) const {
-				return Output(pos * val, texpos * val, intensity, isReflection, directionalLight, aboveWater);
+				return Output(pos * val, texpos * val, intensity, isReflection, directionalLight);
 			}
 			Output& operator/(float val) {
 				pos = pos / val;
@@ -250,7 +224,6 @@ public:
 			float intensity;
 			bool isReflection;
 			Vecf4 directionalLight;
-			bool aboveWater;
 		};
 	public:
 		Triangle<Output> operator()(const VertexShader::Output& v0, const VertexShader::Output& v1, const VertexShader::Output& v2) {
@@ -258,12 +231,6 @@ public:
 			surfaceNormal = ((v0.pos - v1.pos).GetNormalized() % (v2.pos - v1.pos)).GetNormalized();
 			// calculating intensity
 			float intensity = std::min(1.0f, std::max(0.0f, (-/*(Vecf3)v0.*/directionalLight * surfaceNormal)) * diffuseLight + ambientLight);
-			//if (isTerrain) {
-			//	// if all three vertices fall below 0 in model space, set flag to 1
-			//	if (v0.pos.y < 0.5f && v1.pos.y < 0.5f && v2.pos.y < 0.5f) {
-			//		boolFlag = 1;
-			//	}
-			//}
 			return { {v0.pos, v0, intensity},
 			{v1.pos, v1, intensity},
 			{v2.pos, v2, intensity} };
@@ -325,7 +292,6 @@ public:
 					(int)std::min((input.pos.x / screenWidth)*tex_width, width_clamp),
 					(int)std::min((input.pos.y / screenHeight)*tex_height, height_clamp));
 				return (Color)(colorReturn * input.intensity);
-				//return Colors::Red;
 			}
 		}
 		void BindTexture(const std::string& filename) {
@@ -352,17 +318,10 @@ public:
 				for (int y = 0; y < tex_height; y++) {
 					Color reflection = reflectionBuffer[y*(int)tex_width + x];
 					Color refraction = refractionBuffer[y*(int)tex_width + x];
-					//texture->PutPixel(x, y, reflection);
 					Color mixed = Colors::MakeRGB(char(reflection.GetR() * 0.5f + refraction.GetR() * 0.5f),
 						char(reflection.GetG() * 0.5f + refraction.GetG() * 0.5f),
 						char(reflection.GetB() * 0.5f + refraction.GetB() * 0.5f));
 					texture->PutPixel(x, y, mixed);
-					/*if ((refraction.GetR() + refraction.GetG() + refraction.GetB()) == 0) {
-						
-					}
-					else {
-						texture->PutPixel(x, y, reflection);
-					}*/
 				}
 			}
 		}

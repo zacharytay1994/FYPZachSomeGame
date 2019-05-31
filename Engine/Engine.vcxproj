@@ -157,6 +157,7 @@
     <ClInclude Include="DebuggingMenu.h" />
     <ClInclude Include="DebugWorld.h" />
     <ClInclude Include="DefaultVertexShader.h" />
+    <ClInclude Include="Distortion.h" />
     <ClInclude Include="DXErr.h" />
     <ClInclude Include="EnemyAAOne.h" />
     <ClInclude Include="EnemyAlive.h" />
@@ -243,7 +244,6 @@
     <ClCompile Include="BuildingDead.cpp" />
     <ClCompile Include="Clock.cpp" />
     <ClCompile Include="COMInitializer.cpp" />
-    <ClCompile Include="DebugWorld.cpp" />
     <ClCompile Include="DXErr.cpp" />
     <ClCompile Include="EnemyAlive.cpp" />
     <ClCompile Include="EnemyAttack.cpp" />
@@ -342,6 +342,7 @@
     <Image Include="..\..\..\Memes\consoleimage.bmp" />
     <Image Include="..\..\..\Memes\debuggingMenu1.bmp" />
     <Image Include="..\..\..\Memes\debuggingMenu2.bmp" />
+    <Image Include="..\..\..\Memes\dudvmap1.bmp" />
     <Image Include="..\..\..\Memes\entityselectscreen.bmp" />
     <Image Include="..\..\..\Memes\entityselectscreen2.bmp" />
     <Image Include="..\..\..\Memes\entityselectscreen3.bmp" />

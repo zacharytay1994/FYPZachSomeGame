@@ -50,36 +50,13 @@ private:
 	void ProcessVertices(std::vector<Vertex>& vertices, std::vector<size_t>& indices) {
 		// create holder vector of output vertices
 		std::vector<outputVertexStruct> verticesOut(vertices.size());
-		//std::vector<Vertex> tempVertices
-		if (isTerrain) {
-			for (Vertex& v : vertices) {
-				// if y in model space falls below 0, set above water to false
-				if (v.pos.y < 0) {
-					v.aboveWater = false;
-				}
-			}
-		}
+
 		// transform vertices using vertex shader
 		std::transform(vertices.begin(), vertices.end(), verticesOut.begin(), effect.vertexShader);
 
-		// calculate perpendicular of plane
+		// if is rendering water, calculate plane orientation for clipping reflection
 		if (isWater) {
-			/*Vecf3 vone = (Vecf3)verticesOut[0].basicVertices.pos;
-			Vecf3 vtwo = (Vecf3)verticesOut[1].basicVertices.pos;
-			Vecf3 vthree = (Vecf3)verticesOut[2].basicVertices.pos;*/
-			Vecf3 uprightVec = { 0.0f, 0.5f, 0.0f };
-			Vecf3 centerPoint = { 0.0f, 0.0f, 0.0f };
-			pointOnWaterPlane = effect.vertexShader.CalcPoint(centerPoint);
-			perpendicularVectorToWaterPlane = effect.vertexShader(uprightVec) - pointOnWaterPlane;
-			perpendicularVectorToWaterPlane.y *= 2.3f;
-			//perpendicularVectorToWaterPlane = (Vecf3)((Vecf4)perpendicularVectorToWaterPlane * Matf4::RotationY(PI));
-			/*SurfaceDirectionalLighting::Vertex vertex = { Vecf3(0.0f, 0.5f, 0.0f), Vecf2(1.0f, 0.0f), true };
-			SurfaceDirectionalLighting::Vertex vertex2 = { Vecf3(0.0f, 0.0f, 0.0f), Vecf2(1.0f, 0.0f), true };
-			pointOnWaterPlane = (Vecf3)effect.vertexShader(vertex2).basicVertices.pos;
-			perpendicularVectorToWaterPlane = (Vecf3)effect.vertexShader(vertex).basicVertices.pos - pointOnWaterPlane;*/
-			/*Vecf3 perp1 = vtwo - vone;
-			Vecf3 perp2 = vthree - vone;
-			perpendicularVectorToWaterPlane = perp2 % perp1;*/
+			CalculatePlaneOrientation();
 		}
 		// pass it on
 		AssembleTriangles(verticesOut, indices);
@@ -87,10 +64,7 @@ private:
 	void AssembleTriangles(const std::vector<outputVertexStruct>& vertices, const std::vector<size_t>& indices) {
 		// calculate origin with perspective projection matrix
 		const Vecf4 eyepos = Vecf4{ 0.0f, 0.0f, 0.0f, 1.0f } *effect.vertexShader.GetProj();
-		// loops and create triangles
-		if (isTerrain) {
-			int j = 1;
-		}
+
 		for (size_t i = 0, end = indices.size() / 3; i < end; i++) {
 			// get vertices by index
 			const outputVertexStruct& v0 = vertices[indices[i * 3]];
@@ -110,13 +84,7 @@ private:
 		}
 	}
 	void ProcessTriangle(const outputVertex& v0, const outputVertex& v1, const outputVertex& v2) {
-		// flag to return if all three vertices are under the water
-		//int flag = 0;
 		ClipCulling(effect.geomShader(v0, v1, v2));
-		// if flag returns 1, i.e. vertex y falls under 0 in model space
-		/*if (flag == 1) {
-			aboveWater = false;
-		}*/
 	} // makeshift geom shader
 
 	// clip culling of triangles
@@ -319,63 +287,57 @@ private:
 			float xPrestep = ((float)xStart + 0.5f) - leftInterpolant.pos.x;
 			leftToRight = leftToRight + (changeX * xPrestep);
 
-			// loop for x
+			// color of to be sample
 			Color tempColor;
-			outputGeom clipSpace; 
-			//clipSpace = trans.TransformScreenToClip(leftToRight);
-			//outputGeom modelSpace;
+			// vertex with coordinate in clip space from screen space
+			outputGeom clipSpace;
+			// loop for x
 			for (int x = xStart; x < xEnd; x++, leftToRight = leftToRight + changeX) {
 				// get z value
 				const float zValue = 1.0f/leftToRight.pos.w;
 				// bring output vertex back into orthographic space
 				outputGeom passIn = leftToRight * zValue;
-				if (!isWater/* && leftToRight.aboveWater*/) {
+				if (!isWater) {
+					// getting color from orthographic texture coordinates
 					tempColor = effect.pixelShader(passIn, false, screenWidth, screenHeight);
 				}
 				else {
+					// getting color from  screen space texture coordinates, i.e. 
+					// mapping reflection screenbuffer to water plane texture buffer
 					tempColor = effect.pixelShader(passIn/zValue, true, screenWidth, screenHeight);
 				}
 				assert(passIn.isReflection == true || passIn.isReflection == false);
+				// if pipeline is not rendering a reflection coordinate
 				if (!passIn.isReflection) {
 					assert(x > 0 && x < screenWidth && y>0 && y < screenHeight);
+					// get clip space coordinates from screen space coordinates for water clipping plane comparison
 					clipSpace = trans.TransformScreenToClip(leftToRight);
+					// if pipeline is not rendering water and coordinates fall below the water plane,
+					// add color to refraction buffer
 					if (!AbovePlane(clipSpace.pos) && !isWater) {
 						zBuffer->FillRefractionBuffer(x, y, zValue, tempColor);
 					}
 					if (zBuffer->TestAndSetZ(x, y, zValue, passIn.texpos)) {
-						// getting color from orthographic texture coordinates
-						//
-						
-						if (leftToRight.aboveWater) {
-							gfx.PutPixel(x, y, tempColor);
-						}
-						else {
-							
-						}
-						//else {
-						//	// filling the reflection buffer used in water
-						//	modelSpace = trans.TransformClipToModel(leftToRight);
-						//	zBuffer->FillReflectionBuffer(x, y, tempColor, modelSpace.pos.y);
-						//}
+						gfx.PutPixel(x, y, tempColor);
 					}
 				}
+				// if is a reflection but not of water, i.e. water can't reflect itself
 				else if (!isWater) {
-					// check if processing triangle quads fall under water
-					if (true) {
-						// to get the model space coordinates of y for the clipping plane
-						clipSpace = trans.TransformScreenToClip(leftToRight);
-						zBuffer->FillReflectionBuffer(x, y, zValue, tempColor, clipSpace.pos);
-					}
+					// to get the model space coordinates of y for the clipping plane
+					clipSpace = trans.TransformScreenToClip(leftToRight);
+					// add color to reflection buffer
+					zBuffer->FillReflectionBuffer(x, y, zValue, tempColor, clipSpace.pos);
 				}
 			}
 		}
 	}
-	Vecf3 CalculateUprightVector() {
-		Matf4 rotationMatrix = Matf4::RotationZ(roll) * Matf4::RotationX(pitch) * Matf4::RotationY(yaw);
-		Vecf3 test = (Vecf3)((Vecf4)uprightVector * rotationMatrix);
-		return (Vecf3)((Vecf4)uprightVector * rotationMatrix);
+	// calculates perpendicular and point on plane for plane clipping
+	void CalculatePlaneOrientation() {
+		pointOnWaterPlane = effect.vertexShader.CalcPointTransform(centerPoint);
+		perpendicularVectorToWaterPlane = effect.vertexShader.CalcPointTransform(uprightVec) - pointOnWaterPlane;
+		perpendicularVectorToWaterPlane.y *= 2.3f;
 	}
-	bool IsAbovePlane(const Vecf3& coord);
+	// check if reflection point falls above the water surface, i.e. have to to be clipped
 	bool AbovePlane(const Vecf3& coord) {
 		Vecf3 pointToCheckVector = coord - pointOnWaterPlane;
 		float planeCheck = (pointToCheckVector) * perpendicularVectorToWaterPlane;
@@ -386,18 +348,10 @@ private:
 	}
 public:
 	Effect effect;
-	bool toDraw = true;
 	bool isWater = false;
-	bool aboveWater = true;
-	bool isTerrain = false;
-	bool testtrans = false;
 	// orientation
-	static Vecf3 uprightVector;
-	static float pitch;
-	static float yaw;
-	static float roll;
-	static float camWorldX;
-	static float camWorldZ;
+	Vecf3 uprightVec = { 0.0f, 0.5f, 0.0f };
+	Vecf3 centerPoint = { 0.0f, 0.0f, 0.0f };
 	static Vecf3 pointOnWaterPlane;
 	static Vecf3 perpendicularVectorToWaterPlane;
 private:

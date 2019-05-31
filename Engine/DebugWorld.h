@@ -36,12 +36,14 @@ public:
 		terrainWithPath(std::make_shared<TerrainWithPath>(gfx, sceneZBuffer, "heightmap1.bmp", "test.bmp", worldSize, gridSize, -5.0f, 10.0f)), // TerrainWithPath(graphics, zbuffer, heightmap, surface texture, world size, grid size, min world height, max world height)
 		entityHandler(gfx, sceneZBuffer, worldSize, gridSize, terrainWithPath, consoleBox),
 		consoleBox(std::make_shared<ConsoleBox>(gfx, sceneZBuffer, fontList)),
-		water(std::make_shared<Water>(gfx, sceneZBuffer,0.0f, cameraPosition, camX, camY)),
+		water(std::make_shared<Water>(gfx, sceneZBuffer,0.0f)),
 		gfx(gfx)
 	{
 		//entityHandler.AddSolid(1.0f, { 55, 0, 45 });
 		// let entityHandler know about the heightmap to implicitly place some entities
 		entityHandler.SetHeightMap(terrainWithPath->GetHeightMap());
+
+		// ------------------ ADD ENTITIES TO WORLD -----------------------
 		//entityHandler.AddEnemy(1.0f, { 8.0f, 0.1f, 8.0f });
 		entityHandler.AddBuilding(3.0f, { 60, 60 });
 		entityHandler.AddBuilding(3.0f, { 30, 30 });
@@ -54,14 +56,10 @@ public:
 		//entityHandler.AddEnemyAA(0.5f, { 75, 25 });
 		//entityHandler.PopulateRandomTurrets(15);
 		//entityHandler.AddTurret(2.5f, { 50, 50 });
+		// -----------------------------------------------------------------
+
 		// make known to world terrain of solid obstacle entities
 		terrainWithPath->SyncWithWorldEntities(entityHandler.buildingBuffer);
-		/*Pipeline<SurfaceDirectionalLighting>::uprightVector = { 0.0f, 1.0f, 0.0f };
-		Pipeline<SurfaceDirectionalLighting>::pitch = 0.0f;
-		Pipeline<SurfaceDirectionalLighting>::roll = 0.0f;
-		Pipeline<SurfaceDirectionalLighting>::yaw = 0.0f;*/
-		//Pipeline<SurfaceDirectionalLighting>::pitch = 3.14f/4;
-		//float test = Pipeline<SurfaceDirectionalLighting>::pitch;
 	}
 	virtual void Update(Keyboard&kbd, Mouse& mouse, float dt) override {
 		clock++;
@@ -86,19 +84,15 @@ public:
 		}
 		if (kbd.KeyIsPressed('J')) {
 			camY += 1.0f * dt;
-			//Pipeline<SurfaceDirectionalLighting>::yaw = -camY;
 		}
 		if (kbd.KeyIsPressed('K')) {
 			camY -= 1.0f * dt;
-			//Pipeline<SurfaceDirectionalLighting>::yaw = -camY;
 		}
 		if (kbd.KeyIsPressed('U')) {
 			camX += 1.0f * dt;
-			//Pipeline<SurfaceDirectionalLighting>::pitch = -camY;
 		}
 		if (kbd.KeyIsPressed('H')) {
 			camX -= 1.0f * dt;
-			//Pipeline<SurfaceDirectionalLighting>::pitch = -camY;
 		}
 		if (kbd.KeyIsPressed('L')) {
 			camZ += 1.0f * dt;
@@ -132,47 +126,59 @@ public:
 		}
 		//ss << test.x << "," << test.y << std::endl;
 		OutputDebugString(ss.str().c_str());
-		/*Pipeline<SurfaceDirectionalLighting>::camWorldX = xOffset;
-		Pipeline<SurfaceDirectionalLighting>::camWorldZ = zOffset;*/
 	}
 	virtual void Draw() override {
 		// clearing shared zbuffer between all pipelines per frame
 		sceneZBuffer->Clear();
 		// scene world and camera transformation matrices
 		const Matf4 projectionMatrix = Matf4::Projection(4.0f, 3.0f, 1.0f, 100.0f);
-		camRotInverse = Matf4::RotationZ(camZ) * Matf4::RotationY(camY) * Matf4::RotationX(camX);
-		// reflection camRotInverse
+
+		// ---------------- REAL WORLD TRANSFORMATIONS ---------------------------
+		// CAMERA TRANSFORMS
+		// camera position
 		cameraPosition = { xOffset, yOffset, zOffset };
-		reflectionCameraPosition = { xOffset, -yOffset, zOffset };
-		reflectionCamRotInverse = Matf4::RotationZ(camZ) * Matf4::RotationY(camY+PI) * Matf4::RotationX(camX+PI);
+		// camera inverse rotation, i.e. counter camera orientation
+		camRotInverse = Matf4::RotationZ(camZ) * Matf4::RotationY(camY) * Matf4::RotationX(camX);
+		// view matrix
 		const Matf4 viewMatrix = Matf4::Translation(-cameraPosition) * camRotInverse;
-		// reflection view Matrix
-		const Matf4 reflectionViewMatrix = Matf4::Translation(-reflectionCameraPosition) * reflectionCamRotInverse;
+
+		// MODEL TRANSFORMS
+		// translation
 		Vecf3 translate = { 0.0f, 0.0f, 0.0f };
+		// world transform
 		Matf4 worldTransform = Matf4::RotationZ(theta_z) * Matf4::RotationX(theta_x) * Matf4::RotationY(theta_y) * Matf4::Translation(translate);
+		// model orientation, i.e. rotation about model center
 		const Matf4 orientation = Matf4::RotationZ(theta_z) * Matf4::RotationX(theta_x) * Matf4::RotationY(theta_y);
-		// binding transformation matrices to external components and draws them
+
+		// ---------------- REFLECTION WORLD TRANSFORMATIONS ---------------------
+		// reflection camera position
+		reflectionCameraPosition = { xOffset, -yOffset, zOffset };
+		// reflection camRotInverse
+		reflectionCamRotInverse = Matf4::RotationZ(camZ) * Matf4::RotationY(camY+PI) * Matf4::RotationX(camX+PI);
+		// reflection view matrix
+		const Matf4 reflectionViewMatrix = Matf4::Translation(-reflectionCameraPosition) * reflectionCamRotInverse;
+		
+		
+		// --------------- BINDING TRANSFORMATIONS MATRICES TO EXTERNAL COMPONENTS FOR INVIDVIDUAL DRAWING -----------------
 		// draws all entities in entity handler
 		entityHandler.Draw(viewMatrix, projectionMatrix, reflectionViewMatrix);
+
 		// draws world terrain and path found TerrainWithPath::FindPath()
 		terrainWithPath->Draw(worldTransform, viewMatrix, projectionMatrix, reflectionViewMatrix);
-		//entityHandler.DrawDebugDisplay();
-		//terrainWithPath.DrawPath(viewMatrix, projectionMatrix);
+		
+		// draw skybox console
 		consoleBox->Draw(viewMatrix, projectionMatrix, reflectionViewMatrix);
+
 		// drawing the water plane
-		const Matf4 camRotInverseInverse = Matf4::RotationZ(camZ) * Matf4::RotationY(camY + PI) * Matf4::RotationX(camX);
-		Vecf3 cameraPosition2 = { xOffset, -yOffset, zOffset };
-		const Matf4 viewMatrixInverse = Matf4::Translation(-cameraPosition) * camRotInverseInverse;
-		const Matf4 viewMatrixInverse2 = Matf4::Translation(-cameraPosition) * camRotInverse;
-		worldViewProj = Matf4::Identity() * viewMatrixInverse * projectionMatrix;
-		worldViewProj2 = Matf4::Identity() * viewMatrixInverse2 * projectionMatrix; 
 		translate = { 0.0f, water->GetYOffSet(), 0.0f };
 		worldTransform = Matf4::RotationZ(theta_z) * Matf4::RotationX(theta_x) * Matf4::RotationY(theta_y) * Matf4::Translation(translate);
-		water->Draw(worldTransform, viewMatrix, projectionMatrix, viewMatrixInverse2);
-		//worldPoint = { -xOffset, -yOffset, -zOffset };
-		CalculateUprightVector();
+		water->Draw(worldTransform, viewMatrix, projectionMatrix);
 
-		//// debug gui test
+		// ------------- OTHER DRAW CALLS -------------------
+		//entityHandler.DrawDebugDisplay();
+		//terrainWithPath.DrawPath(viewMatrix, projectionMatrix);
+
+		// debug gui test for quadtree visualization
 		//int bufferSize = sceneZBuffer->width * sceneZBuffer->height;
 		//int startX = 1;
 		//int startY = 1;
@@ -184,50 +190,21 @@ public:
 		//		gfx.PutPixel(x, y, sceneZBuffer->ColorAt(xInt, yInt));
 		//	}
 		//}
-		//ToScreenSpace(pointOnPlane);
+
+		// interval skybox console display
 		if (testCheck) {
 			if (debugClock > 60) {
-				//consoleBox->Write(std::to_string(uprightVector.x) + "," + std::to_string(uprightVector.y) + "," + std::to_string(uprightVector.z));
-				//consoleBox->Write(std::to_string(pointOnPlane.x) + "," + std::to_string(pointOnPlane.y) + "," + std::to_string(pointOnPlane.z));
-				//consoleBox->Write(std::to_string(zOffset));
-				consoleBox->Write(std::to_string(pointOnPlane.x) + "," + std::to_string(pointOnPlane.y));
+				// consoleBox->Write(STRING_HERE);
 				debugClock = 0;
 			}
 			else {
 				debugClock++;
 			}
 		}
-		//gfx.PutLargePixel(pointOnPla, 50, Colors::Yellow, 20);
 	}
 	void ExecuteCameraMovement(float dt) {
 		cameraPosition += Vecf4{ 0.0f, 0.0f, 1.0f, 0.0f } * camSpeed * dt;
 	}
-	void CalculateUprightVector() {
-		Vecf3 vecHolder = (Vecf3)((Vecf4)worldVector * worldViewProj);
-		Vecf3 pointHolder = (Vecf3)((Vecf4)worldPoint * worldViewProj);
-		//consoleBox->Write("vecHolder" + std::to_string(vecHolder.x) + "," + std::to_string(vecHolder.y) + "," + std::to_string(vecHolder.z));
-		//pointHolder.y *= -1;
-		//vecHolder.z *= -1;
-		pointOnPlane = pointHolder;
-		vecHolder = (vecHolder - pointHolder);
-		//consoleBox->Write("pointHolder" + std::to_string(pointHolder.x) + "," + std::to_string(pointHolder.y) + "," + std::to_string(pointHolder.z));
-		uprightVector = vecHolder;
-	}
-	void ToScreenSpace(Vecf3& coord) {
-		// NDC to screen space
-		// z divide the entire vertex
-		coord.x = coord.x / coord.z;
-		coord.y = coord.y / coord.z;
-		// transform x and y into screenspace
-		coord.x = (coord.x + 1.0f) * gfx.ScreenWidth;
-		coord.y = (-coord.y + 1.0f) * gfx.ScreenHeight;
-	}
-//public:
-//	// mouse interactivity
-//	MouseInteract mouseInteract;
-public:	
-	static Vecf3 uprightVector;
-	static Vecf3 pointOnPlane;
 private:
 	// shared zbuffer of scene
 	std::shared_ptr<ZBuffer> sceneZBuffer;
@@ -239,24 +216,21 @@ private:
 	float xOffset = 0.0f;
 	float zOffset = -20.0f;
 	// projection inverse matrices, directional light position, camera variables
-	Matf4 camRotInverse;// = Matf4::Identity() * Matf4::RotationX(-0.8f) * Matf4::RotationY(camY);
-	Matf4 reflectionCamRotInverse;// = Matf4::Identity() * Matf4::RotationX(0.8f) * Matf4::RotationY(camY);
-	Vecf3 cameraPosition = { xOffset, yOffset, zOffset };
-	Vecf3 reflectionCameraPosition = { xOffset, 0.0f, zOffset };
+	Matf4 camRotInverse;
+	Matf4 reflectionCamRotInverse;
+	Vecf3 cameraPosition;
+	Vecf3 reflectionCameraPosition;
 	Vecf3 lightPosition = { 0.0f, 0.0f, 0.6f };
 	const float cameraSpeed = 4.0f;
 	float camY = 0.0f;
-	float camX = 0.0f/*-3.14f/4*/;
+	float camX = 0.0f;
 	float camZ = 0.0f;
-	float reflectionCamX = 0.0f;
-	// external components
+
+	// EXTERNAL COMPONENTS
 	// entityHandler object, handles all scene objects that inherit the entity class
 	EntityHandler entityHandler;
 	// object that represents the scene terrain and pathing grid, handles pathfinding and terrain rendering
 	std::shared_ptr<TerrainWithPath> terrainWithPath;
-	// other testing variables
-	float testingval = 0.0f;
-	// world variables
 
 	// environment object
 	std::shared_ptr<ConsoleBox> consoleBox;
@@ -280,13 +254,10 @@ private:
 	int clock = 0;
 	bool spawnCheck = false;
 
-	
-
-	Vecf3 worldVector = { 0.0f, 1.0f, 0.0f };
-	Vecf3 worldPoint = { 0.0f, 0.0f, 0.0f };
+	// TESTING VARIABLES
+	float testingval = 0.0f;
 	int debugClock = 0;
 	bool testCheck = false;
-
 	// testing graphics
 	Graphics& gfx;
 };

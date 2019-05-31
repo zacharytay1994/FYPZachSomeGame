@@ -136,6 +136,9 @@
     <Filter Include="Header Files\Water">
       <UniqueIdentifier>{465fcad8-7b81-45c4-b5f8-7944ff0f12dd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\dUdVMaps">
+      <UniqueIdentifier>{ee69cf27-3958-45b6-a18e-f1b9831b96ae}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ChiliWin.h">
@@ -435,6 +438,9 @@
     <ClInclude Include="WaterPipeline.h">
       <Filter>Header Files\Pipelines</Filter>
     </ClInclude>
+    <ClInclude Include="Distortion.h">
+      <Filter>Header Files\Water</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DXErr.cpp">
@@ -514,9 +520,6 @@
     </ClCompile>
     <ClCompile Include="Pipeline.cpp">
       <Filter>Header Files\Pipelines</Filter>
-    </ClCompile>
-    <ClCompile Include="DebugWorld.cpp">
-      <Filter>Header Files\Scenes\WorldScenes</Filter>
     </ClCompile>
     <ClCompile Include="ZBuffer.cpp">
       <Filter>Header Files</Filter>
@@ -664,6 +667,9 @@
     </Image>
     <Image Include="..\..\..\Memes\entityselectscreen3.bmp">
       <Filter>Resource Files\MenuImages\EntitySelectMenu</Filter>
+    </Image>
+    <Image Include="..\..\..\Memes\dudvmap1.bmp">
+      <Filter>Resource Files\dUdVMaps</Filter>
     </Image>
   </ItemGroup>
 </Project>

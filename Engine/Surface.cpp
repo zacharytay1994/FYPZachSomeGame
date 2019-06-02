@@ -80,19 +80,19 @@ Surface::~Surface()
 
 void Surface::PutPixel(int x, int y, Color c)
 {
-	assert(x >= 0);
+	/*assert(x >= 0);
 	assert(x < width);
 	assert(y >= 0);
-	assert(y < height);
+	assert(y < height);*/
 	nPixels[y * width + x] = c;
 }
 
 Color Surface::GetPixel(int x, int y) const
 {
-	assert(x >= 0);
+	/*assert(x >= 0);
 	assert(x < width);
 	assert(y >= 0);
-	assert(y < height);
+	assert(y < height);*/
 	return nPixels[y * width + x];
 }
 

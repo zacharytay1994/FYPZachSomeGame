@@ -21,7 +21,8 @@ void EnemyAwaitPath::Execute(EnemyOne *& entity)
 	// attempt to find path to target destination
 	std::vector<Vecf3> holder;
 	if (entity->WithinWorld()) {
-		if (entity->terrainWithPath->FindAndReturnPath(entity->GetSpawnLocationOffset(), entity->targetDestination, holder, 6.0f)) {
+		// magic number at the end of this function is the radius buffer of a node
+		if (entity->terrainWithPath->FindAndReturnPath(entity->GetSpawnLocationOffset(), entity->targetDestination, holder, 18.0f)) {
 			entity->InsertDebugString("/renemyone id: /y" + std::to_string(entity->GetUniqueID()) + " /cpath /cfound.");
 			entity->SetCurrentPath(holder);
 			entity->stateMachine->ChangeState(EnemyMove::Instance());

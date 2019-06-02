@@ -46,18 +46,41 @@ public:
 	void SetVisualize(const bool& boolIn) {
 		visualize = boolIn;
 	}
+	void CalculateWaterStuff(const Vecf3& cameraPositionIn) {
+		cameraPosition = cameraPositionIn;
+		CalculatePlaneOrientation();
+		BindFresnelValues();
+	}
+	float GetReflectiveIndex() {
+		return reflectiveIndex;
+	}
 private:
 	void ProcessVertices(std::vector<Vertex>& vertices, std::vector<size_t>& indices) {
 		// create holder vector of output vertices
-		std::vector<outputVertexStruct> verticesOut(vertices.size());
+		std::vector<outputVertexStruct> verticesOut;
 
-		// transform vertices using vertex shader
-		std::transform(vertices.begin(), vertices.end(), verticesOut.begin(), effect.vertexShader);
-
-		// if is rendering water, calculate plane orientation for clipping reflection
-		if (isWater) {
-			CalculatePlaneOrientation();
+		if (!isWater) {
+			std::vector<Vertex>::iterator end = vertices.end();
+			for (std::vector<Vertex>::iterator start = vertices.begin(); start != end; std::advance(start, 1)) {
+				verticesOut.push_back(effect.vertexShader(*start, false));
+			}
+			// transform vertices using vertex shader
+			//std::transform(vertices.begin(), vertices.end(), verticesOut.begin(), effect.vertexShader);
 		}
+		else {
+			std::vector<Vertex>::iterator end = vertices.end();
+			for (std::vector<Vertex>::iterator start = vertices.begin(); start != end; std::advance(start, 1)) {
+				verticesOut.push_back(effect.vertexShader(*start, true));
+			}
+			// transform vertices using vertex shader
+			//std::transform(vertices.begin(), vertices.end(), verticesOut.begin(), effect.vertexShader);
+		}
+
+		//// if is rendering water, calculate plane orientation for clipping reflection
+		//if (isWater) {
+		//	/*CalculatePlaneOrientation();
+		//	CalculateFresnel();*/
+		//}
 		// pass it on
 		AssembleTriangles(verticesOut, indices);
 	}
@@ -299,12 +322,12 @@ private:
 				outputGeom passIn = leftToRight * zValue;
 				if (!isWater) {
 					// getting color from orthographic texture coordinates
-					tempColor = effect.pixelShader(passIn, false, screenWidth, screenHeight);
+					tempColor = effect.pixelShader(passIn, leftToRight.reflectiveIndex, false, screenWidth, screenHeight);
 				}
-				else {
+				else if (isWater) {
 					// getting color from  screen space texture coordinates, i.e. 
 					// mapping reflection screenbuffer to water plane texture buffer
-					tempColor = effect.pixelShader(passIn/zValue, true, screenWidth, screenHeight);
+					tempColor = effect.pixelShader(passIn/zValue, leftToRight.reflectiveIndex, true, screenWidth, screenHeight);
 				}
 				assert(passIn.isReflection == true || passIn.isReflection == false);
 				// if pipeline is not rendering a reflection coordinate
@@ -315,7 +338,8 @@ private:
 					// if pipeline is not rendering water and coordinates fall below the water plane,
 					// add color to refraction buffer
 					if (!AbovePlane(clipSpace.pos) && !isWater) {
-						zBuffer->FillRefractionBuffer(x, y, zValue, tempColor);
+						//Vecf3 alteredColor = Vecf3(tempColor) * (1 - leftToRight.reflectiveIndex);
+						zBuffer->FillRefractionBuffer(x, y, zValue, tempColor/*Colors::MakeRGB((int)alteredColor.x, (int)alteredColor.y, (int)alteredColor.z)*/);
 					}
 					if (zBuffer->TestAndSetZ(x, y, zValue, passIn.texpos)) {
 						gfx.PutPixel(x, y, tempColor);
@@ -326,7 +350,8 @@ private:
 					// to get the model space coordinates of y for the clipping plane
 					clipSpace = trans.TransformScreenToClip(leftToRight);
 					// add color to reflection buffer
-					zBuffer->FillReflectionBuffer(x, y, zValue, tempColor, clipSpace.pos);
+					//Vecf3 alteredColor = Vecf3(tempColor) * leftToRight.reflectiveIndex;
+					zBuffer->FillReflectionBuffer(x, y, zValue, tempColor/*Colors::MakeRGB((int)alteredColor.x, (int)alteredColor.y, (int)alteredColor.z)*/, clipSpace.pos);
 				}
 			}
 		}
@@ -347,6 +372,13 @@ private:
 		}
 		return false;
 	}
+	// calculate fresnel reflective index and binds
+	void BindFresnelValues() {
+		// camera vector
+		effect.vertexShader.BindCameraPosition(cameraPosition);
+		effect.vertexShader.BindPerpendicularToPlane(perpendicularVectorToWaterPlane);
+		//reflectiveIndex =  cameraPosition.GetNormalized() * perpendicularVectorToWaterPlane.GetNormalized();
+	}
 public:
 	Effect effect;
 	bool isWater = false;
@@ -355,6 +387,9 @@ public:
 	Vecf3 centerPoint = { 0.0f, 0.0f, 0.0f };
 	static Vecf3 pointOnWaterPlane;
 	static Vecf3 perpendicularVectorToWaterPlane;
+	Vecf3 cameraPosition;
+	float reflectiveIndex;
+	float angleOfIncidence;
 private:
 	Graphics& gfx;
 	float screenWidth = gfx.ScreenWidth;

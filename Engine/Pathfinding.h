@@ -199,8 +199,8 @@ private:
 	std::vector<NodeAStar*> nodesToReset;
 	// vertical heuristics
 	float nodeDiameter;
-	float maxUpwardTraversal = nodeDiameter * 2.0f;
-	float maxDownwardTraversal = nodeDiameter * 2.0f;
+	float maxUpwardTraversal = nodeDiameter * 15.0f;
+	float maxDownwardTraversal = nodeDiameter * 15.0f;
 	// grid size
 	int gridSize;
 };

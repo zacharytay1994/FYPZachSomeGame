@@ -128,7 +128,7 @@ public:
 		//	projectileQt.SetQueryRange(Rect(Vecf2(enemyBuffer[0]->GetSpawnLocationOffset().x, enemyBuffer[0]->GetSpawnLocationOffset().z), 4.0f, 4.0f));
 		//}
 		// Write entity debug messages to console, i.e. all InsertDebugString() functions
-		//WriteEDMToConsole();
+		WriteEDMToConsole();
 	}
 
 	void Draw(const Matf4& viewMatrix, const Matf4& projectionMatrix, const Matf4& reflectionViewMatrix) {

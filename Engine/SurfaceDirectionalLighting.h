@@ -62,25 +62,28 @@ public:
 			// constructors
 			Output() = default;
 			Output(const Vecf4& pos, const Vecf2& texpos, const bool& isReflection,
-				const Vecf4& directionalLight) // i dont really use this constructor
+				const Vecf4& directionalLight, const float& reflectiveIndex) // i dont really use this constructor
 				:
 				pos(pos),
 				texpos(texpos),
 				isReflection(isReflection),
-				directionalLight(directionalLight)
+				directionalLight(directionalLight),
+				reflectiveIndex(reflectiveIndex)
 			{}
-			Output(const Vecf4& pos, const Vertex& vertex_in, const bool& isReflection, const Vecf4& directionalLight)
+			Output(const Vecf4& pos, const Vertex& vertex_in, const bool& isReflection, const Vecf4& directionalLight, const float& reflectiveIndex)
 				:
 				pos(pos),
 				texpos(vertex_in.texpos),
 				isReflection(isReflection),
-				directionalLight(directionalLight)
+				directionalLight(directionalLight),
+				reflectiveIndex(reflectiveIndex)
 			{}
 			// operators
 			Output operator+(const Output& rhs) const {
 				Vecf4 temppos = pos + rhs.pos;
 				Vecf2 temptexpos = texpos + rhs.texpos;
-				return { temppos, temptexpos, isReflection, directionalLight };
+				float reflectiveIndexOut = reflectiveIndex + rhs.reflectiveIndex;
+				return { temppos, temptexpos, isReflection, directionalLight, reflectiveIndexOut };
 			}
 			Output operator+=(const Output& rhs) {
 				return *this + rhs;
@@ -88,17 +91,19 @@ public:
 			Output operator-(const Output& rhs) const {
 				Vecf4 temppos = pos - rhs.pos;
 				Vecf2 temptexpos = texpos - rhs.texpos;
-				return { temppos, temptexpos, isReflection, directionalLight };
+				float reflectiveIndexOut = reflectiveIndex - rhs.reflectiveIndex;
+				return { temppos, temptexpos, isReflection, directionalLight, reflectiveIndexOut };
 			}
 			Output operator-=(const Output& rhs) {
 				return *this - rhs;
 			}
 			Output operator*(float val) const {
-				return Output(pos * val, texpos * val, isReflection, directionalLight);
+				return Output(pos * val, texpos * val, isReflection, directionalLight, reflectiveIndex * val);
 			}
 			Output& operator/(float val) {
 				pos = pos / val;
 				texpos = texpos / val;
+				reflectiveIndex = reflectiveIndex / val;
 				return *this;
 			}
 		public:
@@ -106,16 +111,28 @@ public:
 			Vecf2 texpos;
 			bool isReflection;
 			Vecf4 directionalLight;
+			float reflectiveIndex;
 		};
 		struct OutputStruct {
 			Output basicVertices;
 			Output reflectionVertices;
 		};
-		OutputStruct operator()(const Vertex& vertex_in) {
+		OutputStruct operator()(const Vertex& vertex_in, const bool& isWater) {
 			Vecf4 tempPos = Vecf4(vertex_in.pos) * worldViewProj;
+			float reflectiveIndex;
+			// calculate reflectiveindex
+			if (!isWater) {
+				reflectiveIndex = 1.0f;
+			}
+			else {
+				if (vertex_in.pos.x == cameraPosition.x && vertex_in.pos.z == cameraPosition.z) {
+					int checking = 1;
+				}
+				reflectiveIndex = (cameraPosition - vertex_in.pos).GetNormalized() * Vecf3(0.0f, 1.0f, 0.0f);
+			}
 			Vecf4 reflectionTempPos = Vecf4(vertex_in.pos) * reflectionWorldViewProj;
-			return { Output(tempPos, vertex_in, false, (Vecf4)directionalLightVec3*view),
-				Output(reflectionTempPos, vertex_in, true, (Vecf4)directionalLightVec3*reflectionView) };
+			return { Output(tempPos, vertex_in, false, (Vecf4)directionalLightVec3*view, reflectiveIndex),
+				Output(reflectionTempPos, vertex_in, true, (Vecf4)directionalLightVec3*reflectionView, reflectiveIndex)};
 		}
 		Vecf3 CalcPointTransform(const Vecf3& vec_in) {
 			Vecf3 temp = (Vecf4)vec_in * worldViewProj;
@@ -149,6 +166,12 @@ public:
 			reflectionWorldView = world * reflectionView;
 			reflectionWorldViewProj = reflectionWorldView * proj;
 		}
+		void BindCameraPosition(const Vecf3& cameraPositionIn) {
+			cameraPosition = cameraPositionIn;
+		}
+		void BindPerpendicularToPlane(const Vecf3& perpendicularToPlaneIn) {
+			perpendicularToPlane = perpendicularToPlaneIn;
+		}
 	private:
 		// world transform
 		Matf4 world = Matf4::Identity();
@@ -169,6 +192,9 @@ public:
 		// directional light
 		Vecf3 directionalLightVec3 = { 0.0f, 50.0f, 0.0f };
 		Vecf4 directionalLight;
+		// cameraPosition
+		Vecf3 perpendicularToPlane;
+		Vecf3 cameraPosition;
 	};
 
 	class GeomShader {
@@ -177,13 +203,14 @@ public:
 		public:
 			// constructors
 			Output() = default;
-			Output(const Vecf4 pos, const Vecf2& texpos, float intensity, const bool& isReflection, const Vecf4& directionalLight)
+			Output(const Vecf4 pos, const Vecf2& texpos, float intensity, const bool& isReflection, const Vecf4& directionalLight, const float& reflectiveIndex)
 				:
 				pos(pos),
 				texpos(texpos),
 				intensity(intensity),
 				isReflection(isReflection),
-				directionalLight(directionalLight)
+				directionalLight(directionalLight),
+				reflectiveIndex(reflectiveIndex)
 			{}
 			Output(const Vecf4& pos, const VertexShader::Output& vertex_in, float intensity)
 				:
@@ -191,13 +218,15 @@ public:
 				texpos(vertex_in.texpos),
 				intensity(intensity),
 				isReflection(vertex_in.isReflection),
-				directionalLight(vertex_in.directionalLight)
+				directionalLight(vertex_in.directionalLight),
+				reflectiveIndex(vertex_in.reflectiveIndex)
 			{}
 			// operators
 			Output operator+(const Output& rhs) const {
 				Vecf4 temppos = pos + rhs.pos;
 				Vecf2 temptexpos = texpos + rhs.texpos;
-				return { temppos, temptexpos, intensity, isReflection, directionalLight };
+				float reflectiveIndexOut = reflectiveIndex + rhs.reflectiveIndex;
+				return { temppos, temptexpos, intensity, isReflection, directionalLight, reflectiveIndexOut };
 			}
 			Output operator+=(const Output& rhs) {
 				return *this + rhs;
@@ -205,17 +234,19 @@ public:
 			Output operator-(const Output& rhs) const {
 				Vecf4 temppos = pos - rhs.pos;
 				Vecf2 temptexpos = texpos - rhs.texpos;
-				return { temppos, temptexpos, intensity, isReflection, directionalLight };
+				float reflectiveIndexOut = reflectiveIndex - rhs.reflectiveIndex;
+				return { temppos, temptexpos, intensity, isReflection, directionalLight, reflectiveIndexOut };
 			}
 			Output operator-=(const Output& rhs) {
 				return *this - rhs;
 			}
 			Output operator*(float val) const {
-				return Output(pos * val, texpos * val, intensity, isReflection, directionalLight);
+				return Output(pos * val, texpos * val, intensity, isReflection, directionalLight, reflectiveIndex * val);
 			}
 			Output& operator/(float val) {
 				pos = pos / val;
 				texpos = texpos / val;
+				reflectiveIndex = reflectiveIndex / val;
 				return *this;
 			}
 		public:
@@ -224,6 +255,7 @@ public:
 			float intensity;
 			bool isReflection;
 			Vecf4 directionalLight;
+			float reflectiveIndex;
 		};
 	public:
 		Triangle<Output> operator()(const VertexShader::Output& v0, const VertexShader::Output& v1, const VertexShader::Output& v2) {
@@ -271,7 +303,7 @@ public:
 		};
 	public:
 		template<class Input>
-		Color operator()(const Input& input, const bool& check, const float& screenWidth, const float& screenHeight) const {
+		Color operator()(const Input& input, const float& reflectiveIndex, const bool& check, const float& screenWidth, const float& screenHeight) const {
 			if (!check) {
 				if (staticTexture) {
 					Vecf3 colorReturn = (Vecf3)texture->GetPixel(
@@ -288,10 +320,17 @@ public:
 				}
 			}
 			else {
-				Vecf3 colorReturn = (Vecf3)texture->GetPixel(
+				/*Vecf3 colorReturn = (Vecf3)texture->GetPixel(
 					(int)std::min((input.pos.x / screenWidth)*tex_width, width_clamp),
 					(int)std::min((input.pos.y / screenHeight)*tex_height, height_clamp));
-				return (Color)(colorReturn * input.intensity);
+				return (Color)(colorReturn * input.intensity);*/
+				int xIndex = (int)std::min((input.pos.x / screenWidth)*tex_width, width_clamp);
+				int yIndex = (int)std::min((input.pos.y / screenHeight)*tex_height, height_clamp);
+				Vecf3 reflectionColor = (Vecf3)(reflectionBufferSample[yIndex*texture->GetWidth()+xIndex]);
+				Vecf3 refractionColor = (Vecf3)(refractionBufferSample[yIndex*texture->GetWidth()+xIndex]);
+				Vecf3 returnColor = (reflectionColor * (1.0f - reflectiveIndex)) + (refractionColor * (reflectiveIndex));
+				Color colorReturn = Colors::MakeRGB((int)returnColor.x, (int)returnColor.y, (int)returnColor.z);
+				return colorReturn;
 			}
 		}
 		void BindTexture(const std::string& filename) {
@@ -308,8 +347,8 @@ public:
 			width_clamp = tex_width - 1.0f;
 			height_clamp = tex_height - 1.0f;
 		}
-		void BindBuffer(const std::vector<Color>& reflectionBuffer, const std::vector<Color>& refractionBuffer, const int& bufferWidth, const int& bufferHeight) {
-			texture->Reset(bufferWidth, bufferHeight);
+		void BindBuffer(std::vector<Color> reflectionBuffer, std::vector<Color> refractionBuffer, const int& bufferWidth, const int& bufferHeight) {
+			/*texture->Reset(bufferWidth, bufferHeight);
 			tex_width = (float)texture->GetWidth();
 			tex_height = (float)texture->GetHeight();
 			width_clamp = tex_width - 1.0f;
@@ -318,12 +357,29 @@ public:
 				for (int y = 0; y < tex_height; y++) {
 					Color reflection = reflectionBuffer[y*(int)tex_width + x];
 					Color refraction = refractionBuffer[y*(int)tex_width + x];
-					Color mixed = Colors::MakeRGB(char(reflection.GetR() * 0.5f + refraction.GetR() * 0.5f),
-						char(reflection.GetG() * 0.5f + refraction.GetG() * 0.5f),
-						char(reflection.GetB() * 0.5f + refraction.GetB() * 0.5f));
+					Color mixed = Colors::MakeRGB(char(reflection.GetR() * reflectiveIndex + refraction.GetR() * reflectiveIndex),
+						char(reflection.GetG() * reflectiveIndex + refraction.GetG() * reflectiveIndex),
+						char(reflection.GetB() * reflectiveIndex + refraction.GetB() * reflectiveIndex));
 					texture->PutPixel(x, y, mixed);
 				}
+			}*/
+			texture->Reset(bufferWidth, bufferHeight);
+			tex_width = (float)texture->GetWidth();
+			tex_height = (float)texture->GetHeight();
+			width_clamp = tex_width - 1.0f;
+			height_clamp = tex_height - 1.0f;
+			reflectionBufferSample.clear();
+			refractionBufferSample.clear();
+			std::vector<Color>::iterator end = reflectionBuffer.end();
+			for (std::vector<Color>::iterator start = reflectionBuffer.begin(); start != end; std::advance(start, 1)) {
+				reflectionBufferSample.push_back(*start);
 			}
+			std::vector<Color>::iterator end2 = refractionBuffer.end();
+			for (std::vector<Color>::iterator start2 = refractionBuffer.begin(); start2 != end2; std::advance(start2, 1)) {
+				refractionBufferSample.push_back(*start2);
+			}
+			//reflectionBufferSample = reflectionBuffer;
+			//refractionBufferSample = refractionBuffer;
 		}
 		void AddTexture(const std::string& filename) {
 			BindTexture(filename);
@@ -335,6 +391,10 @@ public:
 		void SetStaticTexture(const bool& boolIn) {
 			staticTexture = boolIn;
 		}
+		/*void SetFresnelValues(const float& reflectiveIndex) {
+			refractionIndex = reflectiveIndex;
+			reflectionIndex = 1.0f - refractionIndex;
+		}*/
 	private:
 		// texture attributes
 		// array of textures for drawing entities with different textures
@@ -347,6 +407,11 @@ public:
 		int entityType = 0;
 		// whether calling entities require different textures
 		bool staticTexture = true;
+		// fresnel effect
+		//float reflectiveIndex = 0.5f;
+		// buffers
+		std::vector<Color> reflectionBufferSample;
+		std::vector<Color> refractionBufferSample;
 	};
 public:
 	PixelShader pixelShader;

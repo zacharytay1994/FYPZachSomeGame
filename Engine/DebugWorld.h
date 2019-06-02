@@ -33,7 +33,7 @@ public:
 		:
 		sceneZBuffer(std::make_shared<ZBuffer>(gfx.ScreenWidth, gfx.ScreenHeight)),
 		Scene("Debug world", sceneZBuffer, gfx),
-		terrainWithPath(std::make_shared<TerrainWithPath>(gfx, sceneZBuffer, "heightmap1.bmp", "test.bmp", worldSize, gridSize, -5.0f, 10.0f)), // TerrainWithPath(graphics, zbuffer, heightmap, surface texture, world size, grid size, min world height, max world height)
+		terrainWithPath(std::make_shared<TerrainWithPath>(gfx, sceneZBuffer, "heightmap1.bmp", "test.bmp", worldSize, gridSize, -2.0f, 5.0f)), // TerrainWithPath(graphics, zbuffer, heightmap, surface texture, world size, grid size, min world height, max world height)
 		entityHandler(gfx, sceneZBuffer, worldSize, gridSize, terrainWithPath, consoleBox),
 		consoleBox(std::make_shared<ConsoleBox>(gfx, sceneZBuffer, fontList)),
 		water(std::make_shared<Water>(gfx, sceneZBuffer,0.0f)),
@@ -45,12 +45,13 @@ public:
 
 		// ------------------ ADD ENTITIES TO WORLD -----------------------
 		//entityHandler.AddEnemy(1.0f, { 8.0f, 0.1f, 8.0f });
-		entityHandler.AddBuilding(3.0f, { 60, 60 });
-		entityHandler.AddBuilding(3.0f, { 30, 30 });
+		//entityHandler.AddBuilding(3.0f, { 15, 15 });
+		entityHandler.AddBuilding(3.0f, { 5, 5 });
+		/*entityHandler.AddBuilding(3.0f, { 30, 30 });
 		entityHandler.AddBuilding(3.0f, { 70, 30 });
 		entityHandler.AddBuilding(3.0f, { 30, 60 });
 		entityHandler.AddBuilding(3.0f, { 50, 50 });
-		entityHandler.AddBuilding(3.0f, { 55, 60 });
+		entityHandler.AddBuilding(3.0f, { 55, 60 });*/
 		
 		//entityHandler.AddEnemy(1.0f, { 75, 75 });
 		//entityHandler.AddEnemyAA(0.5f, { 75, 25 });
@@ -174,7 +175,7 @@ public:
 		// drawing the water plane
 		translate = { 0.0f, water->GetYOffSet(), 0.0f };
 		worldTransform = Matf4::RotationZ(theta_z) * Matf4::RotationX(theta_x) * Matf4::RotationY(theta_y) * Matf4::Translation(translate);
-		water->Draw(worldTransform, viewMatrix, projectionMatrix);
+		water->Draw(worldTransform, viewMatrix, projectionMatrix, cameraPosition);
 
 		// ------------- OTHER DRAW CALLS -------------------
 		//entityHandler.DrawDebugDisplay();
@@ -215,7 +216,7 @@ private:
 	float theta_y = 0.0f;
 	float theta_z = 0.0f;
 	float yOffset = 10.0f;
-	float xOffset = 0.0f;
+	float xOffset = -20.0f;
 	float zOffset = -20.0f;
 	// projection inverse matrices, directional light position, camera variables
 	Matf4 camRotInverse;
@@ -225,7 +226,7 @@ private:
 	Vecf3 lightPosition = { 0.0f, 0.0f, 0.6f };
 	const float cameraSpeed = 4.0f;
 	float camY = 0.0f;
-	float camX = 0.0f;
+	float camX = -PI/4;
 	float camZ = 0.0f;
 
 	// EXTERNAL COMPONENTS

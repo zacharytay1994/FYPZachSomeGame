@@ -49,4 +49,5 @@ private:
 	int height;
 	float moveFactor = 0.0f;
 	float waveSpeed = 100.0f;
+	//std::shared_ptr<std::vector<Color>> reflectionBuffer
 };

@@ -26,12 +26,15 @@ public:
 	void Update(float dt) {
 		distortion.Update(dt);
 	}
-	void Draw(const Matf4& worldTransform, const Matf4& viewMatrix, const Matf4& projectionMatrix) {
+	void Draw(const Matf4& worldTransform, const Matf4& viewMatrix, const Matf4& projectionMatrix, const Vecf3& cameraPosition) {
+		// binds camera position in pipeline to calculate fresnel
+		waterPipeline->CalculateWaterStuff(cameraPosition);
 		// distort with dudvmap
 		std::vector<Color> reflectionOut;
 		std::vector<Color> refractionOut;
 		distortion.SampleDuDv(zBuffer->reflectionBuffer.get(), zBuffer->refractionBuffer.get(), zBuffer->width, zBuffer->height, 5.0f, reflectionOut, refractionOut);
 		// binds reflection buffer from zBuffer as surface texture using screen space coordinates
+		//waterPipeline->effect.pixelShader.SetFresnelValues(waterPipeline->GetReflectiveIndex());
 		waterPipeline->effect.pixelShader.BindBuffer(reflectionOut,
 			refractionOut, zBuffer->width, zBuffer->height);
 		waterPipeline->effect.vertexShader.BindWorld(worldTransform);

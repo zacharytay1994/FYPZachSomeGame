@@ -54,6 +54,15 @@ public:
 	float GetReflectiveIndex() {
 		return reflectiveIndex;
 	}
+	void BindNormalMap(const std::vector<Vecf3> normalMapIn, const int& mapWidthIn, const int& mapHeightIn) {
+		normalMap = normalMapIn;
+		mapWidth = mapWidthIn;
+		mapHeight = mapHeightIn;
+	}
+	void CalculateCameraClipPosition() {
+		cameraClipPosition = effect.vertexShader.CalcPointTransform(cameraPosition);
+		//cameraClipPosition.z = cameraClipPosition.z / cameraClipPosition.w;
+	}
 private:
 	void ProcessVertices(std::vector<Vertex>& vertices, std::vector<size_t>& indices) {
 		// create holder vector of output vertices
@@ -342,8 +351,34 @@ private:
 						zBuffer->FillRefractionBuffer(x, y, zValue, tempColor/*Colors::MakeRGB((int)alteredColor.x, (int)alteredColor.y, (int)alteredColor.z)*/);
 					}
 					if (zBuffer->TestAndSetZ(x, y, zValue, passIn.texpos)) {
-						gfx.PutPixel(x, y, tempColor);
+						if (!isWater) {
+							gfx.PutPixel(x, y, tempColor);
+						}
+						else {
+							// get normal from normal map
+							Vecf3 surfaceNormal = normalMap[int(passIn.texpos.y*mapHeight)*mapWidth + int(passIn.texpos.x*mapWidth)];
+							// calculate specular
+							Vecf3 planePosition = GetModelFromTex(passIn.texpos);
+							//planePosition.z = planePosition.z / planePosition.w;
+							Vecf3 lightToPoint = (Vecf3(0.0f, 10.0f, 0.0f) - planePosition).GetNormalized();
+							float normalScalar = -lightToPoint * surfaceNormal;
+							Vecf3 normalScaled = surfaceNormal * normalScalar;
+							float specularIntensity = std::max(((lightToPoint + (normalScaled/*.GetNormalized()*/*2.0f)).GetNormalized() * (cameraPosition - planePosition).GetNormalized()), 0.0f);
+							specularIntensity = std::powf(specularIntensity, 1.0f);
+							Vecf3 alteredColor = Vecf3(tempColor) + Vecf3(100.0f, 100.0f, 100.0f) * specularIntensity * 0.5f;
+							gfx.PutPixel(x, y, Colors::MakeRGB(std::clamp(int(alteredColor.x), 0, 255), std::clamp(int(alteredColor.y), 0, 255), std::clamp(int(alteredColor.z), 0, 255)));
+						}
 					}
+					//else if (isWater) {
+					//	// get normal from normal map
+					//	Vecf3 surfaceNormal = normalMap[int(passIn.texpos.y*mapHeight)*mapWidth + int(passIn.texpos.x*mapWidth)];
+					//	// calculate specular
+					//	Vecf4 planePosition = trans.TransformScreenToClip(leftToRight).pos;
+					//	//planePosition.z = planePosition.z / planePosition.w;
+					//	float specularIntensity = (Vecf3(0.5f, 0.5f, 0.5f) + (surfaceNormal*2.0f)).GetNormalized() * (cameraPosition - planePosition).GetNormalized();
+					//	Vecf3 alteredColor = Vecf3(tempColor) + Vecf3(255.0f, 255.0f, 255.0f) * specularIntensity;
+					//	gfx.PutPixel(x, y, Colors::MakeRGB(std::clamp(int(alteredColor.x), 0, 255), std::clamp(int(alteredColor.y), 0, 255), std::clamp(int(alteredColor.z), 0, 255)));
+					//}
 				}
 				// if is a reflection but not of water, i.e. water can't reflect itself
 				else if (!isWater) {
@@ -379,15 +414,24 @@ private:
 		effect.vertexShader.BindPerpendicularToPlane(perpendicularVectorToWaterPlane);
 		//reflectiveIndex =  cameraPosition.GetNormalized() * perpendicularVectorToWaterPlane.GetNormalized();
 	}
+	Vecf3 GetModelFromTex(const Vecf2& texpos) {
+		float xPos = (texpos.x * 40.0f) - 20.0f;
+		float zPos = ((texpos.y * 40.0f) - 20.0f) * -1;
+		return Vecf3( xPos, 0.0f, zPos );
+	}
 public:
 	Effect effect;
 	bool isWater = false;
+	std::vector<Vecf3> normalMap;
+	int mapHeight;
+	int mapWidth;
 	// orientation
 	Vecf3 uprightVec = { 0.0f, 0.5f, 0.0f };
 	Vecf3 centerPoint = { 0.0f, 0.0f, 0.0f };
 	static Vecf3 pointOnWaterPlane;
 	static Vecf3 perpendicularVectorToWaterPlane;
 	Vecf3 cameraPosition;
+	Vecf4 cameraClipPosition;
 	float reflectiveIndex;
 	float angleOfIncidence;
 private:

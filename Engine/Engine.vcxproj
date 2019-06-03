@@ -362,6 +362,7 @@
     <Image Include="..\..\..\Memes\makeshiftboardtile.bmp" />
     <Image Include="..\..\..\Memes\menunavi1.bmp" />
     <Image Include="..\..\..\Memes\menunavi2.bmp" />
+    <Image Include="..\..\..\Memes\normalMap.bmp" />
     <Image Include="..\..\..\Memes\parchmentpaper.bmp" />
     <Image Include="..\..\..\Memes\pikachumeme.bmp" />
     <Image Include="..\..\..\Memes\postgrassblock.bmp" />
@@ -376,6 +377,7 @@
     <Image Include="..\..\..\Memes\startmenutest5.bmp" />
     <Image Include="..\..\..\Memes\startmenutest6.bmp" />
     <Image Include="..\..\..\Memes\startmenutest7.bmp" />
+    <Image Include="..\..\..\Memes\waterDuDv.bmp" />
     <Image Include="..\..\..\Memes\waterimage.bmp" />
     <Image Include="..\..\..\Memes\whiteimage.bmp" />
     <Image Include="Chili.ico" />

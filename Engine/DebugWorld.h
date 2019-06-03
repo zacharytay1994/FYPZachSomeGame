@@ -33,7 +33,7 @@ public:
 		:
 		sceneZBuffer(std::make_shared<ZBuffer>(gfx.ScreenWidth, gfx.ScreenHeight)),
 		Scene("Debug world", sceneZBuffer, gfx),
-		terrainWithPath(std::make_shared<TerrainWithPath>(gfx, sceneZBuffer, "heightmap1.bmp", "test.bmp", worldSize, gridSize, -2.0f, 5.0f)), // TerrainWithPath(graphics, zbuffer, heightmap, surface texture, world size, grid size, min world height, max world height)
+		terrainWithPath(std::make_shared<TerrainWithPath>(gfx, sceneZBuffer, "heightmap1.bmp", "test.bmp", worldSize, gridSize, -5.0f, 10.0f)), // TerrainWithPath(graphics, zbuffer, heightmap, surface texture, world size, grid size, min world height, max world height)
 		entityHandler(gfx, sceneZBuffer, worldSize, gridSize, terrainWithPath, consoleBox),
 		consoleBox(std::make_shared<ConsoleBox>(gfx, sceneZBuffer, fontList)),
 		water(std::make_shared<Water>(gfx, sceneZBuffer,0.0f)),
@@ -216,7 +216,7 @@ private:
 	float theta_y = 0.0f;
 	float theta_z = 0.0f;
 	float yOffset = 10.0f;
-	float xOffset = -20.0f;
+	float xOffset = 0.0f;
 	float zOffset = -20.0f;
 	// projection inverse matrices, directional light position, camera variables
 	Matf4 camRotInverse;

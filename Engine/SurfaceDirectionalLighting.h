@@ -120,23 +120,43 @@ public:
 		OutputStruct operator()(const Vertex& vertex_in, const bool& isWater) {
 			Vecf4 tempPos = Vecf4(vertex_in.pos) * worldViewProj;
 			float reflectiveIndex;
+			//float specularIntensity;
 			// calculate reflectiveindex
 			if (!isWater) {
 				reflectiveIndex = 1.0f;
+				//specularIntensity = 0.0f;
 			}
 			else {
 				if (vertex_in.pos.x == cameraPosition.x && vertex_in.pos.z == cameraPosition.z) {
 					int checking = 1;
 				}
-				reflectiveIndex = (cameraPosition - vertex_in.pos).GetNormalized() * Vecf3(0.0f, 1.0f, 0.0f);
+				Vecf3 viewingVector = (cameraPosition - vertex_in.pos).GetNormalized();
+				reflectiveIndex = viewingVector * Vecf3(0.0f, 1.0f, 0.0f);// specular intensity
+				/*int indextest = int(vertex_in.texpos.y*(NMHeight - 1))*(NMWidth)+int(vertex_in.texpos.x*(NMWidth - 1));
+				Vecf3 normalAtPoint;*/
+				/*if (indextest < 512 * 512) {
+					normalAtPoint = normalMap[indextest];
+					if (normalAtPoint.z < 0) {
+						int yes = 0;
+					}
+				}
+				else {
+					normalAtPoint = { 0.0f, 1.0f, 0.0f };
+				}*/
+				/*Vecf3 lightToPoint = Vecf3(10.0f, 10.0f, 10.0f) - vertex_in.pos;
+				specularIntensity = (lightToPoint + ((normalAtPoint*2.0f))).GetNormalized() * viewingVector;*/
 			}
 			Vecf4 reflectionTempPos = Vecf4(vertex_in.pos) * reflectionWorldViewProj;
+			
 			return { Output(tempPos, vertex_in, false, (Vecf4)directionalLightVec3*view, reflectiveIndex),
 				Output(reflectionTempPos, vertex_in, true, (Vecf4)directionalLightVec3*reflectionView, reflectiveIndex)};
 		}
 		Vecf3 CalcPointTransform(const Vecf3& vec_in) {
 			Vecf3 temp = (Vecf4)vec_in * worldViewProj;
 			return temp;
+		}
+		Vecf4 CalcPointTransform(const Vecf4& vec_in) {
+			return vec_in * worldViewProj;
 		}
 		void BindWorld(const Matf4& transformation_in) {
 			world = transformation_in;
@@ -172,6 +192,11 @@ public:
 		void BindPerpendicularToPlane(const Vecf3& perpendicularToPlaneIn) {
 			perpendicularToPlane = perpendicularToPlaneIn;
 		}
+		/*void BindNormalMap(const std::vector<Vecf3> &normalMapIn, const int& nmWidth, const int& nmHeight) {
+			normalMap = normalMapIn;
+			NMWidth = nmWidth;
+			NMHeight = nmHeight;
+		}*/
 	private:
 		// world transform
 		Matf4 world = Matf4::Identity();
@@ -195,6 +220,9 @@ public:
 		// cameraPosition
 		Vecf3 perpendicularToPlane;
 		Vecf3 cameraPosition;
+		/*std::vector<Vecf3> normalMap;
+		int NMWidth;
+		int NMHeight;*/
 	};
 
 	class GeomShader {
@@ -281,6 +309,7 @@ public:
 		}
 	private:
 		Vecf3 surfaceNormal;
+		Vecf3 cameraPosition;
 		Vecf3 directionalLight = { 0.0f, 0.9f, 0.0f };
 		float diffuseLight = 1.0f;
 		float ambientLight = 0.2f;
@@ -328,6 +357,8 @@ public:
 				int yIndex = (int)std::min((input.pos.y / screenHeight)*tex_height, height_clamp);
 				Vecf3 reflectionColor = (Vecf3)(reflectionBufferSample[yIndex*texture->GetWidth()+xIndex]);
 				Vecf3 refractionColor = (Vecf3)(refractionBufferSample[yIndex*texture->GetWidth()+xIndex]);
+				// calculate specular light color
+				//Vecf3 specularColor = Vecf3(255.0f, 255.0f, 255.0f) * input.specularIntensity * 1.0f;
 				Vecf3 returnColor = (reflectionColor * (1.0f - reflectiveIndex)) + (refractionColor * (reflectiveIndex));
 				Color colorReturn = Colors::MakeRGB((int)returnColor.x, (int)returnColor.y, (int)returnColor.z);
 				return colorReturn;

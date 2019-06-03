@@ -139,6 +139,9 @@
     <Filter Include="Resource Files\dUdVMaps">
       <UniqueIdentifier>{ee69cf27-3958-45b6-a18e-f1b9831b96ae}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\NormalMaps">
+      <UniqueIdentifier>{3615b375-271f-44a3-b22d-23458d391169}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ChiliWin.h">
@@ -673,6 +676,12 @@
     </Image>
     <Image Include="..\..\..\Memes\dudvmap2.bmp">
       <Filter>Resource Files\dUdVMaps</Filter>
+    </Image>
+    <Image Include="..\..\..\Memes\waterDuDv.bmp">
+      <Filter>Resource Files\dUdVMaps</Filter>
+    </Image>
+    <Image Include="..\..\..\Memes\normalMap.bmp">
+      <Filter>Resource Files\NormalMaps</Filter>
     </Image>
   </ItemGroup>
 </Project>

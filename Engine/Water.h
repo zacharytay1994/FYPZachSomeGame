@@ -29,6 +29,10 @@ public:
 	void Draw(const Matf4& worldTransform, const Matf4& viewMatrix, const Matf4& projectionMatrix, const Vecf3& cameraPosition) {
 		// binds camera position in pipeline to calculate fresnel
 		waterPipeline->CalculateWaterStuff(cameraPosition);
+		std::vector<Vecf3> passInMap = distortion.DistortNormalMap();
+		waterPipeline->BindNormalMap(passInMap,distortion.NMWidth,distortion.NMHeight);
+		waterPipeline->CalculateCameraClipPosition();
+		//waterPipeline->BindNormalMap(distortion.normals, distortion.NMWidth, distortion.NMHeight);
 		// distort with dudvmap
 		std::vector<Color> reflectionOut;
 		std::vector<Color> refractionOut;

@@ -53,7 +53,6 @@ public:
 		// attributes
 		Vecf3 pos;
 		Vecf2 texpos;
-		//bool aboveWater = true;
 	};
 	class VertexShader {
 	public:
@@ -128,38 +127,20 @@ public:
 		OutputStruct operator()(const Vertex& vertex_in, const bool& isWater) {
 			Vecf4 tempPos = Vecf4(vertex_in.pos) * worldViewProj;
 			float reflectiveIndex;
-			//float specularIntensity;
 			// calculate reflectiveindex
 			if (!isWater) {
 				reflectiveIndex = 1.0f;
-				//specularIntensity = 0.0f;
 			}
 			else {
 				if (vertex_in.pos.x == cameraPosition.x && vertex_in.pos.z == cameraPosition.z) {
 					int checking = 1;
 				}
 				Vecf3 viewingVector = (cameraPosition - vertex_in.pos).GetNormalized();
-				reflectiveIndex = viewingVector * Vecf3(0.0f, 1.0f, 0.0f);// specular intensity
-				/*int indextest = int(vertex_in.texpos.y*(NMHeight - 1))*(NMWidth)+int(vertex_in.texpos.x*(NMWidth - 1));
-				Vecf3 normalAtPoint;*/
-				/*if (indextest < 512 * 512) {
-					normalAtPoint = normalMap[indextest];
-					if (normalAtPoint.z < 0) {
-						int yes = 0;
-					}
-				}
-				else {
-					normalAtPoint = { 0.0f, 1.0f, 0.0f };
-				}*/
-				/*Vecf3 lightToPoint = Vecf3(10.0f, 10.0f, 10.0f) - vertex_in.pos;
-				specularIntensity = (lightToPoint + ((normalAtPoint*2.0f))).GetNormalized() * viewingVector;*/
+				reflectiveIndex = viewingVector * Vecf3(0.0f, 1.0f, 0.0f);
 			}
 			Vecf4 reflectionTempPos = Vecf4(vertex_in.pos) * reflectionWorldViewProj;
 			Vecf3 worldAlteredModelPos = (Vecf3)((Vecf4)vertex_in.pos * world);
 			Vecf3 reflectionTempModelPos = worldAlteredModelPos * -1;
-			/*Vecf3 tempModelPos = vertex_in.pos;
-			reflectionTempModelPos = (Vecf3)((Vecf4)reflectionTempModelPos * world);
-			reflectionTempModelPos.y *= -1;*/
 			return { Output(tempPos, vertex_in, false, (Vecf4)directionalLightVec3*view, reflectiveIndex,worldAlteredModelPos),
 				Output(reflectionTempPos, vertex_in, true, (Vecf4)directionalLightVec3*reflectionView, reflectiveIndex, reflectionTempModelPos)};
 		}
@@ -201,14 +182,6 @@ public:
 		void BindCameraPosition(const Vecf3& cameraPositionIn) {
 			cameraPosition = cameraPositionIn;
 		}
-		void BindPerpendicularToPlane(const Vecf3& perpendicularToPlaneIn) {
-			perpendicularToPlane = perpendicularToPlaneIn;
-		}
-		/*void BindNormalMap(const std::vector<Vecf3> &normalMapIn, const int& nmWidth, const int& nmHeight) {
-			normalMap = normalMapIn;
-			NMWidth = nmWidth;
-			NMHeight = nmHeight;
-		}*/
 	private:
 		// world transform
 		Matf4 world = Matf4::Identity();
@@ -230,11 +203,7 @@ public:
 		Vecf3 directionalLightVec3 = { 0.0f, 50.0f, 0.0f };
 		Vecf4 directionalLight;
 		// cameraPosition
-		Vecf3 perpendicularToPlane;
 		Vecf3 cameraPosition;
-		/*std::vector<Vecf3> normalMap;
-		int NMWidth;
-		int NMHeight;*/
 	};
 
 	class GeomShader {
@@ -368,16 +337,11 @@ public:
 				}
 			}
 			else {
-				/*Vecf3 colorReturn = (Vecf3)texture->GetPixel(
-					(int)std::min((input.pos.x / screenWidth)*tex_width, width_clamp),
-					(int)std::min((input.pos.y / screenHeight)*tex_height, height_clamp));
-				return (Color)(colorReturn * input.intensity);*/
 				int xIndex = (int)std::min((input.pos.x / screenWidth)*tex_width, width_clamp);
 				int yIndex = (int)std::min((input.pos.y / screenHeight)*tex_height, height_clamp);
 				Vecf3 reflectionColor = (Vecf3)(reflectionBufferSample[yIndex*texture->GetWidth()+xIndex]);
 				Vecf3 refractionColor = (Vecf3)(refractionBufferSample[yIndex*texture->GetWidth()+xIndex]);
 				// calculate specular light color
-				//Vecf3 specularColor = Vecf3(255.0f, 255.0f, 255.0f) * input.specularIntensity * 1.0f;
 				Vecf3 returnColor = (reflectionColor * (1.0f - reflectiveIndex)) + (refractionColor * (reflectiveIndex));
 				Color colorReturn = Colors::MakeRGB((int)returnColor.x, (int)returnColor.y, (int)returnColor.z);
 				return colorReturn;
@@ -398,22 +362,6 @@ public:
 			height_clamp = tex_height - 1.0f;
 		}
 		void BindBuffer(std::vector<Color> reflectionBuffer, std::vector<Color> refractionBuffer, const int& bufferWidth, const int& bufferHeight) {
-			/*texture->Reset(bufferWidth, bufferHeight);
-			tex_width = (float)texture->GetWidth();
-			tex_height = (float)texture->GetHeight();
-			width_clamp = tex_width - 1.0f;
-			height_clamp = tex_height - 1.0f;
-			for (int x = 0; x < tex_width; x++) {
-				for (int y = 0; y < tex_height; y++) {
-					Color reflection = reflectionBuffer[y*(int)tex_width + x];
-					Color refraction = refractionBuffer[y*(int)tex_width + x];
-					Color mixed = Colors::MakeRGB(char(reflection.GetR() * reflectiveIndex + refraction.GetR() * reflectiveIndex),
-						char(reflection.GetG() * reflectiveIndex + refraction.GetG() * reflectiveIndex),
-						char(reflection.GetB() * reflectiveIndex + refraction.GetB() * reflectiveIndex));
-					texture->PutPixel(x, y, mixed);
-				}
-			}*/
-			/*texture->Reset(96, 54);*/
 			texture->Reset(bufferWidth, bufferHeight);
 			tex_width = (float)texture->GetWidth();
 			tex_height = (float)texture->GetHeight();
@@ -429,8 +377,6 @@ public:
 			for (std::vector<Color>::iterator start2 = refractionBuffer.begin(); start2 != end2; std::advance(start2, 1)) {
 				refractionBufferSample.push_back(*start2);
 			}
-			//reflectionBufferSample = reflectionBuffer;
-			//refractionBufferSample = refractionBuffer;
 		}
 		void AddTexture(const std::string& filename) {
 			BindTexture(filename);
@@ -442,10 +388,6 @@ public:
 		void SetStaticTexture(const bool& boolIn) {
 			staticTexture = boolIn;
 		}
-		/*void SetFresnelValues(const float& reflectiveIndex) {
-			refractionIndex = reflectiveIndex;
-			reflectionIndex = 1.0f - refractionIndex;
-		}*/
 	private:
 		// texture attributes
 		// array of textures for drawing entities with different textures
@@ -458,8 +400,6 @@ public:
 		int entityType = 0;
 		// whether calling entities require different textures
 		bool staticTexture = true;
-		// fresnel effect
-		//float reflectiveIndex = 0.5f;
 		// buffers
 		std::vector<Color> reflectionBufferSample;
 		std::vector<Color> refractionBufferSample;

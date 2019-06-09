@@ -29,36 +29,19 @@ public:
 		//std::vector<Vecf3> normalMapDistort;
 		int distortY;
 		int distortX;
-		int tempWidth = 480;
-		int tempHeight = 270;
-		/*int distortNormalX;
-		int distortNormalY;*/
-		Color* tempHolder = new Color[tempWidth*tempHeight];
 		for (int y = 0; y < bufferHeight; y++) {
 			for (int x = 0; x < bufferWidth; x++) {
-				int test1 = int(((float)(int(float(x)+moveFactor*2)% tempWidth) / (float)tempWidth)*(float)width);
-				int test2 = int(((float)(int(float(y)+moveFactor)% tempHeight) / (float)tempHeight)*(float)height);
-				/*int nmtest1 = int(((float)(int(float((x/bufferWidth)*NMWidth) + moveFactor*10) % bufferWidth) / (float)bufferWidth)*(float)NMWidth);
-				int nmtest2 = int((float((y/bufferHeight)*NMHeight) / (float)bufferHeight)*(float)NMHeight);*/
+				int test1 = int(((float)(int(float(x)+moveFactor*2)% bufferWidth) / (float)bufferWidth)*(float)width);
+				int test2 = int(((float)(int(float(y)+moveFactor)% bufferHeight) / (float)bufferHeight)*(float)height);
 				// sample value from dudv map
 				distortColor = Vecf3(dudvMap.GetPixel(test1, test2));
 				distortVal = ConvertColorToVecf2(distortColor);
-				distortY = std::clamp((int(float(y) + distortVal.y*strength)), 0, tempHeight);
-				distortX = std::clamp((int(float(x) + distortVal.x*strength*2)), 0, tempWidth);
-				reflectionOut.push_back(reflectionIn[distortY*tempWidth+distortX]);
-				refractionOut.push_back(refractionIn[distortY*tempWidth+distortX]);
-				/*reflectionOut.push_back(reflectionIn[y*bufferWidth + x]);
-				refractionOut.push_back(refractionIn[y*bufferWidth + x]);*/
-				// distort normal map
-				/*distortColor = Vecf3(dudvMap.GetPixel(nmtest1, nmtest2));
-				distortVal = ConvertColorToVecf2(distortColor);
-				distortNormalX = std::clamp((int(float(x/bufferWidth)*NMWidth + distortVal.x*strength * 100)), 0, NMWidth - 10);
-				distortNormalY = std::clamp((int(float(x / bufferHeight)*NMHeight + distortVal.x*strength * 50)), 0, NMHeight - 10);
-				normalMapDistort.push_back(normals[distortNormalY*NMWidth+distortNormalX]);*/
+				distortY = std::clamp((int(float(y) + distortVal.y*strength)), 1, bufferHeight-1);
+				distortX = std::clamp((int(float(x) + distortVal.x*strength*2)), 1, bufferWidth-1);
+				reflectionOut.push_back(reflectionIn[distortY*bufferWidth +distortX]);
+				refractionOut.push_back(refractionIn[distortY*bufferWidth +distortX]);
 			}
-			//((y + int(distortVal.y*strength)) % bufferHeight)*bufferWidth + ((x + int(distortVal.x*strength)) % bufferWidth)
 		}
-		//normals = normalMapDistort;
 	}
 	std::vector<Vecf3> DistortNormalMap(const int& strength) {
 		std::vector<Vecf3> outputMap;
@@ -80,7 +63,6 @@ public:
 		return outputMap;
 	}
 	Vecf2 ConvertColorToVecf2(const Vecf3 distortColor) {
-		//Vecf3 colorRange = Vecf3(distortColor);
 		return { (distortColor.x/255.0f)*2-1, (distortColor.y/255.0f)*2-1 };
 	}
 	void CalculateNormals() {
@@ -105,5 +87,4 @@ private:
 
 	float nmMoveFactor = 0.0f;
 	float nmSpeed = 5.0f;
-	//std::shared_ptr<std::vector<Color>> reflectionBuffer
 };

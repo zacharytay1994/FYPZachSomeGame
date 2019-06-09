@@ -33,7 +33,7 @@ public:
 		:
 		sceneZBuffer(std::make_shared<ZBuffer>(gfx.ScreenWidth, gfx.ScreenHeight)),
 		Scene("Debug world", sceneZBuffer, gfx),
-		terrainWithPath(std::make_shared<TerrainWithPath>(gfx, sceneZBuffer, "heightmap2.bmp", "test.bmp", worldSize, gridSize, -10.0f, 0.0f)), // TerrainWithPath(graphics, zbuffer, heightmap, surface texture, world size, grid size, min world height, max world height)
+		terrainWithPath(std::make_shared<TerrainWithPath>(gfx, sceneZBuffer, "heightmap1.bmp", "test.bmp", worldSize, gridSize, -15.0f, 15.0f)), // TerrainWithPath(graphics, zbuffer, heightmap, surface texture, world size, grid size, min world height, max world height)
 		entityHandler(gfx, sceneZBuffer, worldSize, gridSize, terrainWithPath, consoleBox),
 		consoleBox(std::make_shared<ConsoleBox>(gfx, sceneZBuffer, fontList)),
 		water(std::make_shared<Water>(gfx, sceneZBuffer,0.0f)),
@@ -125,6 +125,7 @@ public:
 			}
 			ExecuteCameraMovement(dt);
 		}*/
+		//MoveForwardSlowly(dt);
 		// updating all entities in the entity buffer
 		entityHandler.Update(kbd, mouse, dt);
 		// updating world terrain, shifting worldEndPos per frame FindPath(worldStartPos, worldEndPos)
@@ -220,7 +221,10 @@ public:
 		}
 	}
 	void ExecuteCameraMovement(float dt) {
-		cameraPosition += Vecf4{ 0.0f, 0.0f, 1.0f, 0.0f } * camSpeed * dt;
+		cameraPosition += Vecf4{ 0.0f, 0.0f, 1.0f, 0.0f } * 10.0f * dt;
+	}
+	void MoveForwardSlowly(float dt) {
+		zOffset += 2.0f * dt;
 	}
 private:
 	// shared zbuffer of scene

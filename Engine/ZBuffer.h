@@ -115,7 +115,6 @@ public:
 		float& depthAtPoint = AtRefract(x, y);
 		if (depth < depthAtPoint) {
 			depthAtPoint = depth;
-			/*refractionBuffer[int(y*ratioValY)*reflectionBufferWidth + (reflectionBufferWidth - int(x*ratioValX))] = color;*/
 			refractionBuffer[y*width+x] = color;
 			return true;
 		}

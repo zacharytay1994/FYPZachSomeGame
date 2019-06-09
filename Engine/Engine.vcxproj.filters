@@ -521,9 +521,6 @@
     <ClCompile Include="EnemyParent.cpp">
       <Filter>Header Files\Entity\Enemies</Filter>
     </ClCompile>
-    <ClCompile Include="Pipeline.cpp">
-      <Filter>Header Files\Pipelines</Filter>
-    </ClCompile>
     <ClCompile Include="ZBuffer.cpp">
       <Filter>Header Files</Filter>
     </ClCompile>

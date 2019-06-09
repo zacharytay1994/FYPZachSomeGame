@@ -28,17 +28,12 @@ public:
 	Pipeline(Graphics& gfx)
 		:
 		Pipeline(gfx, std::make_shared<ZBuffer>(gfx.ScreenWidth, gfx.ScreenHeight))
-	{
-		//CalculatePlaneOrientation();
-	}
+	{}
 	Pipeline(Graphics& gfx, std::shared_ptr<ZBuffer> zBuffer)
 		:
 		gfx(gfx),
 		zBuffer(std::move(zBuffer))
-	{
-		//CalculatePlaneOrientation();
-		//assert(zBuffer->height == gfx.ScreenHeight && zBuffer->width == gfx.ScreenWidth);
-	}
+	{}
 	void Draw(IndexedTriangleList<Vertex> triangleList) { ProcessVertices(triangleList.vertices, triangleList.indices); }
 	void BeginFrame() {
 		zBuffer->Clear();
@@ -51,7 +46,6 @@ public:
 	}
 	void CalculateWaterStuff(const Vecf3& cameraPositionIn) {
 		cameraPosition = cameraPositionIn;
-		//CalculatePlaneOrientation();
 		BindFresnelValues();
 	}
 	float GetReflectiveIndex() {
@@ -64,7 +58,6 @@ public:
 	}
 	void CalculateCameraClipPosition() {
 		cameraClipPosition = effect.vertexShader.CalcPointTransform(cameraPosition);
-		//cameraClipPosition.z = cameraClipPosition.z / cameraClipPosition.w;
 	}
 private:
 	void ProcessVertices(std::vector<Vertex>& vertices, std::vector<size_t>& indices) {
@@ -76,23 +69,13 @@ private:
 			for (std::vector<Vertex>::iterator start = vertices.begin(); start != end; std::advance(start, 1)) {
 				verticesOut.push_back(effect.vertexShader(*start, false));
 			}
-			// transform vertices using vertex shader
-			//std::transform(vertices.begin(), vertices.end(), verticesOut.begin(), effect.vertexShader);
 		}
 		else {
 			std::vector<Vertex>::iterator end = vertices.end();
 			for (std::vector<Vertex>::iterator start = vertices.begin(); start != end; std::advance(start, 1)) {
 				verticesOut.push_back(effect.vertexShader(*start, true));
 			}
-			// transform vertices using vertex shader
-			//std::transform(vertices.begin(), vertices.end(), verticesOut.begin(), effect.vertexShader);
 		}
-
-		//// if is rendering water, calculate plane orientation for clipping reflection
-		//if (isWater) {
-		//	/*CalculatePlaneOrientation();
-		//	CalculateFresnel();*/
-		//}
 		// pass it on
 		AssembleTriangles(verticesOut, indices);
 	}
@@ -350,13 +333,6 @@ private:
 					// if pipeline is not rendering water and coordinates fall below the water plane,
 					// add color to refraction buffer
 					if (!AbovePlane(leftToRight.modelPos) && !isWater) {
-						//Vecf3 alteredColor = Vecf3(tempColor) * (1 - leftToRight.reflectiveIndex);
-						if (isEntity) {
-							int stophere = 1;
-						}
-						if (!isEntity) {
-							int stophere2 = 2;
-						}
 						zBuffer->FillRefractionBuffer(x, y, zValue, tempColor);
 					}
 					if (zBuffer->TestAndSetZ(x, y, zValue, passIn.texpos)) {
@@ -374,31 +350,13 @@ private:
 							Vecf3 normalScaled = surfaceNormal * normalScalar;
 							float specularIntensity = std::max(((lightToPoint + (normalScaled/*.GetNormalized()*/*2.0f)).GetNormalized() * (cameraPosition - planePosition).GetNormalized()), 0.0f);
 							specularIntensity = std::powf(specularIntensity, 1.0f);
-							Vecf3 alteredColor = Vecf3(tempColor) + Vecf3(100.0f, 100.0f, 100.0f) * specularIntensity * 0.0f;
+							Vecf3 alteredColor = Vecf3(tempColor) + Vecf3(255.0f, 255.0f, 255.0f) * specularIntensity * 0.4f;
 							gfx.PutPixel(x, y, Colors::MakeRGB(std::clamp(int(alteredColor.x), 0, 255), std::clamp(int(alteredColor.y), 0, 255), std::clamp(int(alteredColor.z), 0, 255)));
 						}
 					}
-					//else if (isWater) {
-					//	// get normal from normal map
-					//	Vecf3 surfaceNormal = normalMap[int(passIn.texpos.y*mapHeight)*mapWidth + int(passIn.texpos.x*mapWidth)];
-					//	// calculate specular
-					//	Vecf4 planePosition = trans.TransformScreenToClip(leftToRight).pos;
-					//	//planePosition.z = planePosition.z / planePosition.w;
-					//	float specularIntensity = (Vecf3(0.5f, 0.5f, 0.5f) + (surfaceNormal*2.0f)).GetNormalized() * (cameraPosition - planePosition).GetNormalized();
-					//	Vecf3 alteredColor = Vecf3(tempColor) + Vecf3(255.0f, 255.0f, 255.0f) * specularIntensity;
-					//	gfx.PutPixel(x, y, Colors::MakeRGB(std::clamp(int(alteredColor.x), 0, 255), std::clamp(int(alteredColor.y), 0, 255), std::clamp(int(alteredColor.z), 0, 255)));
-					//}
 				}
 				// if is a reflection but not of water, i.e. water can't reflect itself
 				else if (!isWater) {
-					// to get the model space coordinates of y for the clipping plane
-					//clipSpace = trans.TransformScreenToClip(leftToRight);
-					//Vecf3 testVector = leftToRight.modelPos;
-					// add color to reflection buffer
-					//Vecf3 alteredColor = Vecf3(tempColor) * leftToRight.reflectiveIndex;
-					/*if (isEntity) {
-						int something = 1;
-					}*/
 					Vecf3 pointToCheckVector = leftToRight.modelPos - centerPoint;
 					float planeCheck = (pointToCheckVector)* uprightVec;
 					if (planeCheck < 0) {
@@ -408,17 +366,10 @@ private:
 			}
 		}
 	}
-	// calculates perpendicular and point on plane for plane clipping
-	void CalculatePlaneOrientation() {
-		pointOnWaterPlane = effect.vertexShader.CalcPointTransform(centerPoint);
-		perpendicularVectorToWaterPlane = effect.vertexShader.CalcPointTransform(uprightVec) - pointOnWaterPlane;
-		// a little hacky scaler to offset unintended effect, still an unresolved problem
-		perpendicularVectorToWaterPlane.y *= 2.3f;
-	}
 	// check if reflection point falls above the water surface, i.e. have to to be clipped
 	bool AbovePlane(const Vecf3& coord) {
-		Vecf3 pointToCheckVector = coord - /*pointOnWaterPlane*/ centerPoint;
-		float planeCheck = (pointToCheckVector) * /*perpendicularVectorToWaterPlane*/ uprightVec;
+		Vecf3 pointToCheckVector = coord - centerPoint;
+		float planeCheck = (pointToCheckVector) * uprightVec;
 		if (planeCheck > 0) {
 			return true;
 		}
@@ -428,8 +379,6 @@ private:
 	void BindFresnelValues() {
 		// camera vector
 		effect.vertexShader.BindCameraPosition(cameraPosition);
-		effect.vertexShader.BindPerpendicularToPlane(perpendicularVectorToWaterPlane);
-		//reflectiveIndex =  cameraPosition.GetNormalized() * perpendicularVectorToWaterPlane.GetNormalized();
 	}
 	Vecf3 GetModelFromTex(const Vecf2& texpos) {
 		float xPos = (texpos.x * 40.0f) - 20.0f;

@@ -24,7 +24,7 @@
 class DebugWorld : public Scene {
 public:
 	// size of the world in world space coordinates (worldSize by worldSize large)
-	const float worldSize = 35.0f;
+	const float worldSize = 40.0f;
 	// size of the world in terms of a grid (gridSize by gridSize large)
 	const int gridSize = 100;
 	// hence, worldSize/gridSize = density of vertices in world space
@@ -33,7 +33,7 @@ public:
 		:
 		sceneZBuffer(std::make_shared<ZBuffer>(gfx.ScreenWidth, gfx.ScreenHeight)),
 		Scene("Debug world", sceneZBuffer, gfx),
-		terrainWithPath(std::make_shared<TerrainWithPath>(gfx, sceneZBuffer, "heightmap1.bmp", "test.bmp", worldSize, gridSize, -5.0f, 10.0f)), // TerrainWithPath(graphics, zbuffer, heightmap, surface texture, world size, grid size, min world height, max world height)
+		terrainWithPath(std::make_shared<TerrainWithPath>(gfx, sceneZBuffer, "heightmap2.bmp", "test.bmp", worldSize, gridSize, -10.0f, 0.0f)), // TerrainWithPath(graphics, zbuffer, heightmap, surface texture, world size, grid size, min world height, max world height)
 		entityHandler(gfx, sceneZBuffer, worldSize, gridSize, terrainWithPath, consoleBox),
 		consoleBox(std::make_shared<ConsoleBox>(gfx, sceneZBuffer, fontList)),
 		water(std::make_shared<Water>(gfx, sceneZBuffer,0.0f)),
@@ -46,12 +46,12 @@ public:
 		// ------------------ ADD ENTITIES TO WORLD -----------------------
 		//entityHandler.AddEnemy(1.0f, { 8.0f, 0.1f, 8.0f });
 		//entityHandler.AddBuilding(3.0f, { 15, 15 });
-		entityHandler.AddBuilding(3.0f, { 5, 5 });
-		/*entityHandler.AddBuilding(3.0f, { 30, 30 });
+		entityHandler.AddBuilding(3.0f, { 0, 0 });
+		entityHandler.AddBuilding(3.0f, { 30, 30 });
 		entityHandler.AddBuilding(3.0f, { 70, 30 });
 		entityHandler.AddBuilding(3.0f, { 30, 60 });
 		entityHandler.AddBuilding(3.0f, { 50, 50 });
-		entityHandler.AddBuilding(3.0f, { 55, 60 });*/
+		entityHandler.AddBuilding(3.0f, { 55, 60 });
 		
 		//entityHandler.AddEnemy(1.0f, { 75, 75 });
 		//entityHandler.AddEnemyAA(0.5f, { 75, 25 });
@@ -84,22 +84,36 @@ public:
 			yOffset -= cameraSpeed * dt;
 		}
 		if (kbd.KeyIsPressed('J')) {
-			camY += 1.0f * dt;
+			camY += rotationSpeed2 * dt;
 		}
 		if (kbd.KeyIsPressed('K')) {
-			camY -= 1.0f * dt;
+			camY -= rotationSpeed2 * dt;
 		}
 		if (kbd.KeyIsPressed('U')) {
-			camX += 1.0f * dt;
+			camX += rotationSpeed2 * dt;
 		}
 		if (kbd.KeyIsPressed('H')) {
-			camX -= 1.0f * dt;
+			camX -= rotationSpeed2 * dt;
 		}
 		if (kbd.KeyIsPressed('L')) {
-			camZ += 1.0f * dt;
+			camZ += rotationSpeed2 * dt;
 		}
 		if (kbd.KeyIsPressed('I')) {
 			testCheck = true;
+		}
+		if (kbd.KeyIsPressed('B')) {
+			camY += PI;
+		}
+		if (kbd.KeyIsPressed('V')) {
+			camX += PI;
+		}
+		if (kbd.KeyIsPressed('G')) {
+			yOffset = yOffset * -1;
+		}
+		if (kbd.KeyIsPressed('C')) {
+			camY = 0;
+			camX = 0;
+			yOffset = 10.0f;
 		}
 		/*if (clock > 300) {
 			if (!spawnCheck) {
@@ -224,9 +238,10 @@ private:
 	Vecf3 cameraPosition;
 	Vecf3 reflectionCameraPosition;
 	Vecf3 lightPosition = { 0.0f, 0.0f, 0.6f };
-	const float cameraSpeed = 4.0f;
+	const float cameraSpeed = 40.0f;
+	const float rotationSpeed2 = 10.0f;
 	float camY = 0.0f;
-	float camX = -PI/4;
+	float camX = -PI/4.0f;
 	float camZ = 0.0f;
 
 	// EXTERNAL COMPONENTS

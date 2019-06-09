@@ -16,7 +16,7 @@ public:
 	Water(Graphics& gfx, std::shared_ptr<ZBuffer>& zbuffer, const float& yOffset) 
 		:
 		waterPipeline(std::make_unique<Pipeline<SurfaceDirectionalLighting>>(gfx, zbuffer)),
-		waterPlane(PlaneVertex::GetPlaneHorizontalSplit<SurfaceDirectionalLighting::Vertex>(40.0f, 10)),
+		waterPlane(PlaneVertex::GetPlaneHorizontalSplit<SurfaceDirectionalLighting::Vertex>(40.0f, 1)),
 		zBuffer(zbuffer),
 		yOffset(yOffset)
 	{
@@ -29,14 +29,14 @@ public:
 	void Draw(const Matf4& worldTransform, const Matf4& viewMatrix, const Matf4& projectionMatrix, const Vecf3& cameraPosition) {
 		// binds camera position in pipeline to calculate fresnel
 		waterPipeline->CalculateWaterStuff(cameraPosition);
-		std::vector<Vecf3> passInMap = distortion.DistortNormalMap();
+		std::vector<Vecf3> passInMap = distortion.DistortNormalMap(5);
 		waterPipeline->BindNormalMap(passInMap,distortion.NMWidth,distortion.NMHeight);
 		waterPipeline->CalculateCameraClipPosition();
 		//waterPipeline->BindNormalMap(distortion.normals, distortion.NMWidth, distortion.NMHeight);
 		// distort with dudvmap
 		std::vector<Color> reflectionOut;
 		std::vector<Color> refractionOut;
-		distortion.SampleDuDv(zBuffer->reflectionBuffer.get(), zBuffer->refractionBuffer.get(), zBuffer->width, zBuffer->height, 5.0f, reflectionOut, refractionOut);
+		distortion.SampleDuDv(zBuffer->reflectionBuffer.get(), zBuffer->refractionBuffer.get(), zBuffer->width, zBuffer->height, 2.0f, reflectionOut, refractionOut);
 		// binds reflection buffer from zBuffer as surface texture using screen space coordinates
 		//waterPipeline->effect.pixelShader.SetFresnelValues(waterPipeline->GetReflectiveIndex());
 		waterPipeline->effect.pixelShader.BindBuffer(reflectionOut,

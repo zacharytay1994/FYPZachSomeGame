@@ -61,6 +61,7 @@ public:
 		entityPipeline->effect.pixelShader.AddTexture("redimage.bmp");
 		entityPipeline->effect.pixelShader.AddTexture("greenimage.bmp");
 		entityPipeline->effect.pixelShader.AddTexture("blueimage.bmp");
+		entityPipeline->isEntity = true;
 	}
 
 	void Update(Keyboard&kbd, Mouse& mouse, float dt) {
@@ -128,11 +129,11 @@ public:
 		//	projectileQt.SetQueryRange(Rect(Vecf2(enemyBuffer[0]->GetSpawnLocationOffset().x, enemyBuffer[0]->GetSpawnLocationOffset().z), 4.0f, 4.0f));
 		//}
 		// Write entity debug messages to console, i.e. all InsertDebugString() functions
-		WriteEDMToConsole();
+		//WriteEDMToConsole();
 	}
 
 	void Draw(const Matf4& viewMatrix, const Matf4& projectionMatrix, const Matf4& reflectionViewMatrix) {
-		entityPipeline->BeginFrame();
+		//entityPipeline->BeginFrame();
 		entityPipeline->effect.vertexShader.BindView(viewMatrix);
 		entityPipeline->effect.vertexShader.BindReflectionView(reflectionViewMatrix);
 		entityPipeline->effect.vertexShader.BindProjection(projectionMatrix);

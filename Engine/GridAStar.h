@@ -37,7 +37,7 @@ public:
 				grid.emplace_back(std::make_unique<NodeAStar>(true, Vecf3( x, nodeRadius, y ), (int)gridX, (int)gridY));
 			}
 		}
-		NodeAStar* test = grid[3999].get();
+		//NodeAStar* test = grid[3999].get();
 		// bind texture to pipeline
 		gridPipeline->effect.pixelShader.BindTexture("greenimage.bmp");
 	}

@@ -18,6 +18,7 @@ public:
 		// z divide the entire vertex
 		v = v * wInv;
 		v.reflectiveIndex /= wInv;
+		v.modelPos /= wInv;
 		// transform x and y into screenspace
 		v.pos.x = (v.pos.x + 1.0f) * horizontalF;
 		v.pos.y = (-v.pos.y + 1.0f) * verticalF;

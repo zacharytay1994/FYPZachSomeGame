@@ -28,12 +28,15 @@ public:
 	Pipeline(Graphics& gfx)
 		:
 		Pipeline(gfx, std::make_shared<ZBuffer>(gfx.ScreenWidth, gfx.ScreenHeight))
-	{}
+	{
+		//CalculatePlaneOrientation();
+	}
 	Pipeline(Graphics& gfx, std::shared_ptr<ZBuffer> zBuffer)
 		:
 		gfx(gfx),
 		zBuffer(std::move(zBuffer))
 	{
+		//CalculatePlaneOrientation();
 		//assert(zBuffer->height == gfx.ScreenHeight && zBuffer->width == gfx.ScreenWidth);
 	}
 	void Draw(IndexedTriangleList<Vertex> triangleList) { ProcessVertices(triangleList.vertices, triangleList.indices); }
@@ -48,7 +51,7 @@ public:
 	}
 	void CalculateWaterStuff(const Vecf3& cameraPositionIn) {
 		cameraPosition = cameraPositionIn;
-		CalculatePlaneOrientation();
+		//CalculatePlaneOrientation();
 		BindFresnelValues();
 	}
 	float GetReflectiveIndex() {
@@ -346,9 +349,15 @@ private:
 					clipSpace = trans.TransformScreenToClip(leftToRight);
 					// if pipeline is not rendering water and coordinates fall below the water plane,
 					// add color to refraction buffer
-					if (!AbovePlane(clipSpace.pos) && !isWater) {
+					if (!AbovePlane(leftToRight.modelPos) && !isWater) {
 						//Vecf3 alteredColor = Vecf3(tempColor) * (1 - leftToRight.reflectiveIndex);
-						zBuffer->FillRefractionBuffer(x, y, zValue, tempColor/*Colors::MakeRGB((int)alteredColor.x, (int)alteredColor.y, (int)alteredColor.z)*/);
+						if (isEntity) {
+							int stophere = 1;
+						}
+						if (!isEntity) {
+							int stophere2 = 2;
+						}
+						zBuffer->FillRefractionBuffer(x, y, zValue, tempColor);
 					}
 					if (zBuffer->TestAndSetZ(x, y, zValue, passIn.texpos)) {
 						if (!isWater) {
@@ -358,14 +367,14 @@ private:
 							// get normal from normal map
 							Vecf3 surfaceNormal = normalMap[int(passIn.texpos.y*mapHeight)*mapWidth + int(passIn.texpos.x*mapWidth)];
 							// calculate specular
-							Vecf3 planePosition = GetModelFromTex(passIn.texpos);
+							Vecf3 planePosition = leftToRight.modelPos;
 							//planePosition.z = planePosition.z / planePosition.w;
-							Vecf3 lightToPoint = (Vecf3(0.0f, 10.0f, 0.0f) - planePosition).GetNormalized();
-							float normalScalar = -lightToPoint * surfaceNormal;
+							Vecf3 lightToPoint = (Vecf3(0.0f, 10.0f, 0.0f) - planePosition);
+							float normalScalar = lightToPoint * surfaceNormal;
 							Vecf3 normalScaled = surfaceNormal * normalScalar;
 							float specularIntensity = std::max(((lightToPoint + (normalScaled/*.GetNormalized()*/*2.0f)).GetNormalized() * (cameraPosition - planePosition).GetNormalized()), 0.0f);
 							specularIntensity = std::powf(specularIntensity, 1.0f);
-							Vecf3 alteredColor = Vecf3(tempColor) + Vecf3(100.0f, 100.0f, 100.0f) * specularIntensity * 0.5f;
+							Vecf3 alteredColor = Vecf3(tempColor) + Vecf3(100.0f, 100.0f, 100.0f) * specularIntensity * 0.0f;
 							gfx.PutPixel(x, y, Colors::MakeRGB(std::clamp(int(alteredColor.x), 0, 255), std::clamp(int(alteredColor.y), 0, 255), std::clamp(int(alteredColor.z), 0, 255)));
 						}
 					}
@@ -383,10 +392,18 @@ private:
 				// if is a reflection but not of water, i.e. water can't reflect itself
 				else if (!isWater) {
 					// to get the model space coordinates of y for the clipping plane
-					clipSpace = trans.TransformScreenToClip(leftToRight);
+					//clipSpace = trans.TransformScreenToClip(leftToRight);
+					//Vecf3 testVector = leftToRight.modelPos;
 					// add color to reflection buffer
 					//Vecf3 alteredColor = Vecf3(tempColor) * leftToRight.reflectiveIndex;
-					zBuffer->FillReflectionBuffer(x, y, zValue, tempColor/*Colors::MakeRGB((int)alteredColor.x, (int)alteredColor.y, (int)alteredColor.z)*/, clipSpace.pos);
+					/*if (isEntity) {
+						int something = 1;
+					}*/
+					Vecf3 pointToCheckVector = leftToRight.modelPos - centerPoint;
+					float planeCheck = (pointToCheckVector)* uprightVec;
+					if (planeCheck < 0) {
+						zBuffer->FillReflectionBuffer(x, y, zValue, tempColor, clipSpace.pos);
+					}
 				}
 			}
 		}
@@ -400,8 +417,8 @@ private:
 	}
 	// check if reflection point falls above the water surface, i.e. have to to be clipped
 	bool AbovePlane(const Vecf3& coord) {
-		Vecf3 pointToCheckVector = coord - pointOnWaterPlane;
-		float planeCheck = (pointToCheckVector) * perpendicularVectorToWaterPlane;
+		Vecf3 pointToCheckVector = coord - /*pointOnWaterPlane*/ centerPoint;
+		float planeCheck = (pointToCheckVector) * /*perpendicularVectorToWaterPlane*/ uprightVec;
 		if (planeCheck > 0) {
 			return true;
 		}
@@ -422,11 +439,12 @@ private:
 public:
 	Effect effect;
 	bool isWater = false;
+	bool isEntity = false;
 	std::vector<Vecf3> normalMap;
 	int mapHeight;
 	int mapWidth;
 	// orientation
-	Vecf3 uprightVec = { 0.0f, 0.5f, 0.0f };
+	Vecf3 uprightVec = { 0.0f, 1.0f, 0.0f };
 	Vecf3 centerPoint = { 0.0f, 0.0f, 0.0f };
 	static Vecf3 pointOnWaterPlane;
 	static Vecf3 perpendicularVectorToWaterPlane;
@@ -434,6 +452,8 @@ public:
 	Vecf4 cameraClipPosition;
 	float reflectiveIndex;
 	float angleOfIncidence;
+	int waterResolutionCounterY = 0;
+	int waterResolutionCounterX = 0;
 private:
 	Graphics& gfx;
 	float screenWidth = gfx.ScreenWidth;

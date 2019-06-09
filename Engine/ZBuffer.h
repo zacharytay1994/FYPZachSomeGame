@@ -7,6 +7,9 @@
 
 class ZBuffer {
 public:
+	int reflectionBufferWidth = 96;
+	int reflectionBufferHeight = 54;
+public:
 	ZBuffer(const int& width, const int& height) 
 		:
 		width(width),
@@ -15,8 +18,10 @@ public:
 		reflectionZBuffer(new float[width * height]),
 		refractionZBuffer(new float[width * height]),
 		pointBuffer(new Vecf2[(width * height)]),
-		reflectionBuffer(new Color[width*height]),
-		refractionBuffer(new Color[width*height])
+		/*reflectionBuffer(new Color[reflectionBufferWidth*reflectionBufferHeight]),
+		refractionBuffer(new Color[reflectionBufferWidth*reflectionBufferHeight])*/
+		reflectionBuffer(new Color[width * height]),
+		refractionBuffer(new Color[width * height])
 	{}
 	// reset buffer data
 	void Clear() {
@@ -27,8 +32,13 @@ public:
 			refractionZBuffer[i] = std::numeric_limits<float>::infinity();
 			pointBuffer[i] = Vecf2(0.0f, 0.0f);
 			reflectionBuffer[i] = Colors::White;
-			refractionBuffer[i] = Colors::Black;
+			refractionBuffer[i] = Colors::White;
 		}
+		/*int size2 = reflectionBufferWidth * reflectionBufferHeight;
+		for (int i = 0; i < size2; i++) {
+			reflectionBuffer[i] = Colors::White;
+			refractionBuffer[i] = Colors::Black;
+		}*/
 	}
 	// get at position
 	float& At(int x, int y) {
@@ -43,7 +53,7 @@ public:
 		assert(x < width);
 		assert(y >= 0);
 		assert(y < height);
-		return reflectionZBuffer[y * width + x];
+		return reflectionZBuffer[y * width + (width-x)];
 	}
 	float& AtRefract(int x, int y) {
 		assert(x >= 0);
@@ -105,7 +115,8 @@ public:
 		float& depthAtPoint = AtRefract(x, y);
 		if (depth < depthAtPoint) {
 			depthAtPoint = depth;
-			refractionBuffer[y*width + x] = color;
+			/*refractionBuffer[int(y*ratioValY)*reflectionBufferWidth + (reflectionBufferWidth - int(x*ratioValX))] = color;*/
+			refractionBuffer[y*width+x] = color;
 			return true;
 		}
 		return false;
@@ -113,6 +124,8 @@ public:
 public:
 	int width;
 	int height;
+	float ratioValY = float(reflectionBufferHeight / height);
+	float ratioValX = float(reflectionBufferWidth / width);
 	std::unique_ptr<Vecf2[]> pointBuffer;
 	// for water sampling
 	std::unique_ptr<Color[]> reflectionBuffer;

@@ -142,6 +142,9 @@
     <Filter Include="Resource Files\NormalMaps">
       <UniqueIdentifier>{3615b375-271f-44a3-b22d-23458d391169}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\LevelGUI">
+      <UniqueIdentifier>{8648cc05-c4e6-4c3f-908b-deb0cc3d301b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ChiliWin.h">
@@ -444,6 +447,9 @@
     <ClInclude Include="Distortion.h">
       <Filter>Header Files\Water</Filter>
     </ClInclude>
+    <ClInclude Include="LevelOneGUI.h">
+      <Filter>Header Files\Scenes\MenuScenes</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DXErr.cpp">
@@ -679,6 +685,12 @@
     </Image>
     <Image Include="..\..\..\Memes\normalMap.bmp">
       <Filter>Resource Files\NormalMaps</Filter>
+    </Image>
+    <Image Include="..\..\..\Memes\levelguione.bmp">
+      <Filter>Resource Files\LevelGUI</Filter>
+    </Image>
+    <Image Include="..\..\..\Memes\gameloopbackground2.bmp">
+      <Filter>Resource Files\LevelGUI</Filter>
     </Image>
   </ItemGroup>
 </Project>

@@ -48,8 +48,8 @@ Graphics::Graphics( HWNDKey& key )
 	// create device and swap chain/get render target view
 	DXGI_SWAP_CHAIN_DESC sd = {};
 	sd.BufferCount = 1;
-	sd.BufferDesc.Width = Graphics::ScreenWidth;
-	sd.BufferDesc.Height = Graphics::ScreenHeight;
+	sd.BufferDesc.Width = Graphics::ScreenWidthDisplay;
+	sd.BufferDesc.Height = Graphics::ScreenHeightDisplay;
 	sd.BufferDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
 	sd.BufferDesc.RefreshRate.Numerator = 1;
 	sd.BufferDesc.RefreshRate.Denominator = 60;
@@ -111,8 +111,8 @@ Graphics::Graphics( HWNDKey& key )
 
 	// set viewport dimensions
 	D3D11_VIEWPORT vp;
-	vp.Width = float( Graphics::ScreenWidth );
-	vp.Height = float( Graphics::ScreenHeight );
+	vp.Width = float( Graphics::ScreenWidthDisplay );
+	vp.Height = float( Graphics::ScreenHeightDisplay );
 	vp.MinDepth = 0.0f;
 	vp.MaxDepth = 1.0f;
 	vp.TopLeftX = 0.0f;
@@ -123,8 +123,8 @@ Graphics::Graphics( HWNDKey& key )
 	///////////////////////////////////////
 	// create texture for cpu render target
 	D3D11_TEXTURE2D_DESC sysTexDesc;
-	sysTexDesc.Width = Graphics::ScreenWidth;
-	sysTexDesc.Height = Graphics::ScreenHeight;
+	sysTexDesc.Width = Graphics::ScreenWidthDisplay;
+	sysTexDesc.Height = Graphics::ScreenHeightDisplay;
 	sysTexDesc.MipLevels = 1;
 	sysTexDesc.ArraySize = 1;
 	sysTexDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
@@ -237,7 +237,7 @@ Graphics::Graphics( HWNDKey& key )
 
 	// allocate memory for sysbuffer (16-byte aligned for faster access)
 	pSysBuffer = reinterpret_cast<Color*>( 
-		_aligned_malloc( sizeof( Color ) * Graphics::ScreenWidth * Graphics::ScreenHeight,16u ) );
+		_aligned_malloc( sizeof( Color ) * Graphics::ScreenWidthDisplay * Graphics::ScreenHeightDisplay,16u ) );
 }
 
 void Graphics::DrawTriangle(const Vecf3 & p1, const Vecf3 & p2, const Vecf3 & p3, Color c)
@@ -572,10 +572,10 @@ void Graphics::EndFrame()
 	// setup parameters for copy operation
 	Color* pDst = reinterpret_cast<Color*>(mappedSysBufferTexture.pData );
 	const size_t dstPitch = mappedSysBufferTexture.RowPitch / sizeof( Color );
-	const size_t srcPitch = Graphics::ScreenWidth;
+	const size_t srcPitch = Graphics::ScreenWidthDisplay;
 	const size_t rowBytes = srcPitch * sizeof( Color );
 	// perform the copy line-by-line
-	for( size_t y = 0u; y < Graphics::ScreenHeight; y++ )
+	for( size_t y = 0u; y < Graphics::ScreenHeightDisplay; y++ )
 	{
 		memcpy( &pDst[ y * dstPitch ],&pSysBuffer[y * srcPitch],rowBytes );
 	}
@@ -611,16 +611,31 @@ void Graphics::EndFrame()
 void Graphics::BeginFrame()
 {
 	// clear the sysbuffer
-	memset( pSysBuffer,0u,sizeof( Color ) * Graphics::ScreenHeight * Graphics::ScreenWidth );
+	memset( pSysBuffer,0u,sizeof( Color ) * Graphics::ScreenHeightDisplay * Graphics::ScreenWidthDisplay );
 }
 
 void Graphics::PutPixel( int x,int y,Color c )
 {
 	assert( x >= 0 );
-	assert( x < int( Graphics::ScreenWidth ) );
+	assert( x < int( Graphics::ScreenWidthDisplay ) );
 	assert( y >= 0 );
-	assert( y < int( Graphics::ScreenHeight ) );
-	pSysBuffer[Graphics::ScreenWidth * y + x] = c;
+	assert( y < int( Graphics::ScreenHeightDisplay ) );
+	//pSysBuffer[Graphics::ScreenWidthDisplay * y + x] = c;
+	for (int X = 0; X < screenWidthRatio; X++) {
+		for (int Y = 0; Y < screenHeightRatio; Y++) {
+			pSysBuffer[int(y*screenHeightRatio + Y + pixelOffsetY)*Graphics::ScreenWidthDisplay + int(x*screenWidthRatio + X + pixelOffsetX)] = c;
+		}
+	}
+	//pSysBuffer[(int(y*screenHeightRatio) + pixelOffsetY)*Graphics::ScreenWidthDisplay + (int(x*screenWidthRatio) + pixelOffsetX)] = c;
+}
+
+void Graphics::PutPixelGUI(int x, int y, Color c)
+{
+	assert(x >= 0);
+	assert(x < int(Graphics::ScreenWidthDisplay));
+	assert(y >= 0);
+	assert(y < int(Graphics::ScreenHeightDisplay));
+	pSysBuffer[Graphics::ScreenWidthDisplay * y + x] = c;
 }
 
 void Graphics::DrawSprite(int x, int y, Surface surf)

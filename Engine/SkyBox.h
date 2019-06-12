@@ -13,7 +13,7 @@ public:
 		:
 		zBuffer(zBuffer),
 		skyBoxPipeline(std::make_shared<Pipeline<SurfaceDirectionalLighting>>(gfx, zBuffer)),
-		skyCubeList(TexCube::GetSkyCube<Pipeline<SurfaceDirectionalLighting>::Vertex>(40.0f))
+		skyCubeList(TexCube::GetSkyCube<Pipeline<SurfaceDirectionalLighting>::Vertex>(80.0f))
 	{
 		skyBoxPipeline->effect.pixelShader.BindTexture("blackimage.bmp");
 		skyBoxPipeline->effect.geomShader.BindAmbientLight(1.0f);

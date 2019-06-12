@@ -18,6 +18,11 @@ public:
 		pipeline(pipeline),
 		surface(surface)
 	{}
+	Console(const std::shared_ptr<Font>& font, const Surface& surface)
+		:
+		font(font),
+		surface(surface)
+	{}
 	void Update(Keyboard& kbd) {
 		if (!kbd.CharIsEmpty()) {
 			const char charHolder = kbd.ReadChar();
@@ -142,7 +147,9 @@ public:
 					columnCount++;
 				}
 			}
-			pipeline->effect.pixelShader.BindSurface(surface);
+			if (!isGUI) {
+				pipeline->effect.pixelShader.BindSurface(surface);
+			}
 			rowCount = 0;
 			columnCount++;
 		}
@@ -164,12 +171,28 @@ public:
 		AddSentence(string);
 		PrintStack();
 	}
+	void DrawSurfaceGUI(const int& startX, const int& startY, const int& width, const int& height, Graphics& gfx) {
+		int endX = startX + width;
+		int endY = startY + height;
+		int incX = 0;
+		int incY = 0;
+		float widthRatio = (float)surface.GetWidth()/(float)width;
+		float heightRatio = (float)surface.GetHeight()/(float)height;
+		for (int x = startX; x < endX; x++, incX++) {
+			incY = 0;
+			for (int y = startY; y < endY; y++, incY++) {
+				gfx.PutPixelGUI(x, y, surface.GetPixel(int(incX*widthRatio), int(incY*heightRatio)));
+			}
+		}
+	}
 	void CharPerFrame() {
 
 	}
+public:
+	bool isGUI = false;
 private:
 	const std::shared_ptr<Font>& font;
-	std::shared_ptr<Pipeline<T>>& pipeline;
+	std::shared_ptr<Pipeline<T>> pipeline;
 	// copied surface to be altered
 	Surface surface;
 	Surface clearSurface = surface;

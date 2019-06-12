@@ -61,7 +61,10 @@ public:
 	{
 		PutPixel( x,y,{ unsigned char( r ),unsigned char( g ),unsigned char( b ) } );
 	}
+	// this put pixel scales rendering resolution (i.e. calculation resolution to screen resolution)
 	void PutPixel( int x,int y,Color c );
+	// this put pixel place pixels to the screen on a 1 to 1 scale, mainly for GUI purposes
+	void PutPixelGUI(int x, int y, Color c);
 	void PutLargePixel(int x, int y, Color c, const int& size) {
 		int startingPosX = x - size / 2;
 		int startingPosY = y - size / 2;
@@ -143,5 +146,20 @@ private:
 	Color*                                              pSysBuffer = nullptr;
 public:
 	static constexpr int ScreenWidth = 480;
-	static constexpr int ScreenHeight = 260;
+	static constexpr int ScreenHeight = 270;
+
+	static constexpr int ScreenWidthDisplay = 960;
+	static constexpr int ScreenHeightDisplay = 540;
+private:
+	float screenOffsetStartX = 0.33f;
+	float screenOffsetEndX = 1.0f;
+	int pixelOffsetX = int(ScreenWidthDisplay * screenOffsetStartX);
+	float screenOffsetStartY = 0.0f;
+	float screenOffsetEndY = 0.66f;
+	int pixelOffsetY = int(ScreenHeightDisplay * screenOffsetStartY);
+	float displayWidth = (screenOffsetEndX - screenOffsetStartX) * ScreenWidthDisplay;
+	float displayHeight = (screenOffsetEndY - screenOffsetStartY) * ScreenHeightDisplay;
+
+	float screenWidthRatio = displayWidth / ScreenWidth;
+	float screenHeightRatio = displayHeight / ScreenHeight;
 };

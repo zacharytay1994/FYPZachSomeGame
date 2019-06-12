@@ -26,6 +26,7 @@
 #include "Scene.h"
 #include "StartMenuScene.h"
 #include "DebuggingMenu.h"
+#include "LevelOneGUI.h"
 #include "FontList.h"
 #include "Clock.h"
 

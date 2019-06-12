@@ -21,8 +21,8 @@ public:
 		name(name),
 		surface(Surface(filename)),
 		gfx(gfx),
-		screenWidth(gfx.ScreenWidth),
-		screenHeight(gfx.ScreenHeight),
+		screenWidth(gfx.ScreenWidthDisplay),
+		screenHeight(gfx.ScreenHeightDisplay),
 		surfaceWidth(surface.GetWidth()),
 		surfaceHeight(surface.GetHeight()),
 		screenAlphaW(float(surfaceWidth) / float(screenWidth)),
@@ -35,14 +35,14 @@ public:
 	virtual void Update(Keyboard& kbd, Mouse& mouse, float dt) = 0;
 	virtual void AddDraw() = 0;
 	virtual void Draw() {
+		AddDraw();
 		for (int x = 0; x < screenWidth; x++) {
 			for (int y = 0; y < screenHeight; y++) {
 				if ((Vecf3)(surface.GetPixel(int(x * screenAlphaW), int(y * screenAlphaH))) != chroma) {
-					gfx.PutPixel(x, y, (Color)(surface.GetPixel(int(x * screenAlphaW), int(y * screenAlphaH))));
+					gfx.PutPixelGUI(x, y, (Color)(surface.GetPixel(int(x * screenAlphaW), int(y * screenAlphaH))));
 				}
 			}
 		}
-		AddDraw();
 	}
 	virtual bool OnClick(const Mouse::Event& e) {
 		if (e.GetType() == Mouse::Event::Type::LPress) {

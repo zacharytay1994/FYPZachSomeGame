@@ -350,7 +350,7 @@ private:
 							Vecf3 normalScaled = surfaceNormal * normalScalar;
 							float specularIntensity = std::max(((lightToPoint + (normalScaled/*.GetNormalized()*/*2.0f)).GetNormalized() * (cameraPosition - planePosition).GetNormalized()), 0.0f);
 							specularIntensity = std::powf(specularIntensity, 1.0f);
-							Vecf3 alteredColor = Vecf3(tempColor) + Vecf3(255.0f, 255.0f, 255.0f) * specularIntensity * 0.4f;
+							Vecf3 alteredColor = Vecf3(tempColor) + Vecf3(100.0f, 100.0f, 100.0f) * specularIntensity * 0.3f;
 							gfx.PutPixel(x, y, Colors::MakeRGB(std::clamp(int(alteredColor.x), 0, 255), std::clamp(int(alteredColor.y), 0, 255), std::clamp(int(alteredColor.z), 0, 255)));
 						}
 					}

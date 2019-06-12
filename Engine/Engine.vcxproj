@@ -182,6 +182,7 @@
     <ClInclude Include="IndexedLineList.h" />
     <ClInclude Include="IndexedTriangleList.h" />
     <ClInclude Include="Keyboard.h" />
+    <ClInclude Include="LevelOneGUI.h" />
     <ClInclude Include="MainWindow.h" />
     <ClInclude Include="Mat2.h" />
     <ClInclude Include="Mat3.h" />
@@ -354,10 +355,12 @@
     <Image Include="..\..\..\Memes\fontsheet6.bmp" />
     <Image Include="..\..\..\Memes\fontsheet7.bmp" />
     <Image Include="..\..\..\Memes\fontsheet8.bmp" />
+    <Image Include="..\..\..\Memes\gameloopbackground2.bmp" />
     <Image Include="..\..\..\Memes\greenimage.bmp" />
     <Image Include="..\..\..\Memes\heightmap1.bmp" />
     <Image Include="..\..\..\Memes\heightmap2.bmp" />
     <Image Include="..\..\..\Memes\heightmap3.bmp" />
+    <Image Include="..\..\..\Memes\levelguione.bmp" />
     <Image Include="..\..\..\Memes\makeshiftboardtile.bmp" />
     <Image Include="..\..\..\Memes\menunavi1.bmp" />
     <Image Include="..\..\..\Memes\menunavi2.bmp" />

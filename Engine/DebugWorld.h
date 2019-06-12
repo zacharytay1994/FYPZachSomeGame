@@ -24,7 +24,7 @@
 class DebugWorld : public Scene {
 public:
 	// size of the world in world space coordinates (worldSize by worldSize large)
-	const float worldSize = 40.0f;
+	const float worldSize = 80.0f;
 	// size of the world in terms of a grid (gridSize by gridSize large)
 	const int gridSize = 100;
 	// hence, worldSize/gridSize = density of vertices in world space
@@ -33,7 +33,7 @@ public:
 		:
 		sceneZBuffer(std::make_shared<ZBuffer>(gfx.ScreenWidth, gfx.ScreenHeight)),
 		Scene("Debug world", sceneZBuffer, gfx),
-		terrainWithPath(std::make_shared<TerrainWithPath>(gfx, sceneZBuffer, "heightmap1.bmp", "test.bmp", worldSize, gridSize, -15.0f, 15.0f)), // TerrainWithPath(graphics, zbuffer, heightmap, surface texture, world size, grid size, min world height, max world height)
+		terrainWithPath(std::make_shared<TerrainWithPath>(gfx, sceneZBuffer, "heightmap2.bmp", "parchmentpaper.bmp", worldSize, gridSize, -3.0f, 4.0f)), // TerrainWithPath(graphics, zbuffer, heightmap, surface texture, world size, grid size, min world height, max world height)
 		entityHandler(gfx, sceneZBuffer, worldSize, gridSize, terrainWithPath, consoleBox),
 		consoleBox(std::make_shared<ConsoleBox>(gfx, sceneZBuffer, fontList)),
 		water(std::make_shared<Water>(gfx, sceneZBuffer,0.0f)),

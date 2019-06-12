@@ -33,7 +33,7 @@ Game::Game( MainWindow& wnd )
 	curScene = scenes.begin();
 
 	// push in start menu
-	menuScenes.push(std::make_unique<DebuggingMenu>(gfx, menuScenes, scenes, fontList));
+	menuScenes.push(std::make_unique<LevelOneGUI>(gfx, menuScenes, scenes, fontList));
 }
 
 void Game::Go()
@@ -61,6 +61,6 @@ void Game::ComposeFrame()
 
 	// draw top menu scene
 	if (!menuScenes.empty()) {
-		//menuScenes.top()->Draw();
+		menuScenes.top()->Draw();
 	}
 }

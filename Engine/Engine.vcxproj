@@ -208,6 +208,7 @@
     <ClInclude Include="Rect.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="Scene.h" />
+    <ClInclude Include="SceneGUIInterface.h" />
     <ClInclude Include="SkyBox.h" />
     <ClInclude Include="Sound.h" />
     <ClInclude Include="SoundEffect.h" />
@@ -339,7 +340,9 @@
     <Image Include="..\..\..\Memes\blueimage.bmp" />
     <Image Include="..\..\..\Memes\checkered.bmp" />
     <Image Include="..\..\..\Memes\coastalHeightmap.bmp" />
+    <Image Include="..\..\..\Memes\consoledisplaybackground.bmp" />
     <Image Include="..\..\..\Memes\consoleimage.bmp" />
+    <Image Include="..\..\..\Memes\consolewritebackground.bmp" />
     <Image Include="..\..\..\Memes\debuggingMenu1.bmp" />
     <Image Include="..\..\..\Memes\debuggingMenu2.bmp" />
     <Image Include="..\..\..\Memes\dudvmap1.bmp" />
@@ -361,6 +364,7 @@
     <Image Include="..\..\..\Memes\heightmap2.bmp" />
     <Image Include="..\..\..\Memes\heightmap3.bmp" />
     <Image Include="..\..\..\Memes\levelguione.bmp" />
+    <Image Include="..\..\..\Memes\levelguitwo.bmp" />
     <Image Include="..\..\..\Memes\makeshiftboardtile.bmp" />
     <Image Include="..\..\..\Memes\menunavi1.bmp" />
     <Image Include="..\..\..\Memes\menunavi2.bmp" />

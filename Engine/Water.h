@@ -16,7 +16,7 @@ public:
 	Water(Graphics& gfx, std::shared_ptr<ZBuffer>& zbuffer, const float& yOffset) 
 		:
 		waterPipeline(std::make_unique<Pipeline<SurfaceDirectionalLighting>>(gfx, zbuffer)),
-		waterPlane(PlaneVertex::GetPlaneHorizontalSplit<SurfaceDirectionalLighting::Vertex>(80.0f, 1)),
+		waterPlane(PlaneVertex::GetPlaneHorizontalSplit<SurfaceDirectionalLighting::Vertex>(40.0f, 1)),
 		zBuffer(zbuffer),
 		yOffset(yOffset)
 	{

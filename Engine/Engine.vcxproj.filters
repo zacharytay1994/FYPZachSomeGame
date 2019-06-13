@@ -450,6 +450,9 @@
     <ClInclude Include="LevelOneGUI.h">
       <Filter>Header Files\Scenes\MenuScenes</Filter>
     </ClInclude>
+    <ClInclude Include="SceneGUIInterface.h">
+      <Filter>Header Files\Scenes</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DXErr.cpp">
@@ -690,6 +693,15 @@
       <Filter>Resource Files\LevelGUI</Filter>
     </Image>
     <Image Include="..\..\..\Memes\gameloopbackground2.bmp">
+      <Filter>Resource Files\LevelGUI</Filter>
+    </Image>
+    <Image Include="..\..\..\Memes\levelguitwo.bmp">
+      <Filter>Resource Files\LevelGUI</Filter>
+    </Image>
+    <Image Include="..\..\..\Memes\consoledisplaybackground.bmp">
+      <Filter>Resource Files\LevelGUI</Filter>
+    </Image>
+    <Image Include="..\..\..\Memes\consolewritebackground.bmp">
       <Filter>Resource Files\LevelGUI</Filter>
     </Image>
   </ItemGroup>

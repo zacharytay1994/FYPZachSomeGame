@@ -74,7 +74,7 @@ public:
 		int valRange;
 		Color color = Colors::Green;
 		bool readColor = false;
-		if (!lines.empty() && columnCount < (charPerColumn/2 - 3)) {
+		if (!lines.empty() && columnCount < (charPerColumn)) {
 			// add index in stack to front of sentence
 			for (char c : std::to_string(lineCount)) {
 				font->PlaceFontColoured(surface, c, rowCount, columnCount, Colors::LightGray);
@@ -153,7 +153,7 @@ public:
 			rowCount = 0;
 			columnCount++;
 		}
-		else if (!(columnCount < (charPerColumn/2 - 3))) {
+		else if (!(columnCount < (charPerColumn))) {
 			surface = clearSurface;
 			rowCount = 0;
 			columnCount = 0;

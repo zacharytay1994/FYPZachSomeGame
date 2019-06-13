@@ -24,7 +24,7 @@
 class DebugWorld : public Scene {
 public:
 	// size of the world in world space coordinates (worldSize by worldSize large)
-	const float worldSize = 80.0f;
+	const float worldSize = 40.0f;
 	// size of the world in terms of a grid (gridSize by gridSize large)
 	const int gridSize = 100;
 	// hence, worldSize/gridSize = density of vertices in world space
@@ -77,16 +77,16 @@ public:
 		if (kbd.KeyIsPressed('D')) {
 			xOffset += cameraSpeed * dt;
 		}
-		if (kbd.KeyIsPressed('N')) {
+		if (kbd.KeyIsPressed('C')) {
 			yOffset += cameraSpeed * dt;
 		}
-		if (kbd.KeyIsPressed('M')) {
+		if (kbd.KeyIsPressed('X')) {
 			yOffset -= cameraSpeed * dt;
 		}
-		if (kbd.KeyIsPressed('J')) {
+		if (kbd.KeyIsPressed('Q')) {
 			camY += rotationSpeed2 * dt;
 		}
-		if (kbd.KeyIsPressed('K')) {
+		if (kbd.KeyIsPressed('E')) {
 			camY -= rotationSpeed2 * dt;
 		}
 		if (kbd.KeyIsPressed('U')) {
@@ -110,7 +110,7 @@ public:
 		if (kbd.KeyIsPressed('G')) {
 			yOffset = yOffset * -1;
 		}
-		if (kbd.KeyIsPressed('C')) {
+		if (kbd.KeyIsPressed('Z')) {
 			camY = 0;
 			camX = 0;
 			yOffset = 10.0f;
@@ -144,6 +144,13 @@ public:
 		OutputDebugString(ss.str().c_str());
 
 		water->Update(dt);
+
+		// process messages from gui
+		if (ProcessMessages(frameMessage)) {
+			if (frameMessage == "yes") {
+				entityHandler.AddEnemy(0.5f, Veci2(50, 50));
+			}
+		}
 	}
 	virtual void Draw() override {
 		// clearing shared zbuffer between all pipelines per frame
@@ -282,4 +289,7 @@ private:
 	bool testCheck = false;
 	// testing graphics
 	Graphics& gfx;
+
+	// gui interface
+	std::string frameMessage;
 };

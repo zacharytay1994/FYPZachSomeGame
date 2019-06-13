@@ -8,10 +8,11 @@
 
 #include <string>
 #include <memory>
+#include <queue>
 
 class Scene {
 public:
-	Scene(const std::string& name, std::shared_ptr<ZBuffer>& zBuffer, Graphics& gfx) 
+	Scene(const std::string& name, std::shared_ptr<ZBuffer>& zBuffer, Graphics& gfx)
 		:
 		name(name),
 		mouseInteract(zBuffer, gfx)
@@ -22,9 +23,21 @@ public:
 	const std::string& GetName() const {
 		return name;
 	}
+	void ReceiveMessage(const std::string& message) {
+		messageQueue.push(message);
+	}
+	bool ProcessMessages(std::string& context) {
+		if (messageQueue.size() > 0) {
+			context = messageQueue.front();
+			messageQueue.pop();
+			return true;
+		}
+		return false;
+	}
 public:
 	// mouse interactivity
 	MouseInteract mouseInteract;
-private:
+protected:
 	std::string name;
+	std::queue<std::string> messageQueue;
 };

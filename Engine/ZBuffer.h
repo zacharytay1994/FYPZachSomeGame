@@ -18,6 +18,7 @@ public:
 		reflectionZBuffer(new float[width * height]),
 		refractionZBuffer(new float[width * height]),
 		pointBuffer(new Vecf2[(width * height)]),
+		typeBuffer(new int[(width*height)]),
 		/*reflectionBuffer(new Color[reflectionBufferWidth*reflectionBufferHeight]),
 		refractionBuffer(new Color[reflectionBufferWidth*reflectionBufferHeight])*/
 		reflectionBuffer(new Color[width * height]),
@@ -31,6 +32,7 @@ public:
 			reflectionZBuffer[i] = std::numeric_limits<float>::infinity();
 			refractionZBuffer[i] = std::numeric_limits<float>::infinity();
 			pointBuffer[i] = Vecf2(0.0f, 0.0f);
+			typeBuffer[i] = -1;
 			reflectionBuffer[i] = Colors::White;
 			refractionBuffer[i] = Colors::White;
 		}
@@ -84,11 +86,14 @@ public:
 		return false;
 	}
 	// test and set with z
-	bool TestAndSetZ(int x, int y, float depth, const Vecf2& texpos) {
+	bool TestAndSetZ(int x, int y, float depth, const Vecf2& texpos, const bool& isGround) {
 		float& depthAtPoint = At(x, y);
 		if (depth < depthAtPoint) {
 			depthAtPoint = depth;
 			pointBuffer[y*width + x] = texpos;
+			if (isGround) {
+				typeBuffer[y*width + x] = 1;
+			}
 			return true;
 		}
 		return false;
@@ -126,6 +131,7 @@ public:
 	float ratioValY = float(reflectionBufferHeight / height);
 	float ratioValX = float(reflectionBufferWidth / width);
 	std::unique_ptr<Vecf2[]> pointBuffer;
+	std::unique_ptr<int[]> typeBuffer;
 	// for water sampling
 	std::unique_ptr<Color[]> reflectionBuffer;
 	std::unique_ptr<Color[]> refractionBuffer;

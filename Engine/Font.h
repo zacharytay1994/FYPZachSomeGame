@@ -46,7 +46,7 @@ public:
 				for (y = yStart, j = fontStartY; y < yEnd; y++, j++) {
 					Color check = fontSheet.GetPixel(i, j);
 					if ((Vecf3)check != Vecf3(255, 255, 255)) {
-						surfaceToAlter.PutPixel(x, y, check);
+						surfaceToAlter.PutPixel(x, y, Colors::Green);
 					}
 				}
 			}
@@ -66,7 +66,7 @@ public:
 				for (y = yStart, j = fontStartY; y < yEnd; y++, j++) {
 					Color check = fontSheet.GetPixel(i, j);
 					if ((Vecf3)check != Vecf3(255, 255, 255)) {
-						surfaceToAlter.PutPixel(x, y, check);
+						surfaceToAlter.PutPixel(x, y, Colors::Green);
 					}
 				}
 			}
@@ -86,7 +86,7 @@ public:
 				for (y = yStart, j = fontStartY; y < yEnd; y++, j++) {
 					Color check = fontSheet.GetPixel(i, j);
 					if ((Vecf3)check != Vecf3(255, 255, 255)) {
-						surfaceToAlter.PutPixel(x, y, check);
+						surfaceToAlter.PutPixel(x, y, Colors::Green);
 					}
 				}
 			}
@@ -106,7 +106,7 @@ public:
 				for (y = yStart, j = fontStartY; y < yEnd; y++, j++) {
 					Color check = fontSheet.GetPixel(i, j);
 					if ((Vecf3)check != Vecf3(255, 255, 255)) {
-						surfaceToAlter.PutPixel(x, y, check);
+						surfaceToAlter.PutPixel(x, y, Colors::Green);
 					}
 				}
 			}

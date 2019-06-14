@@ -33,7 +33,7 @@ public:
 		:
 		sceneZBuffer(std::make_shared<ZBuffer>(gfx.ScreenWidth, gfx.ScreenHeight)),
 		Scene("Debug world", sceneZBuffer, gfx),
-		terrainWithPath(std::make_shared<TerrainWithPath>(gfx, sceneZBuffer, "heightmap2.bmp", "parchmentpaper.bmp", worldSize, gridSize, -3.0f, 4.0f)), // TerrainWithPath(graphics, zbuffer, heightmap, surface texture, world size, grid size, min world height, max world height)
+		terrainWithPath(std::make_shared<TerrainWithPath>(gfx, sceneZBuffer, "heightmap2.bmp", "parchmentpaper.bmp", worldSize, gridSize, -3.0f, 3.0f)), // TerrainWithPath(graphics, zbuffer, heightmap, surface texture, world size, grid size, min world height, max world height)
 		entityHandler(gfx, sceneZBuffer, worldSize, gridSize, terrainWithPath, consoleBox),
 		consoleBox(std::make_shared<ConsoleBox>(gfx, sceneZBuffer, fontList)),
 		water(std::make_shared<Water>(gfx, sceneZBuffer,0.0f)),
@@ -65,31 +65,33 @@ public:
 	virtual void Update(Keyboard&kbd, Mouse& mouse, float dt) override {
 		clock++;
 		// camera movement
-		if (kbd.KeyIsPressed('W')) {
-			zOffset += cameraSpeed * dt;
+		if (interactWorld) {
+			if (kbd.KeyIsPressed('W')) {
+				zOffset += cameraSpeed * dt;
+			}
+			if (kbd.KeyIsPressed('A')) {
+				xOffset -= cameraSpeed * dt;
+			}
+			if (kbd.KeyIsPressed('S')) {
+				zOffset -= cameraSpeed * dt;
+			}
+			if (kbd.KeyIsPressed('D')) {
+				xOffset += cameraSpeed * dt;
+			}
+			if (kbd.KeyIsPressed('C')) {
+				yOffset += cameraSpeed * dt;
+			}
+			if (kbd.KeyIsPressed('X')) {
+				yOffset -= cameraSpeed * dt;
+			}
+			if (kbd.KeyIsPressed('Q')) {
+				camY += rotationSpeed2 * dt;
+			}
+			if (kbd.KeyIsPressed('E')) {
+				camY -= rotationSpeed2 * dt;
+			}
 		}
-		if (kbd.KeyIsPressed('A')) {
-			xOffset -= cameraSpeed * dt;
-		}
-		if (kbd.KeyIsPressed('S')) {
-			zOffset -= cameraSpeed * dt;
-		}
-		if (kbd.KeyIsPressed('D')) {
-			xOffset += cameraSpeed * dt;
-		}
-		if (kbd.KeyIsPressed('C')) {
-			yOffset += cameraSpeed * dt;
-		}
-		if (kbd.KeyIsPressed('X')) {
-			yOffset -= cameraSpeed * dt;
-		}
-		if (kbd.KeyIsPressed('Q')) {
-			camY += rotationSpeed2 * dt;
-		}
-		if (kbd.KeyIsPressed('E')) {
-			camY -= rotationSpeed2 * dt;
-		}
-		if (kbd.KeyIsPressed('U')) {
+		/*if (kbd.KeyIsPressed('U')) {
 			camX += rotationSpeed2 * dt;
 		}
 		if (kbd.KeyIsPressed('H')) {
@@ -97,11 +99,11 @@ public:
 		}
 		if (kbd.KeyIsPressed('L')) {
 			camZ += rotationSpeed2 * dt;
-		}
+		}*/
 		if (kbd.KeyIsPressed('I')) {
 			testCheck = true;
 		}
-		if (kbd.KeyIsPressed('B')) {
+		/*if (kbd.KeyIsPressed('B')) {
 			camY += PI;
 		}
 		if (kbd.KeyIsPressed('V')) {
@@ -114,6 +116,12 @@ public:
 			camY = 0;
 			camX = 0;
 			yOffset = 10.0f;
+		}*/
+		if (kbd.KeyIsPressed('T')) {
+			interactWorld = false;
+		}
+		if (kbd.KeyIsPressed(char(13))) {
+			interactWorld = true;
 		}
 		/*if (clock > 300) {
 			if (!spawnCheck) {
@@ -136,7 +144,7 @@ public:
 		if (kbd.KeyIsPressed('R')) {
 			mouseAct = true;
 		}
-		if (mouse.LeftIsPressed() && mouseAct) {
+		if (mouse.LeftIsPressed() /*&& mouseAct*/) {
 			mouseInteract.SpawnEnemy(entityHandler, mouse);
 			mouseAct = false;
 		}
@@ -146,11 +154,12 @@ public:
 		water->Update(dt);
 
 		// process messages from gui
-		if (ProcessMessages(frameMessage)) {
+		/*if (ProcessMessages(frameMessage)) {
 			if (frameMessage == "yes") {
 				entityHandler.AddEnemy(0.5f, Veci2(50, 50));
 			}
-		}
+		}*/
+		HandleFrameMessage();
 	}
 	virtual void Draw() override {
 		// clearing shared zbuffer between all pipelines per frame
@@ -233,6 +242,66 @@ public:
 	void MoveForwardSlowly(float dt) {
 		zOffset += 2.0f * dt;
 	}
+	enum class Commands {
+		createturret
+	};
+	// message to function conversion
+	void HandleFrameMessage() {
+		char parse = 'c';
+		bool look = false;
+		std::string command;
+		std::string intParam;
+		std::string stringParam;
+		int intParamIndex = 0;
+		int intParamArray[2];
+		int stringParamIndex = 0;
+		std::string stringParamArray[2];
+		std::string frameMessage;
+		std::wstringstream ss;
+		if (!ProcessMessages(frameMessage)) {
+			return;
+		}
+		for (char c : frameMessage) {
+			if (look) {
+				parse = c;
+				look = false;
+				continue;
+			}
+			if (c == '/') {
+				look = true;
+				continue;
+			}
+			if (c != ',') {
+				if (parse == 'c') {
+					command += c;
+				}
+				else if (parse == 'i') {
+					intParam += c;
+				}
+				else  if (parse == 's') {
+					stringParam += c;
+				}
+			}
+			else if (parse == 'i') {
+				intParamArray[intParamIndex] = std::stoi(intParam);
+				intParam = "";
+				intParamIndex++;
+			}
+			else if (parse == 's') {
+				stringParamArray[stringParamIndex] = stringParam;
+				stringParam = "";
+				stringParamIndex++;
+			}
+		}
+		// execute commands
+		if (command.compare("createturret") == 0) {
+			entityHandler.AddTurret(intParamArray[0], mouseInteract.GetGridPos());
+		}
+		/*consoleBox->Write(command);
+		consoleBox->Write("createturret");
+		ss << intParamArray[0] << std::endl;
+		OutputDebugString(ss.str().c_str());*/
+	}
 private:
 	// shared zbuffer of scene
 	std::shared_ptr<ZBuffer> sceneZBuffer;
@@ -292,4 +361,5 @@ private:
 
 	// gui interface
 	std::string frameMessage;
+	bool interactWorld = true;
 };

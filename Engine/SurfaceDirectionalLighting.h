@@ -298,7 +298,7 @@ public:
 	private:
 		Vecf3 surfaceNormal;
 		Vecf3 cameraPosition;
-		Vecf3 directionalLight = { 0.0f, 0.9f, 0.0f };
+		Vecf3 directionalLight = { 0.0f, 1.0f, 0.0f };
 		float diffuseLight = 1.0f;
 		float ambientLight = 0.2f;
 	};
@@ -316,7 +316,8 @@ public:
 			Enemy,
 			Turret,
 			Building,
-			Projectile
+			Projectile,
+			Arrow
 		};
 	public:
 		template<class Input>

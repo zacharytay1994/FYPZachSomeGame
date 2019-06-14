@@ -182,4 +182,31 @@ public:
 
 		return { std::move(vertexVec), {0,1,2, 1,3,2, 4,5,6, 5,7,6, 8,9,10, 9,11,10, 12,13,14, 13,15,14, 16,17,18, 17,19,18} };
 	}
+
+	template<class T>
+	static IndexedTriangleList<T> GetArrow(float size) {
+		const float side = size / 2.0f;
+
+		std::vector<Vecf3> vertices;
+		std::vector<Vecf2> textureCoords;
+
+		vertices.emplace_back(-side, side, side);
+		textureCoords.emplace_back(0.0f, 0.0f);
+		vertices.emplace_back(-side, side, -side);
+		textureCoords.emplace_back(0.0f, 1.0f);
+		vertices.emplace_back(side, side, side);
+		textureCoords.emplace_back(1.0f, 0.0f);
+		vertices.emplace_back(side, side, -side);
+		textureCoords.emplace_back(1.0f, 1.0f);
+		vertices.emplace_back(0.0f, -side*4, 0.0f);
+		textureCoords.emplace_back(1.0f, 1.0f);
+
+		std::vector<T> vertexVec(vertices.size());
+		for (size_t i = 0; i < vertices.size(); i++) {
+			vertexVec[i].pos = vertices[i];
+			vertexVec[i].texpos = textureCoords[i];
+		}
+
+		return { std::move(vertexVec), {0,2,1, 2,3,1, 0,1,4, 1,3,4, 3,2,4, 2,0,4} };
+	}
 };

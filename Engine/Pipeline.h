@@ -335,7 +335,7 @@ private:
 					if (!AbovePlane(leftToRight.modelPos) && !isWater) {
 						zBuffer->FillRefractionBuffer(x, y, zValue, tempColor);
 					}
-					if (zBuffer->TestAndSetZ(x, y, zValue, passIn.texpos)) {
+					if (zBuffer->TestAndSetZ(x, y, zValue, passIn.texpos, isGround)) {
 						if (!isWater) {
 							gfx.PutPixel(x, y, tempColor);
 						}
@@ -389,6 +389,7 @@ public:
 	Effect effect;
 	bool isWater = false;
 	bool isEntity = false;
+	bool isGround = false;
 	std::vector<Vecf3> normalMap;
 	int mapHeight;
 	int mapWidth;

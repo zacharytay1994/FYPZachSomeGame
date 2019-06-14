@@ -10,7 +10,7 @@ public:
 		CourierNew15by27(std::make_shared<Font>(Surface("fontsheet8.bmp"), 15, 27, 300, 600, 1000, 1000, 2, 2)),
 		LevelGUIGameLoop(std::make_shared<Font>(Surface("fontsheet8.bmp"), 15, 27, 150, 300, 750, 540, 3, 2)),
 		LevelGUIDisplay(std::make_shared<Font>(Surface("fontsheet8.bmp"), 15, 27, 150, 300, 750, 360, 3, 2)),
-		LevelGUIWrite(std::make_shared<Font>(Surface("fontsheet8.bmp"), 15, 27, 150, 300, 750, 540, 1, 0))
+		LevelGUIWrite(std::make_shared<Font>(Surface("fontsheet8.bmp"), 15, 27, 150, 300, 900, 27, 1, 0))
 	{}
 public:
 	// current fonts

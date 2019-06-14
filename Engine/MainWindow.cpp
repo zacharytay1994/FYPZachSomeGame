@@ -158,7 +158,7 @@ LRESULT MainWindow::HandleMsg( HWND hWnd,UINT msg,WPARAM wParam,LPARAM lParam )
 	case WM_MOUSEMOVE:
 	{
 		POINTS pt = MAKEPOINTS( lParam );
-		if( pt.x > 0 && pt.x < Graphics::ScreenWidth && pt.y > 0 && pt.y < Graphics::ScreenHeight )
+		if( pt.x > 0 && pt.x < Graphics::ScreenWidthDisplay && pt.y > 0 && pt.y < Graphics::ScreenHeightDisplay)
 		{
 			mouse.OnMouseMove( pt.x,pt.y );
 			if( !mouse.IsInWindow() )
@@ -172,9 +172,9 @@ LRESULT MainWindow::HandleMsg( HWND hWnd,UINT msg,WPARAM wParam,LPARAM lParam )
 			if( wParam & (MK_LBUTTON | MK_RBUTTON) )
 			{
 				pt.x = std::max( short( 0 ),pt.x );
-				pt.x = std::min( short( Graphics::ScreenWidth - 1 ),pt.x );
+				pt.x = std::min( short( Graphics::ScreenWidthDisplay - 1 ),pt.x );
 				pt.y = std::max( short( 0 ),pt.y );
-				pt.y = std::min( short( Graphics::ScreenHeight - 1 ),pt.y );
+				pt.y = std::min( short( Graphics::ScreenHeightDisplay - 1 ),pt.y );
 				mouse.OnMouseMove( pt.x,pt.y );
 			}
 			else

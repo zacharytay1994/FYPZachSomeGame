@@ -27,18 +27,21 @@ public:
 		if (!kbd.CharIsEmpty()) {
 			const char charHolder = kbd.ReadChar();
 			const int valRange = charHolder;
+			
 			// evaluating top char in char buffer and placing font
 			if (charSize < charLimit) {
 				// if char is a-z
 				if (valRange >= 97 && valRange <= 122) {
 					font->PlaceFont(surface, charHolder, rowCount, columnCount);
 					//characterBuffer[(columnCount * charPerRow) + (rowCount - 1)] = charHolder;
-					pipeline->effect.pixelShader.BindSurface(surface);
+					//pipeline->effect.pixelShader.BindSurface(surface);
+					charBuffer.push_back(charHolder);
 				}
 				// if char is 0-9
 				else if (valRange >= 48 && valRange <= 57) {
 					font->PlaceFont(surface, charHolder, rowCount, columnCount);
-					pipeline->effect.pixelShader.BindSurface(surface);
+					//pipeline->effect.pixelShader.BindSurface(surface);
+					charBuffer.push_back(charHolder);
 				}
 				// if char is whitespace
 				else if (charHolder == (' ')) {
@@ -46,23 +49,44 @@ public:
 					if (rowCount == 0) {
 						columnCount++;
 					}
+					charBuffer.push_back(' ');
 				}
 				// if char is punctuation 33-47
 				else if (valRange >= 33 && valRange <= 47) {
 					font->PlaceFont(surface, charHolder, rowCount, columnCount);
-					pipeline->effect.pixelShader.BindSurface(surface);
+					//pipeline->effect.pixelShader.BindSurface(surface);
+					charBuffer.push_back(charHolder);
 				}
 				// if char is punctuation 58-64
 				else if (valRange >= 58 && valRange <= 64) {
 					font->PlaceFont(surface, charHolder, rowCount, columnCount);
-					pipeline->effect.pixelShader.BindSurface(surface);
+					//pipeline->effect.pixelShader.BindSurface(surface);
+					charBuffer.push_back(charHolder);
 				}
 				// if input is carriage return
 				else if (valRange == 13) {
 					rowCount = 0;
 					columnCount++;
 				}
-				charSize++;
+				if (valRange != 8) {
+					charSize++;
+				}
+			}
+			// if is backspace
+			if (valRange == 8 && charSize > 0) {
+				charBuffer.erase(charBuffer.end() - 1);
+				charSize--;
+				surface = clearSurface;
+				columnCount = 0;
+				rowCount = 0;
+				for (char c : charBuffer) {
+					if (c != ' ') {
+						font->PlaceFont(surface, c, rowCount, columnCount);
+					}
+					else {
+						rowCount++;
+					}
+				}
 			}
 		}
 	}
@@ -185,11 +209,17 @@ public:
 			}
 		}
 	}
-	void CharPerFrame() {
-
+	void Clear() {
+		rowCount = 0;
+		columnCount = 0;
+		charSize = 0;
+		surface = clearSurface;
+		charBuffer.clear();
 	}
 public:
 	bool isGUI = false;
+	std::vector<char> charBuffer;
+	int charSize = 0;
 private:
 	const std::shared_ptr<Font>& font;
 	std::shared_ptr<Pipeline<T>> pipeline;
@@ -203,7 +233,6 @@ private:
 	const int charLimit = charPerRow * charPerColumn;
 	int rowCount = 0;
 	int columnCount = 0;
-	int charSize = 0;
 	// stack of lines to be written
 	std::stack<std::string> lines;
 	int lineCount = 0;

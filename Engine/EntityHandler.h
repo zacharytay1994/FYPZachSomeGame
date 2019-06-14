@@ -22,6 +22,9 @@
 // types of buildings
 #include "BuildingOne.h"
 
+// arrow
+#include "Arrow.h"
+
 #include "HeightMap.h"
 #include "Graphics.h"
 #include "MatTemplate.h"
@@ -52,8 +55,10 @@ public:
 		projectileQt(worldSize),
 		enemyQt(worldSize),
 		gfx(gfx),
-		consoleBox(consoleBox)
+		consoleBox(consoleBox),
+		arrow(0.5f, Veci2(50,50), worldSize/2, worldSize, gridSize, entityQueryHandler)
 	{
+		arrow.Calculate3DLocationOffset();
 		// initialize entity query handler
 		entityQueryHandler = std::make_shared<EntityQueryHandler>(turretBuffer, enemyBuffer, buildingBuffer, projectileBuffer, entityMap, projectileQt, enemyQt);
 		// initialized the effect used by the pipeline, non static textures, red for enemy, green for turret, and blue for buildings
@@ -61,6 +66,8 @@ public:
 		entityPipeline->effect.pixelShader.AddTexture("redimage.bmp");
 		entityPipeline->effect.pixelShader.AddTexture("greenimage.bmp");
 		entityPipeline->effect.pixelShader.AddTexture("blueimage.bmp");
+		entityPipeline->effect.pixelShader.AddTexture("redimage.bmp");
+		entityPipeline->effect.pixelShader.AddTexture("redimage.bmp");
 		entityPipeline->isEntity = true;
 	}
 
@@ -120,6 +127,8 @@ public:
 				ReadDebugQueue((*x)->debugQueue);
 			}
 		}
+
+		arrow.Update(kbd, mouse, dt);
 		// entity handler functions
 		GetProjectilesFromTurrets();
 		//if (enemyBuffer.size() > 0) {
@@ -198,6 +207,14 @@ public:
 			entityPipeline->Draw((*x)->GetCubeList());
 		}
 		//OutputDebugString(ss.str().c_str());
+
+		// render arrow
+		entityPipeline->effect.pixelShader.SetTextureType(TextureEntityType::Arrow);
+		translateVector = arrow.GetSpawnLocationOffset();
+		translateVector.y += arrow.arrowYOffset;
+		worldTransform = Matf4::RotationZ(0.0f) * Matf4::RotationX(0.0f) * Matf4::RotationY(arrow.yaw) * Matf4::Translation(translateVector);
+		entityPipeline->effect.vertexShader.BindWorld(worldTransform);
+		entityPipeline->Draw(arrow.GetArrowList());
 	}
 	void DrawDebugDisplay() {
 		projectileQt.DrawNodeDebuggingDisplay(gfx.ScreenWidth/2, gfx);
@@ -228,7 +245,7 @@ public:
 	}
 	void AddTurret(const float& size, const Veci2& loc) {
 		float temp = heightmap->heightDisplacementGrid[loc.y*heightmap->width + loc.x];
-		turretBuffer.emplace_back(std::make_unique<TurretOne>(size, loc, temp + 1.0f, worldSize, gridSize, 1, entityQueryHandler));
+		turretBuffer.emplace_back(std::make_unique<TurretOne>(size, loc, temp, worldSize, gridSize, 1, entityQueryHandler));
 		(*(turretBuffer.end() - 1))->Calculate3DLocationOffset();
 		entityMap[(*(turretBuffer.end() - 1))->GetUniqueID()] = (*(turretBuffer.end() - 1)).get();
 	}
@@ -254,6 +271,12 @@ public:
 		(*(buildingBuffer.end() - 1))->Calculate3DLocationOffset();
 		(*(buildingBuffer.end() - 1))->CalculateBoundaries();
 		entityMap[(*(buildingBuffer.end() - 1))->GetUniqueID()] = (*(buildingBuffer.end() - 1)).get();
+	}
+	void MoveArrow(const Veci2& loc) {
+		float temp = heightmap->heightDisplacementGrid[loc.y*heightmap->width + loc.x];
+		arrow.Set3DLocation(Vecf3((float)loc.x, 0.0f, (float)loc.y));
+		arrow.Calculate3DLocationOffset();
+		arrow.SetSpawnLocationOffsetY(temp + 0.5f);
 	}
 	void PopulateRandomTurrets(const int& amount) {
 		std::random_device rand;
@@ -402,4 +425,5 @@ private:
 
 	// string stream for debugging purposes
 	std::wstringstream ss;
+	Arrow arrow;
 };

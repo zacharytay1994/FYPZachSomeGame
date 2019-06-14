@@ -28,6 +28,7 @@ public:
 		gridSize(gridSize),
 		unitsPerCell(worldSize/gridSize)
 	{
+		groundPipeline->isGround = true;
 		groundPipeline->effect.pixelShader.BindTexture(groundtexture);
 		SyncTerrainWithHeightmap();
 		surfaceNormalList = CalculateSurfaceNormalMap();

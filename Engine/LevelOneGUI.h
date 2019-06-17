@@ -104,7 +104,7 @@ public:
 				commandIndex++;
 			}
 			if (!validCommand) {
-				consoleDisplay.Write("/rcommand " + command + " /yis /ynot /ya /yvalid /ycommand.");
+				consoleDisplay.Write(command + " /yis /ynot /ya /yvalid /rcommand/y.");
 				return;
 			}
 			else {
@@ -114,12 +114,33 @@ public:
 					int paramInt;
 					// get param one
 					std::string paramOne = GetParamOfString(stringToProcess, 1);
+					if (paramOne.size() == 0) {
+						consoleDisplay.Write("/rparameter /rone /yof /rcommand /ccreateturret /yrequires /yan /cinteger/y.");
+						return;
+					}
 					if (IsInteger(paramOne, paramInt)) {
-						consoleGameLoop.Write("createturret,/i" + paramOne + ",");
-						(*(scenes.begin()))->ReceiveMessage("createturret,/i" + paramOne + ",");
+						//consoleGameLoop.Write("createturret,/i" + paramOne + ",");
+						std::string paramTwo = GetParamOfString(stringToProcess, 2);
+						if (paramTwo.size() == 0) {
+							consoleDisplay.Write("/rparameter /rtwo /yof /rcommand /ccreateturret /yrequires /clob /yor /clow/y.");
+							return;
+						}
+						if (paramTwo == "lob") {
+							(*(scenes.begin()))->ReceiveMessage("createturret,/i" + paramOne + ",/b" + "1,");
+							//consoleDisplay.Write("/rparameter /rtwo /yis /ylob.");
+						}
+						else if (paramTwo == "low") {
+							(*(scenes.begin()))->ReceiveMessage("createturret,/i" + paramOne + ",/b" + "0,");
+							//consoleDisplay.Write("/rparameter /rtwo /yis /ylow.");
+						}
+						else {
+							consoleDisplay.Write("/rparameter /rtwo /yis /ynot /yvalid.");
+							return;
+						}
 					}
 					else {
 						consoleDisplay.Write("/rparameter /rone /ywas /ynot /yan /yinteger.");
+						return;
 					}
 					break;
 				}

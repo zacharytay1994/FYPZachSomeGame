@@ -123,6 +123,9 @@ public:
 		if (kbd.KeyIsPressed(char(13))) {
 			interactWorld = true;
 		}
+		if (kbd.KeyIsPressed('V')) {
+			entityHandler.AddEnemy(1, Veci2(50, 75));
+		}
 		/*if (clock > 300) {
 			if (!spawnCheck) {
 				for (int i = 0; i < 20; i++) {
@@ -252,10 +255,13 @@ public:
 		std::string command;
 		std::string intParam;
 		std::string stringParam;
+		std::string boolParam;
 		int intParamIndex = 0;
 		int intParamArray[2];
 		int stringParamIndex = 0;
 		std::string stringParamArray[2];
+		int boolParamIndex = 0;
+		int boolParamArray[2];
 		std::string frameMessage;
 		std::wstringstream ss;
 		if (!ProcessMessages(frameMessage)) {
@@ -281,6 +287,9 @@ public:
 				else  if (parse == 's') {
 					stringParam += c;
 				}
+				else if (parse == 'b') {
+					boolParam += c;
+				}
 			}
 			else if (parse == 'i') {
 				intParamArray[intParamIndex] = std::stoi(intParam);
@@ -292,10 +301,20 @@ public:
 				stringParam = "";
 				stringParamIndex++;
 			}
+			else if (parse == 'b') {
+				boolParamArray[boolParamIndex] = std::stoi(boolParam);
+				boolParam = "";
+				boolParamIndex++;
+			}
 		}
 		// execute commands
 		if (command.compare("createturret") == 0) {
-			entityHandler.AddTurret(intParamArray[0], mouseInteract.GetGridPos());
+			if (boolParamArray[0] == 1) {
+				entityHandler.AddTurret((float)intParamArray[0], mouseInteract.GetGridPos(), true);
+			}
+			else if (boolParamArray[0] == 0) {
+				entityHandler.AddTurret((float)intParamArray[0], mouseInteract.GetGridPos(), false);
+			}
 		}
 		/*consoleBox->Write(command);
 		consoleBox->Write("createturret");

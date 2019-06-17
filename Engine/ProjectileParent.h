@@ -13,9 +13,9 @@ public:
 	virtual void Update(Keyboard&kbd, Mouse& mouse, float dt) {
 		if (!stop) {
 			// Update location with velocity
-			spawnLocationOffset += velocity * dt;
+			spawnLocationOffset += velocity * dt * 2.0f;
 			// change velocity due to gravitational acceleration
-			velocity += gravitationalAcc * dt;
+			velocity += gravitationalAcc * dt * 2.0f;
 		}
 		// extra updates specified by the child
 		ChildUpdates(kbd, mouse, dt);

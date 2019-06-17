@@ -51,7 +51,7 @@ public:
 			eh.MoveArrow(TexPosToGridPos(eh.gridSize, TexPosAtMouse(mouse)));
 			break;
 		case 1:
-			eh.AddTurret(1.0f, TexPosToGridPos(eh.gridSize, TexPosAtMouse(mouse)));
+			eh.AddTurret(1.0f, TexPosToGridPos(eh.gridSize, TexPosAtMouse(mouse)), false);
 			break;
 		case 2:
 			eh.AddEnemy(0.5f, TexPosToGridPos(eh.gridSize, TexPosAtMouse(mouse)));

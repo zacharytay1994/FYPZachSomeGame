@@ -243,9 +243,9 @@ public:
 		(*(solidBuffer.end() - 1))->CalculateBoundaries();
 		entityMap[(*(solidBuffer.end() - 1))->GetUniqueID()] = (*(solidBuffer.end() - 1)).get();
 	}
-	void AddTurret(const float& size, const Veci2& loc) {
+	void AddTurret(const float& size, const Veci2& loc, const bool& lob) {
 		float temp = heightmap->heightDisplacementGrid[loc.y*heightmap->width + loc.x];
-		turretBuffer.emplace_back(std::make_unique<TurretOne>(size, loc, temp, worldSize, gridSize, 1, entityQueryHandler));
+		turretBuffer.emplace_back(std::make_unique<TurretOne>(size, loc, temp + 2.0f, worldSize, gridSize, 1, entityQueryHandler, lob));
 		(*(turretBuffer.end() - 1))->Calculate3DLocationOffset();
 		entityMap[(*(turretBuffer.end() - 1))->GetUniqueID()] = (*(turretBuffer.end() - 1)).get();
 	}
@@ -293,7 +293,7 @@ public:
 			height = heightmap->heightDisplacementGrid[gridLocation.y*heightmap->width + gridLocation.x] + 0.1f;
 			switch (typeOfTurrets(rng)) {
 				case 0:
-					turretBuffer.emplace_back(std::make_unique<TurretOne>(0.5f, gridLocation, height, worldSize, gridSize, rateOfFire, entityQueryHandler));
+					turretBuffer.emplace_back(std::make_unique<TurretOne>(0.5f, gridLocation, height, worldSize, gridSize, rateOfFire, entityQueryHandler, false));
 					(*(turretBuffer.end() - 1))->Calculate3DLocationOffset();
 					break;
 				case 1:

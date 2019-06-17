@@ -7,7 +7,7 @@ public:
 	ProjectileOne(const Vecf3& loc, const Vecf3& velocity, std::shared_ptr<EntityQueryHandler>& entityQueryHandler)
 		:
 		// (projectileSize, projectileLocation, targetLocation, projectileSpeed, projectionType)
-		ProjectileParent(0.3f, loc, velocity, entityQueryHandler) 
+		ProjectileParent(0.2f, loc, velocity, entityQueryHandler) 
 	{
 		//InsertDebugString("projectileone /y" + std::to_string(entityUniqueID) + " has been created.");
 	}

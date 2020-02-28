@@ -3,3 +3,6 @@ Start of final year project where I write a 3D Rendering Pipeline using Scanline
 
 ## Finished Demo Video
 https://www.youtube.com/watch?v=zG37vw8TOEI
+
+## Development Blog
+https://zactzy.weebly.com/somegame
